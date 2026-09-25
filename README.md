@@ -75,6 +75,20 @@ told recording opens soon.
 - `lib/server/verify.ts` – server-side quest verification.
 - `app/api/*` – progress, activity and claim endpoints.
 - `docs/UX.md` – every user-facing state and why it exists.
+- `docs/UI_BRIEF.md` – visual system brief; `app/globals.css` holds its tokens.
+- `app/components.css` – component styles, one block per component.
+
+## UI
+
+Routes: `/` (landing deck), `/apps`, `/apps/[slug]`, `/quests`, `/quests/[id]`,
+`/passport`. Fonts are Geist Sans/Mono (self-hosted via the `geist` package),
+icons are Lucide at 1.5px stroke, and the glass hero object is pure CSS.
+
+To add an app: add an entry to `APPS` in `lib/registry.ts` (optional logo in
+`public/apps/`). It gets a detail page automatically.
+
+The Arc logo in `public/brand/arc/` is Circle's official file, used unmodified
+for "Built on Arc" attribution only. See `public/brand/arc/NOTICE.md`.
 
 For contracts:
 

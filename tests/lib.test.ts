@@ -48,8 +48,24 @@ describe("humanizeError", () => {
 
 describe("registry", () => {
   const app = (over: Partial<ArcApp>): ArcApp => ({
-    id: "x", name: "X", description: "", category: "Payments", contractAddresses: [],
-    verified: true, active: true, firstAction: "", ...over
+    id: "x", slug: "x", name: "X", tagline: "", description: "", category: "Payments", status: "live",
+    features: [], contractAddresses: [], verified: true, active: true, addedAt: "2026-09-01", firstAction: "", ...over
+  });
+
+  it("ranks featured, then verified, then newest; samples last", () => {
+    const apps = [
+      app({ id: "s", sample: true, featured: true }),
+      app({ id: "old", addedAt: "2026-01-01" }),
+      app({ id: "new", addedAt: "2026-09-20" }),
+      app({ id: "unv", verified: false, addedAt: "2026-09-24" }),
+      app({ id: "feat", featured: true, verified: false })
+    ];
+    expect(discoverApps(apps).map((a) => a.id)).toEqual(["feat", "new", "old", "unv", "s"]);
+  });
+
+  it("searches features and builders", () => {
+    expect(discoverApps([app({ id: "c", builder: { name: "Circle" } })], { search: "circle" })).toHaveLength(1);
+    expect(discoverApps([app({ id: "g", features: ["USDC gas"] })], { search: "gas" })).toHaveLength(1);
   });
 
   it("filters by category and search, verified real listings first", () => {
@@ -105,5 +121,15 @@ describe("fetchActivity", () => {
   it("treats an unknown address as no activity", async () => {
     const fetchImpl = vi.fn(async () => new Response("{}", { status: 404 }));
     expect(await fetchActivity(user, fetchImpl as unknown as typeof fetch)).toEqual([]);
+  });
+});
+
+import { levelFor } from "../lib/levels";
+describe("levelFor", () => {
+  it("maps XP to level and progress toward the next", () => {
+    expect(levelFor(0)).toMatchObject({ index: 0, name: "Newcomer", progress: 0 });
+    expect(levelFor(35)).toMatchObject({ name: "Explorer", progress: 0 });
+    expect(levelFor(72).progress).toBeCloseTo(0.4933, 3);
+    expect(levelFor(500)).toMatchObject({ name: "Pathfinder", progress: 1, next: undefined });
   });
 });

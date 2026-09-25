@@ -13,6 +13,11 @@ export type Quest = {
   /** Concrete instruction shown while the quest is not yet done. */
   howTo: string;
   xp: number;
+  difficulty: "easy" | "medium" | "hard";
+  /** Rough time to complete, in minutes. */
+  minutes: number;
+  /** Concrete steps shown on the quest page. */
+  steps: string[];
   requirement: QuestRequirement;
 };
 
@@ -24,6 +29,9 @@ export const QUESTS: Quest[] = [
     description: "Hold at least 1 USDC on Arc.",
     howTo: "Bring USDC from another chain, or use the faucet on testnet.",
     xp: 10,
+    difficulty: "easy",
+    minutes: 3,
+    steps: ["Copy your wallet address.", "Bring USDC from another chain with CCTP, or use the faucet on testnet.", "Come back here; your balance updates automatically."],
     requirement: { kind: "hold-usdc", minAmount: 1_000_000n }
   },
   {
@@ -32,6 +40,9 @@ export const QUESTS: Quest[] = [
     description: "Make a real transaction on Arc.",
     howTo: "Any transaction from your wallet counts, such as a payment in an Arc app.",
     xp: 25,
+    difficulty: "easy",
+    minutes: 2,
+    steps: ["Switch your wallet to Arc.", "Open an app from Discover and make a small payment or swap.", "Come back here to record it."],
     requirement: { kind: "first-transaction" }
   },
   {
@@ -40,6 +51,9 @@ export const QUESTS: Quest[] = [
     description: "Complete an interaction with a verified ecosystem app.",
     howTo: "Open a verified app from Discover and complete its first action.",
     xp: 25,
+    difficulty: "medium",
+    minutes: 5,
+    steps: ["Pick a verified app in Discover.", "Complete its first action, shown on the app page.", "Come back here to record it."],
     requirement: { kind: "app-interaction" }
   },
   {
@@ -48,6 +62,9 @@ export const QUESTS: Quest[] = [
     description: "Complete the starter path.",
     howTo: "Record the three starter quests on your passport.",
     xp: 50,
+    difficulty: "easy",
+    minutes: 1,
+    steps: ["Record the three starter quests.", "Record Arc Explorer to finish the path."],
     requirement: { kind: "complete-quests", questIds: ["arrive-with-usdc", "first-tx", "explore-app"] }
   }
 ];
