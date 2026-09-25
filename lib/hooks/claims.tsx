@@ -13,7 +13,7 @@ export type ClaimState =
   | { phase: "verifying" }
   | { phase: "confirming"; txHash: string }
   | { phase: "recorded"; txHash?: string }
-  | { phase: "error"; message: string; retryable: boolean };
+  | { phase: "error"; message: string; retryable: boolean; code?: string; txHash?: string };
 
 type ClaimsContext = {
   claim: (questId: string) => Promise<void>;
@@ -41,6 +41,7 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
       if (!address || inFlight.current.has(questId)) return;
       inFlight.current.add(questId);
       set(questId, { phase: "verifying" });
+      let txHash: string | undefined;
       try {
         const res = await apiFetch<ClaimResponse>("/api/quests/claim", {
           method: "POST",
@@ -48,6 +49,7 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
           body: JSON.stringify({ address, questId })
         });
         if (res.status === "submitted") {
+          txHash = res.txHash;
           set(questId, { phase: "confirming", txHash: res.txHash });
           const receipt = await client!.waitForTransactionReceipt({ hash: res.txHash as Hash, timeout: 60_000 });
           if (receipt.status !== "success") {
@@ -64,6 +66,8 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
         set(questId, {
           phase: "error",
           retryable,
+          txHash,
+          code: error instanceof ApiRequestError ? error.code : error instanceof Error ? error.name : undefined,
           message: error instanceof ApiRequestError ? error.message : humanizeError(error)
         });
       } finally {

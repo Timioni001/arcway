@@ -45,3 +45,9 @@ export const explorer = {
 function optionalAddress(value: string | undefined): Address | undefined {
   return value && isAddress(value) ? (value as Address) : undefined;
 }
+
+export const NETWORK_NAME = IS_MAINNET ? "Arc Mainnet" : "Arc Testnet";
+export const ARC_DOCS_URL = "https://docs.arc.network";
+/** Where builders ask to be listed. */
+export const SUBMIT_APP_URL =
+  process.env.NEXT_PUBLIC_SUBMIT_APP_URL || "https://github.com/Timioni001/arcway/issues/new?title=Listing%3A%20";
