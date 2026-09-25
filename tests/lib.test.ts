@@ -133,3 +133,29 @@ describe("levelFor", () => {
     expect(levelFor(500)).toMatchObject({ name: "Pathfinder", progress: 1, next: undefined });
   });
 });
+
+import { buildersFrom } from "../lib/builders";
+import { questProgress, questViews } from "../lib/quests";
+describe("builders and quest progress", () => {
+  it("derives builders from active apps only", () => {
+    const b = buildersFrom();
+    expect(b.map((x) => x.name)).toEqual(["Circle"]);
+    expect(b[0].apps.map((a) => a.slug)).toEqual(["circle-cctp"]);
+  });
+  it("reports partial progress for the starter path", () => {
+    const views = questViews({ completed: new Set(["first-tx"]), eligible: {} });
+    expect(questProgress(views.find((q) => q.id === "arc-explorer")!)).toBeCloseTo(1 / 3);
+    expect(questProgress(views.find((q) => q.id === "first-tx")!)).toBe(1);
+    expect(questProgress(views.find((q) => q.id === "explore-app")!)).toBe(0);
+  });
+});
+
+import { dayLabel } from "../lib/format";
+describe("dayLabel", () => {
+  it("groups by relative day", () => {
+    const now = new Date(2026, 8, 25, 15);
+    expect(dayLabel(new Date(2026, 8, 25, 1).toISOString(), now)).toBe("Today");
+    expect(dayLabel(new Date(2026, 8, 24, 23).toISOString(), now)).toBe("Yesterday");
+    expect(dayLabel(new Date(2026, 8, 2).toISOString(), now)).toBe("Sep 2");
+  });
+});

@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 export function Status({ tone = "info", children }: { tone?: "info" | "error"; children: ReactNode }) {
   if (!children) return null;
   return (
-    <div role={tone === "error" ? "alert" : "status"} className="body-sm" style={{ marginTop: 10, color: tone === "error" ? "var(--aw-danger)" : "var(--aw-muted)" }}>
+    <div role={tone === "error" ? "alert" : "status"} className="small" style={{ marginTop: 10, color: tone === "error" ? "var(--error)" : "var(--text-secondary)" }}>
       {children}
     </div>
   );

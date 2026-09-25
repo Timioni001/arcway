@@ -1950,3 +1950,1436 @@ UPDATE PASSPORT
 If this loop feels excellent, the rest of Arcway can grow around it.
 
 **Build the system, not a collection of screens.**
+
+
+============================================================
+
+# ARCWAY V2 — REVISED VISUAL SYSTEM
+
+## Design Decision
+
+Replace the previous all-blue interface direction.
+
+Arcway should be **white-first, blue-led, with navy used for depth**. The supplied marketplace interface is the composition reference, while the supplied blue spectrum is the color foundation.
+
+Core feeling:
+
+**Premium · Technical · Calm · Financial · Modern · Precise**
+
+Avoid a generic crypto dashboard, excessive glassmorphism, neon gradients, or an interface where every surface is blue.
+
+---
+
+## 1. Reference Interpretation
+
+### Marketplace UI reference
+
+Borrow the visual principles:
+
+- white application shell
+- soft blue-gray environment
+- large white rounded cards
+- modular dashboard composition
+- strong central feature area
+- selective dark information panel
+- blue CTA buttons
+- restrained shadows
+- generous whitespace
+- strong typography
+- clear information hierarchy
+
+Do not copy its NFT imagery, branding, wording, or exact layout.
+
+### Blue palette reference
+
+Use one continuous spectrum:
+
+**Ice → Sky → Light Blue → Medium Blue → Royal Blue → Deep Navy**
+
+This should replace unrelated blues throughout the product.
+
+---
+
+# 2. COLOR SYSTEM
+
+## Light Mode
+
+```text
+ARCWAY WHITE       #FFFFFF
+ARCWAY ICE         #F4FAFC
+ARCWAY PALE        #E8F5F9
+ARCWAY SKY         #C9EAF3
+
+ARCWAY LIGHT BLUE  #78C6DE
+ARCWAY BLUE        #3D91BE
+ARCWAY ROYAL       #2464A5
+ARCWAY DEEP       #193F7A
+ARCWAY NAVY       #080D3D
+
+TEXT PRIMARY       #0B1220
+TEXT SECONDARY     #64748B
+TEXT MUTED         #94A3B8
+
+BORDER             #DCE6EE
+BORDER STRONG      #C9D8E4
+
+SUCCESS            #16835B
+WARNING            #B7791F
+ERROR              #D64545
+```
+
+### Signature Arcway blue
+
+**#3D91BE**
+
+Use this as the primary brand/action blue. It gives Arcway its own identity while remaining within the supplied blue family.
+
+---
+
+# 3. DARK MODE
+
+Do not make dark mode black + gray.
+
+Use the dark end of the same blue spectrum:
+
+```text
+BACKGROUND         #080D3D
+SURFACE            #0D164D
+SURFACE 2          #111F5D
+SURFACE 3          #162A6B
+
+PRIMARY BLUE       #3D91BE
+LIGHT BLUE         #78C6DE
+SKY                #A9DFEB
+
+TEXT PRIMARY       #F5FAFF
+TEXT SECONDARY     #A7B8D0
+TEXT MUTED         #7184A5
+
+BORDER             #253B70
+BORDER STRONG      #35528A
+```
+
+Dark mode should feel like:
+
+**deep blue environment + lighter blue surfaces + sky highlights + white typography**
+
+not:
+
+**black + gray + dull blue**.
+
+---
+
+# 4. COLOR RATIOS
+
+### Light
+
+```text
+70% white / near-white
+20% blue-tinted surfaces
+8% blue accents
+2% deep navy emphasis
+```
+
+### Dark
+
+```text
+65% deep blue surfaces
+20% elevated blue surfaces
+10% blue/sky accents
+5% high-contrast elements
+```
+
+These are visual targets rather than rigid mathematical rules.
+
+---
+
+# 5. DESIGN TOKENS
+
+```css
+:root {
+  --background: #F4FAFC;
+  --surface: #FFFFFF;
+  --surface-soft: #E8F5F9;
+  --surface-blue: #C9EAF3;
+
+  --primary: #3D91BE;
+  --primary-hover: #2464A5;
+  --primary-strong: #193F7A;
+
+  --navy: #080D3D;
+
+  --text: #0B1220;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  --border: #DCE6EE;
+  --border-strong: #C9D8E4;
+
+  --success: #16835B;
+  --warning: #B7791F;
+  --error: #D64545;
+}
+
+.dark {
+  --background: #080D3D;
+  --surface: #0D164D;
+  --surface-soft: #111F5D;
+  --surface-blue: #162A6B;
+
+  --primary: #3D91BE;
+  --primary-hover: #78C6DE;
+  --primary-strong: #A9DFEB;
+
+  --navy: #05082B;
+
+  --text: #F5FAFF;
+  --text-secondary: #A7B8D0;
+  --text-muted: #7184A5;
+
+  --border: #253B70;
+  --border-strong: #35528A;
+}
+```
+
+---
+
+# 6. APPLICATION BACKGROUND
+
+### Light
+
+```text
+Page:      #F4FAFC
+Section:   #E8F5F9
+Card:      #FFFFFF
+Featured:  #C9EAF3
+```
+
+### Dark
+
+```text
+Page:      #080D3D
+Section:   #0D164D
+Card:      #111F5D
+Featured:  #162A6B
+```
+
+The viewport should have a subtle blue-white environment rather than pure white everywhere.
+
+---
+
+# 7. APPLICATION SHELL
+
+Desktop concept:
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│ LOGO    Discover  Quests  Builders   Search    Connect    │
+├────────┬───────────────────────────────────────┬───────────┤
+│        │                                       │           │
+│ SIDE   │            FEATURED AREA              │ ACTIVITY  │
+│ NAV    │                                       │ / INFO    │
+│        │            APP DISCOVERY              │           │
+│        │                                       │           │
+│        │            QUESTS / BUILDERS          │           │
+└────────┴───────────────────────────────────────┴───────────┘
+```
+
+Do not force a right sidebar on every page. Use it only when it adds useful information.
+
+---
+
+# 8. HEADER
+
+Left:
+
+- Arcway logo
+- optional network label
+
+Center:
+
+- Discover
+- Quests
+- Builders
+
+Right:
+
+- Search
+- network status
+- Connect Wallet
+- profile after connection
+
+Light header:
+
+```text
+background: #FFFFFF
+border: #DCE6EE
+```
+
+Dark header:
+
+```text
+background: #0D164D
+border: #253B70
+```
+
+Use a subtle border instead of a heavy shadow.
+
+---
+
+# 9. NAVIGATION
+
+Primary navigation:
+
+```text
+Discover
+Quests
+Builders
+Passport
+Activity
+```
+
+Active light state:
+
+```text
+background: #E8F5F9
+text: #2464A5
+```
+
+Active dark state:
+
+```text
+background: #162A6B
+text: #A9DFEB
+```
+
+Do not make every active state a saturated blue block.
+
+---
+
+# 10. HERO
+
+The homepage hero should use the composition of the supplied interface.
+
+Structure:
+
+```text
+Large headline
+Short explanation
+Primary CTA
+Secondary CTA
+Distinctive blue Arcway visual
+
+              + Arc activity panel
+```
+
+Suggested copy:
+
+```text
+Discover what is being built on Arc.
+
+Explore apps, quests and builders shipping
+real products on Arc Mainnet.
+
+[Explore Apps] [View Quests]
+```
+
+Keep copy concise and factual.
+
+---
+
+# 11. HERO VISUAL
+
+Reuse the earlier stacked rounded-form concept, but recolor it using the supplied palette:
+
+```text
+#C9EAF3
+#78C6DE
+#3D91BE
+#2464A5
+#193F7A
+#080D3D
+```
+
+Characteristics:
+
+- overlapping vertical forms
+- rounded ends
+- controlled depth
+- subtle internal shadows
+- soft rim light
+- restrained gradient
+- no excessive glow
+- no rainbow color
+
+The visual should suggest:
+
+**route / path / layers / network / gateway**
+
+rather than a generic 3D blob.
+
+---
+
+# 12. DARK INFORMATION PANEL
+
+Use one selective dark panel against the otherwise light interface.
+
+Suggested component:
+
+**Arc Activity**
+
+Possible information:
+
+- active apps
+- recent deployments
+- recent quests
+- network activity
+- USDC activity
+- builder activity
+
+Never fabricate live statistics.
+
+If data is unavailable, show an honest empty state.
+
+---
+
+# 13. APP CARDS
+
+Standard card:
+
+```text
+┌─────────────────────────────────────┐
+│ ICON                         LIVE ● │
+│                                     │
+│ App name                            │
+│ Short description                   │
+│                                     │
+│ Category    Category                │
+│                                     │
+│                         Open App →  │
+└─────────────────────────────────────┘
+```
+
+Rules:
+
+- white surface
+- 1px subtle border
+- 18–24px radius
+- restrained shadow
+- 20–24px padding
+- clear hierarchy
+- no unnecessary gradients
+
+Featured cards may use:
+
+```text
+#E8F5F9
+#C9EAF3
+```
+
+---
+
+# 14. APP STATES
+
+Use descriptive states:
+
+```text
+LIVE
+VERIFIED
+NEW
+EXPERIMENTAL
+COMMUNITY
+```
+
+Only show VERIFIED when the product has an actual verification basis.
+
+---
+
+# 15. QUEST CARDS
+
+```text
+┌─────────────────────────────────────┐
+│ QUEST                         2h     │
+│                                     │
+│ Quest title                         │
+│ Short objective                     │
+│                                     │
+│ Reward                              │
+│ Progress ━━━━━━━━━━━ 65%            │
+│                                     │
+│ Start Quest →                       │
+└─────────────────────────────────────┘
+```
+
+Blue should indicate progress and action.
+
+---
+
+# 16. BUILDER CARDS
+
+Include:
+
+- avatar
+- builder name
+- optional wallet/address
+- projects
+- categories
+- Arc activity
+- verification state where applicable
+
+Keep them product-focused rather than turning Arcway into a social network.
+
+---
+
+# 17. PASSPORT
+
+Sections:
+
+```text
+PROFILE
+Wallet
+Builder identity
+
+ACTIVITY
+Apps explored
+Quests completed
+Builders followed
+
+BADGES
+Achievements
+
+ONCHAIN
+Relevant verified activity
+```
+
+Use the blue spectrum for progress and achievement.
+
+---
+
+# 18. SEARCH
+
+Placeholder:
+
+```text
+Search apps, quests, builders...
+```
+
+Categories:
+
+```text
+Apps
+Quests
+Builders
+Categories
+```
+
+Use the same cards in search results as elsewhere.
+
+---
+
+# 19. FILTERS
+
+Default:
+
+```text
+background: #FFFFFF
+border: #DCE6EE
+text: #64748B
+```
+
+Active:
+
+```text
+background: #E8F5F9
+border: #C9EAF3
+text: #2464A5
+```
+
+Primary filter:
+
+```text
+background: #3D91BE
+text: #FFFFFF
+```
+
+---
+
+# 20. BUTTONS
+
+### Primary
+
+```text
+Background: #3D91BE
+Text:       #FFFFFF
+Hover:      #2464A5
+```
+
+### Dark-mode hover
+
+```text
+Background: #78C6DE
+Text:       #080D3D
+```
+
+### Secondary
+
+White/transparent surface + border.
+
+### Ghost
+
+No background; blue text.
+
+Buttons should be confident but not oversized.
+
+---
+
+# 21. CONNECT WALLET
+
+Primary header action:
+
+```text
+Connect Wallet
+```
+
+After connection:
+
+```text
+0x7A...92F1
+```
+
+States:
+
+```text
+CONNECTING
+CONFIRM IN WALLET
+PENDING
+CONFIRMED
+FAILED
+```
+
+Success uses green only for confirmation. Error uses red only for errors.
+
+---
+
+# 22. APP DETAIL
+
+```text
+Breadcrumb
+
+App identity
+App name
+Description
+Categories
+[Open App]
+
+Overview
+How it works
+Activity
+Builder
+Network information
+```
+
+Do not overload the top section with metrics.
+
+---
+
+# 23. QUEST DETAIL
+
+Top:
+
+- title
+- builder/app
+- reward
+- status
+- deadline where applicable
+
+Body:
+
+```text
+Objective
+Steps
+Requirements
+Progress
+Reward
+```
+
+Keep the main action visible.
+
+---
+
+# 24. ACTIVITY
+
+Use a clean timeline rather than a block explorer layout.
+
+```text
+TODAY
+
+● New app deployed
+  App Name
+  4 min ago
+
+● Quest completed
+  Quest Name
+  18 min ago
+
+● Builder joined
+  Builder Name
+  42 min ago
+```
+
+---
+
+# 25. TYPOGRAPHY
+
+Primary:
+
+**Geist Sans**
+
+Technical:
+
+**Geist Mono**
+
+Optional display alternative:
+
+**Space Grotesk**
+
+Use display typography sparingly.
+
+### Scale
+
+```text
+Display:      64–80px
+H1:           48–64px
+H2:           32–40px
+H3:           24–28px
+H4:           18–20px
+
+Body large:   18px
+Body:         15–16px
+Body small:   13–14px
+
+Label:        12–13px
+Mono:         11–13px
+```
+
+---
+
+# 26. CORNERS
+
+```text
+XS     8px
+SM     12px
+MD     16px
+LG     20px
+XL     28px
+PILL   999px
+```
+
+Recommended:
+
+```text
+Cards:    20–24px
+Hero:     28–32px
+Buttons:  12–16px
+```
+
+---
+
+# 27. SHADOWS
+
+Avoid heavy black shadows.
+
+Light card:
+
+```css
+box-shadow: 0 8px 30px rgba(25, 63, 122, 0.08);
+```
+
+Featured:
+
+```css
+box-shadow: 0 18px 50px rgba(25, 63, 122, 0.12);
+```
+
+Dark mode should rely primarily on surface contrast and borders.
+
+---
+
+# 28. GLASS
+
+Glass is no longer the default.
+
+Use it only for:
+
+- floating navigation
+- overlays
+- special hero effects
+- selected status surfaces
+
+Normal cards should be solid.
+
+---
+
+# 29. GRADIENTS
+
+Allowed:
+
+```text
+Ice → Sky
+Sky → Blue
+Blue → Royal
+Royal → Navy
+```
+
+Avoid:
+
+```text
+rainbow
+purple → pink → blue
+green → purple
+random neon gradients
+```
+
+Gradients communicate depth, not decoration.
+
+---
+
+# 30. ICONOGRAPHY
+
+Use:
+
+- Lucide
+- simple geometric icons
+- custom Arcway icons where required
+
+Default stroke:
+
+```text
+1.5px
+```
+
+Do not mix unrelated icon styles.
+
+---
+
+# 31. GRID
+
+Desktop:
+
+```text
+12 columns
+1180–1280px max width
+32–48px outer padding
+20–24px gaps
+```
+
+Tablet:
+
+```text
+8 columns
+24px padding
+```
+
+Mobile:
+
+```text
+4 columns
+16–20px padding
+```
+
+---
+
+# 32. SPACING
+
+Use an 8px rhythm:
+
+```text
+4
+8
+12
+16
+24
+32
+40
+48
+64
+80
+96
+```
+
+---
+
+# 33. HOMEPAGE ORDER
+
+```text
+01 Header
+02 Hero / Featured
+03 Explore Apps
+04 Quests
+05 Builders
+06 Arc Activity
+07 Build on Arc
+08 Footer
+```
+
+The user should understand the product quickly.
+
+---
+
+# 34. ARC NATIVE CATEGORIES
+
+```text
+Payments
+Trading
+DeFi
+FX
+Assets
+Tools
+Agents
+Infrastructure
+Experiments
+```
+
+Use these as discovery categories rather than marketing slogans.
+
+---
+
+# 35. TRUST
+
+Possible labels:
+
+```text
+LIVE
+VERIFIED
+NEW
+EXPERIMENTAL
+COMMUNITY
+```
+
+Do not make unsupported claims such as:
+
+```text
+BEST
+SAFE
+SECURE
+TOP
+TRUSTLESS
+```
+
+unless there is an objective basis.
+
+---
+
+# 36. BLUE AROUND THE INTERFACE
+
+Blue should create a visual route through the page.
+
+Use blue for:
+
+- active navigation
+- CTAs
+- selected filters
+- hero visual
+- links
+- progress
+- network indicators
+- charts
+- important metadata
+
+Do not make entire sections blue just to make them look "crypto."
+
+Ideal rhythm:
+
+```text
+WHITE
+  ↓
+BLUE ACCENT
+  ↓
+WHITE
+  ↓
+DARK INFORMATION PANEL
+  ↓
+BLUE CTA
+```
+
+---
+
+# 37. CHARTS
+
+Light:
+
+- blue line
+- pale blue fill
+- white background
+- subtle grid
+
+Dark:
+
+- sky/blue line
+- transparent blue fill
+- deep navy background
+
+Prefer shades from the same spectrum before introducing unrelated colors.
+
+Do not invent activity or financial data.
+
+---
+
+# 38. BADGES
+
+Compact badge examples:
+
+```text
+LIVE
+NEW
+VERIFIED
+QUEST
+BUILDER
+```
+
+Light:
+
+```text
+blue text + pale blue background
+```
+
+Dark:
+
+```text
+sky text + blue surface
+```
+
+---
+
+# 39. MOBILE
+
+Do not simply shrink desktop.
+
+Priority:
+
+```text
+Header
+Hero
+Featured app
+Explore
+Quests
+Builders
+Activity
+```
+
+Optional bottom navigation:
+
+```text
+Discover
+Quests
+Search
+Passport
+```
+
+Right-side panels become collapsible or disappear.
+
+---
+
+# 40. RESPONSIVE CARDS
+
+```text
+Desktop: 3-column
+Tablet:  2-column
+Mobile:  1-column
+```
+
+Preserve hierarchy at every breakpoint.
+
+---
+
+# 41. MOTION
+
+```text
+Micro:       120–160ms
+Component:   180–240ms
+Panel:       300–400ms
+Hero:        500–700ms
+```
+
+Easing:
+
+```text
+cubic-bezier(0.22, 1, 0.36, 1)
+```
+
+Hover cards:
+
+```text
+translateY(-2px)
+```
+
+Avoid dramatic zoom, rotation, constant movement, or excessive glow.
+
+Respect `prefers-reduced-motion`.
+
+---
+
+# 42. LOADING / EMPTY / ERROR
+
+### Loading
+
+Use layout-matching skeletons.
+
+Light:
+
+```text
+#E8F5F9
+```
+
+Dark:
+
+```text
+#162A6B
+```
+
+### Empty
+
+```text
+No quests yet
+
+New quests will appear here when builders publish them.
+
+[Explore Apps]
+```
+
+### Error
+
+```text
+Something went wrong
+
+We couldn't load this section.
+
+[Try Again]
+```
+
+---
+
+# 43. LOGO DIRECTION
+
+Arcway needs an independent visual identity.
+
+Possible concepts:
+
+- route
+- arch
+- connected nodes
+- path
+- gateway
+- layered blue forms
+
+Style:
+
+```text
+Geometric
+Minimal
+Rounded
+Modular
+Directional
+```
+
+Avoid generic chain links, literal coins, generic shields, or overcomplicated 3D marks.
+
+Do not imitate the Arc logo.
+
+---
+
+# 44. ROUTES
+
+```text
+/
+ /apps
+ /apps/[slug]
+ /quests
+ /quests/[id]
+ /builders
+ /builders/[address]
+ /passport
+ /activity
+ /search
+```
+
+---
+
+# 45. MVP PRIORITY
+
+### P0
+
+```text
+Discover
+App detail
+Quest detail
+Passport
+Wallet / transaction modal
+```
+
+### P1
+
+```text
+Search
+Filters
+Builders
+Activity
+Badges
+```
+
+### P2
+
+```text
+Leaderboards
+Social
+Recommendations
+Advanced analytics
+```
+
+---
+
+# 46. DATA MODELS
+
+```ts
+type ArcApp = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  logo?: string
+  categories: string[]
+  status: "live" | "verified" | "new" | "experimental" | "community"
+  url: string
+  builderId?: string
+  deployedOnArc?: boolean
+}
+
+type Quest = {
+  id: string
+  title: string
+  description: string
+  appId?: string
+  builderId?: string
+  reward?: string
+  progress?: number
+  status: "active" | "completed" | "upcoming" | "expired"
+}
+
+type Builder = {
+  id: string
+  name: string
+  address?: string
+  avatar?: string
+  projects: string[]
+  categories: string[]
+}
+```
+
+---
+
+# 47. DISCOVERY
+
+Initial discovery groups:
+
+```text
+Featured
+New
+Live
+Verified
+Recently active
+Category
+```
+
+Do not create arbitrary popularity rankings without reliable data.
+
+---
+
+# 48. COMPONENT INVENTORY
+
+```text
+AppShell
+Header
+Sidebar
+MobileNav
+
+Hero
+FeaturedPanel
+ActivityPanel
+
+AppCard
+QuestCard
+BuilderCard
+Badge
+StatusBadge
+
+Search
+SearchResults
+FilterBar
+
+Button
+IconButton
+Tabs
+Pill
+Tooltip
+Dropdown
+
+WalletButton
+WalletModal
+TransactionModal
+TransactionStatus
+
+ProgressBar
+Chart
+Timeline
+
+EmptyState
+LoadingState
+ErrorState
+
+Footer
+```
+
+---
+
+# 49. IMPLEMENTATION STACK
+
+Recommended:
+
+```text
+Next.js
+TypeScript
+Tailwind CSS
+Geist
+Geist Mono
+Lucide
+Framer Motion
+wagmi
+viem
+```
+
+Use CSS/SVG for the first hero visual.
+
+Only add Three.js or another heavy 3D system if it is genuinely needed.
+
+---
+
+# 50. IMPLEMENTATION ORDER
+
+```text
+01 Design tokens
+02 Global background + typography
+03 Header
+04 Buttons
+05 Cards
+06 Status badges
+07 Hero visual
+08 App discovery grid
+09 Dark activity panel
+10 Quest cards
+11 Builder cards
+12 Search/filter
+13 Wallet states
+14 Passport
+15 Responsive behavior
+16 Dark mode
+17 Motion
+18 Accessibility
+19 Visual QA
+```
+
+Build the design system first. Do not build every page independently.
+
+---
+
+# 51. ACCESSIBILITY
+
+Required:
+
+- keyboard navigation
+- visible focus states
+- semantic HTML
+- readable contrast
+- aria labels for icon-only controls
+- reduced-motion support
+- accessible form errors
+- touch targets around 44px
+
+Never rely on color alone to communicate status.
+
+---
+
+# 52. PERFORMANCE
+
+Prioritize:
+
+- optimized images
+- lazy loading
+- SVG icons
+- limited client-side JavaScript
+- responsive image sizing
+- lightweight hero rendering
+- skeleton states for network content
+
+The visual system should not make the first render unnecessarily heavy.
+
+---
+
+# 53. DARK MODE RULE
+
+Do not create a completely different product in dark mode.
+
+Keep:
+
+- layout
+- component shapes
+- hierarchy
+- interaction behavior
+
+Change:
+
+- surfaces
+- borders
+- text
+- accent intensity
+- subtle glow/shadow
+
+---
+
+# 54. FINAL NON-NEGOTIABLE RULES
+
+1. **White is the primary interface color.**
+2. **Blue creates structure, not visual noise.**
+3. **Use the supplied blue spectrum as one family.**
+4. **#3D91BE is the signature Arcway blue.**
+5. **Deep navy provides depth, not the entire interface.**
+6. **Dark mode must feel rich and blue, never dull gray.**
+7. **Cards are mostly solid, not glass.**
+8. **Use selective dark information panels.**
+9. **Premium before futuristic.**
+10. **Build a system, not disconnected screens.**
+
+---
+
+# 55. FINAL ART DIRECTION
+
+Arcway should feel like:
+
+> **A white financial interface built inside a blue architectural system.**
+
+White provides clarity.
+
+The blue spectrum provides identity.
+
+Navy provides depth.
+
+Rounded modular cards provide structure.
+
+The stacked blue visual becomes the Arcway signature.
+
+The overall result should feel polished and distinctive without relying on excessive gradients, neon, glassmorphism, or generic crypto aesthetics.
+
+---
+
+# 56. ONE-SENTENCE DESIGN BRIEF
+
+> **Design Arcway as a premium white-first discovery platform for Arc Mainnet, using a coherent ice-to-navy blue spectrum, modular rounded cards, selective dark information panels, and restrained technical motion.**

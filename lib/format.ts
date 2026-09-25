@@ -30,3 +30,13 @@ export function timeAgo(date: Date | string | number, now: number = Date.now()):
   }
   return "just now";
 }
+
+/** "Today", "Yesterday", or a short date, for grouping a timeline. */
+export function dayLabel(iso: string, now = new Date()): string {
+  const d = new Date(iso);
+  const start = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((start(now) - start(d)) / 86_400_000);
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Yesterday";
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: d.getFullYear() === now.getFullYear() ? undefined : "numeric" });
+}

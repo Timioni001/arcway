@@ -124,3 +124,11 @@ export function questViews(signals: QuestSignals, quests: Quest[] = QUESTS): Que
 export function earnedXp(views: QuestView[]): number {
   return views.filter((q) => q.status === "completed").reduce((sum, q) => sum + q.xp, 0);
 }
+
+/** 0..1 progress for the card's bar. Only the starter-path quest has partial progress. */
+export function questProgress(view: QuestView): number {
+  if (view.status === "completed" || view.status === "claimable") return 1;
+  const prereqs = prerequisites(view);
+  if (prereqs.length) return (prereqs.length - view.lockedBy.length) / prereqs.length;
+  return 0;
+}

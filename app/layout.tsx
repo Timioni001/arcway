@@ -3,27 +3,33 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
 import { NetworkNotice } from "../components/NetworkNotice";
 import { Providers } from "../components/Providers";
-import { Footer, MobileNav, Navbar } from "../components/Shell";
+import { Footer, Header, MobileNav } from "../components/Shell";
+import { THEME_INIT_SCRIPT } from "../lib/theme";
 import "./globals.css";
 import "./components.css";
 
 export const metadata: Metadata = {
   title: { default: "Arcway — Discover what's being built on Arc", template: "%s · Arcway" },
-  description: "A discovery layer for apps, quests and onchain experiences built on Arc."
+  description: "Explore apps, quests and builders on Arc."
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050A18",
-  colorScheme: "dark"
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F4FAFC" },
+    { media: "(prefers-color-scheme: dark)", color: "#080D3D" }
+  ]
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <a href="#main" className="skip-link visually-hidden">Skip to content</a>
         <Providers>
-          <Navbar />
+          <Header />
           <NetworkNotice />
           <main id="main">{children}</main>
           <Footer />

@@ -4,10 +4,15 @@ import Link from "next/link";
 export function LogoMark({ className = "logo__mark" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect x="0.5" y="0.5" width="31" height="31" rx="9" fill="#07152F" stroke="rgba(170,205,255,.18)" />
-      <path d="M8 23v-6a8 8 0 0 1 16 0" stroke="#EAF5FF" strokeWidth="2.4" strokeLinecap="round" />
-      <circle cx="24" cy="22" r="2.6" fill="#3B82F6" />
-      <circle cx="24" cy="22" r="5" fill="#3B82F6" opacity=".18" />
+      <defs>
+        <linearGradient id="aw-mark" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#3D91BE" />
+          <stop offset="1" stopColor="#193F7A" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="url(#aw-mark)" />
+      <path d="M8 23v-6a8 8 0 0 1 16 0" stroke="#FFFFFF" strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="24" cy="22" r="2.8" fill="#C9EAF3" />
     </svg>
   );
 }
