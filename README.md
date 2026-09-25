@@ -80,22 +80,22 @@ told recording opens soon.
 
 ## UI
 
-Routes: `/` (landing deck), `/apps`, `/apps/[slug]`, `/quests`, `/quests/[id]`,
-`/passport`. Fonts are Geist Sans/Mono (self-hosted via the `geist` package),
-icons are Lucide at 1.5px stroke, and the glass hero object is pure CSS.
+Follows the V2 brief in `docs/UI_BRIEF.md`: white-first, one ice→navy blue
+spectrum, light and dark themes (toggle in the header, follows the system by
+default). Tokens live in `app/globals.css`; component styles in
+`app/components.css`.
+
+Routes: `/`, `/apps`, `/apps/[slug]`, `/quests`, `/quests/[id]`, `/builders`,
+`/passport`.
+
+Accessibility note: white text on the signature blue `#3D91BE` is only 3.5:1,
+so buttons and links use royal `#2464A5` (6.1:1). `#3D91BE` stays the brand
+colour for the hero forms, progress, focus and accents.
 
 To add an app: add an entry to `APPS` in `lib/registry.ts` (optional logo in
-`public/apps/`). It gets a detail page automatically.
+`public/apps/`). It gets a detail page, and its builder appears on
+`/builders` automatically.
 
 The Arc logo in `public/brand/arc/` is Circle's official file, used unmodified
 for "Built on Arc" attribution only. See `public/brand/arc/NOTICE.md`.
 
-For contracts:
-
-```bash
-cd contracts
-forge install
-forge test
-```
-
-Never commit private keys or Circle secrets.

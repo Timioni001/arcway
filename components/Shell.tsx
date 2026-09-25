@@ -1,16 +1,17 @@
 'use client';
 
-import { Compass, IdCard, Target } from "lucide-react";
+import { Compass, IdCard, Target, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { NETWORK_NAME } from "../lib/config";
 import { Logo } from "./Logo";
+import { ThemeToggle } from "./ThemeToggle";
 import { WalletButton } from "./WalletButton";
 
 const LINKS = [
   { href: "/apps", label: "Discover", icon: Compass },
   { href: "/quests", label: "Quests", icon: Target },
+  { href: "/builders", label: "Builders", icon: Users },
   { href: "/passport", label: "Passport", icon: IdCard }
 ] as const;
 
@@ -19,29 +20,22 @@ function useActive() {
   return (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function Navbar() {
+export function Header() {
   const isActive = useActive();
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <header className="nav" data-scrolled={scrolled}>
-      <div className="container nav__inner">
+    <header className="header">
+      <div className="container header__inner">
         <Logo />
-        <nav className="nav__links" aria-label="Main">
+        <nav className="header__nav" aria-label="Main">
           {LINKS.map(({ href, label }) => (
-            <Link key={href} href={href} className="nav__link" aria-current={isActive(href) ? "page" : undefined}>
+            <Link key={href} href={href} className="header__link" aria-current={isActive(href) ? "page" : undefined}>
               {label}
             </Link>
           ))}
         </nav>
-        <div className="nav__utils">
-          <span className="pill nav__network"><span className="dot" style={{ background: "var(--aw-electric)" }} />{NETWORK_NAME}</span>
+        <div className="header__utils">
+          <span className="net"><i aria-hidden="true" />{NETWORK_NAME}</span>
+          <ThemeToggle />
           <WalletButton />
         </div>
       </div>
@@ -67,17 +61,17 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container footer__inner">
-        <div className="stack-3">
+        <div className="stack" style={{ ["--gap" as string]: "12px" }}>
           <Logo />
-          <p className="body-sm muted" style={{ maxWidth: 380 }}>
-            An independent discovery layer for apps, quests and onchain experiences on Arc. Not affiliated with Circle.
-          </p>
+          <p className="small secondary">Independent. Not affiliated with Circle.</p>
         </div>
         <div className="built-on">
           <span className="label">Built on</span>
-          {/* Official Arc mark, unmodified. See public/brand/arc/NOTICE.md */}
+          {/* Official Arc marks, unmodified. See public/brand/arc/NOTICE.md */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/arc/arc-logo-light.svg" alt="Arc" width={146} height={50} />
+          <img className="for-light" src="/brand/arc/arc-logo-dark.svg" alt="Arc" width={146} height={50} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="for-dark" src="/brand/arc/arc-logo-light.svg" alt="Arc" width={146} height={50} />
         </div>
       </div>
     </footer>

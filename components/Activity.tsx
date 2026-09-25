@@ -1,13 +1,14 @@
 'use client';
 
-import { ArrowUpRight, Clock, CircleAlert, Send, Wallet } from "lucide-react";
+import { ArrowUpRight, CircleAlert, Clock, Wallet } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch, type ActivityItem } from "../lib/api";
 import { explorer } from "../lib/config";
-import { shortAddress, timeAgo } from "../lib/format";
+import { dayLabel, shortAddress, timeAgo } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
 import { StateBlock } from "./Section";
 
+/** Clean timeline grouped by day, not an explorer table. */
 export function Activity({ limit = 20 }: { limit?: number }) {
   const { address, connection } = useArcwayState();
   const activity = useQuery({
@@ -18,51 +19,57 @@ export function Activity({ limit = 20 }: { limit?: number }) {
   });
 
   if (connection.status !== "connected") {
-    return <StateBlock icon={Wallet} title="No wallet connected">Connect a wallet to see your Arc activity.</StateBlock>;
+    return <StateBlock icon={Wallet} title="No wallet connected">Connect a wallet to see your activity on Arc.</StateBlock>;
   }
   if (activity.isPending) {
     return (
-      <div className="surface surface--lg pad" aria-busy="true">
-        <div className="label">Syncing activity…</div>
-        {[0, 1, 2].map((i) => <div key={i} className="shimmer" style={{ height: 20, marginTop: 16 }} />)}
+      <div className="card pad" aria-busy="true" aria-label="Syncing activity">
+        {[0, 1, 2].map((i) => <div key={i} className="skeleton" style={{ height: 18, marginTop: i ? 18 : 0, width: `${80 - i * 15}%` }} />)}
       </div>
     );
   }
   if (activity.isError) {
     return (
-      <StateBlock icon={CircleAlert} tone="error" title="Activity is unavailable" actions={<button className="btn btn--secondary btn--sm" onClick={() => activity.refetch()}>Try again</button>}>
-        The explorer didn&apos;t respond. Your onchain record is unaffected.
+      <StateBlock icon={CircleAlert} tone="error" title="Something went wrong" actions={<button className="btn btn--secondary btn--sm" onClick={() => activity.refetch()}>Try again</button>}>
+        We couldn&apos;t load your activity.
       </StateBlock>
     );
   }
   const items = activity.data.items.slice(0, limit);
   if (items.length === 0) {
-    return (
-      <StateBlock icon={Clock} title="No transactions yet">
-        Your first Arc transaction will appear here a few seconds after it confirms.
-      </StateBlock>
-    );
+    return <StateBlock icon={Clock} title="No activity yet">Your Arc transactions will appear here.</StateBlock>;
   }
+
+  const groups = new Map<string, ActivityItem[]>();
+  for (const tx of items) {
+    const key = dayLabel(tx.timestamp);
+    groups.set(key, [...(groups.get(key) ?? []), tx]);
+  }
+
   return (
-    <div className="surface surface--lg pad">
-      <ul className="activity">
-        {items.map((tx) => (
-          <li key={tx.hash}>
-            <span className="activity__icon" data-failed={!tx.success} aria-hidden="true">
-              {tx.success ? <Send /> : <CircleAlert />}
-            </span>
-            <div style={{ minWidth: 0 }}>
-              <div className="body-sm" style={{ fontWeight: 500 }}>
-                {tx.method ?? "Transfer"}{!tx.success && <span style={{ color: "var(--aw-danger)" }}> · failed</span>}
-              </div>
-              <div className="mono muted">{tx.to ? `to ${shortAddress(tx.to)}` : "contract creation"} · {timeAgo(tx.timestamp)}</div>
-            </div>
-            <a className="link body-sm" href={explorer.tx(tx.hash)} target="_blank" rel="noopener noreferrer" aria-label={`View transaction ${shortAddress(tx.hash)} on explorer`}>
-              <ArrowUpRight aria-hidden="true" />
-            </a>
-          </li>
-        ))}
-      </ul>
+    <div className="card pad">
+      {[...groups].map(([day, txs]) => (
+        <section key={day} className="timeline__day" aria-label={day}>
+          <h3 className="label">{day}</h3>
+          <ul>
+            {txs.map((tx) => (
+              <li key={tx.hash} className="timeline__item" data-failed={!tx.success}>
+                <div style={{ minWidth: 0 }}>
+                  <div className="small" style={{ fontWeight: 500 }}>
+                    {tx.method ?? "Transfer"}{!tx.success && <span style={{ color: "var(--error)" }}> · Failed</span>}
+                  </div>
+                  <div className="xs secondary">
+                    <span className="mono">{tx.to ? shortAddress(tx.to) : "New contract"}</span> · {timeAgo(tx.timestamp)}
+                  </div>
+                </div>
+                <a className="link" href={explorer.tx(tx.hash)} target="_blank" rel="noopener noreferrer" aria-label={`View transaction ${shortAddress(tx.hash)}`}>
+                  <ArrowUpRight aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }

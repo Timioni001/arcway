@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,10 +18,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function QuestPage({ params }: Props) {
   const { id } = await params;
-  if (!getQuest(id)) notFound();
+  const quest = getQuest(id);
+  if (!quest) notFound();
   return (
     <div className="container page">
-      <Link href="/quests" className="back"><ArrowLeft aria-hidden="true" /> All quests</Link>
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <Link href="/quests">Quests</Link><ChevronRight aria-hidden="true" /><span aria-current="page">{quest.title}</span>
+      </nav>
       <QuestDetail questId={id} />
     </div>
   );

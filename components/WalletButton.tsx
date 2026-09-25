@@ -14,11 +14,13 @@ export function WalletButton() {
   const { connection } = wallet;
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const mounted = useMounted();
+  const [mounted, setMounted] = useState(false);
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setMounted(true), []);
 
   // Close on outside click / Escape; return focus to the trigger.
   useEffect(() => {
@@ -41,49 +43,41 @@ export function WalletButton() {
     };
   }, [open]);
 
-  // Close the picker once a connection lands.
   useEffect(() => {
     if (connection.status === "connected") setOpen(false);
   }, [connection.status]);
 
   if (!mounted || connection.status === "reconnecting") {
-    return <span className="btn btn--secondary btn--sm shimmer" style={{ width: 140 }} aria-label="Loading wallet" />;
+    return <span className="skeleton" style={{ width: 132, height: 38, borderRadius: 12 }} aria-label="Loading wallet" />;
   }
 
-  const connected = connection.status === "connected" && connection.address;
+  const address = connection.status === "connected" ? connection.address : undefined;
   const onArc = connection.chainId === arcChain.id;
+  const multiple = wallet.connectors.length > 1;
 
   const copy = async () => {
     try {
-      await navigator.clipboard.writeText(connection.address!);
+      await navigator.clipboard.writeText(address!);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* clipboard blocked; the address is visible */
+      /* clipboard blocked; the address stays visible */
     }
   };
 
-  const multiple = wallet.connectors.length > 1;
-
   return (
     <div className="wallet" ref={rootRef}>
-      {connected ? (
-        <button
-          ref={triggerRef}
-          className="btn btn--secondary btn--sm wallet__trigger"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => setOpen((o) => !o)}
-        >
+      {address ? (
+        <button ref={triggerRef} className="btn btn--secondary btn--sm" aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((o) => !o)}>
           <span className="wallet__dot" data-wrong={!onArc} aria-hidden="true" />
-          <span className="mono" style={{ fontSize: 13 }}>{shortAddress(connection.address!)}</span>
-          <span className="wallet__net muted">{onArc ? "Arc" : "Wrong network"}</span>
+          <span className="mono">{shortAddress(address)}</span>
+          <span className="visually-hidden">{onArc ? `, on ${NETWORK_NAME}` : ", wrong network"}</span>
           <ChevronDown aria-hidden="true" />
         </button>
       ) : (
         <button
           ref={triggerRef}
-          className="btn btn--secondary btn--sm"
+          className="btn btn--primary btn--sm"
           disabled={wallet.connecting}
           aria-busy={wallet.connecting}
           aria-expanded={multiple ? open : undefined}
@@ -91,80 +85,73 @@ export function WalletButton() {
           onClick={() => (multiple ? setOpen((o) => !o) : wallet.connect())}
         >
           <Wallet aria-hidden="true" />
-          {wallet.connecting ? "Check wallet…" : "Connect wallet"}
+          {wallet.connecting ? "Confirm in wallet…" : "Connect wallet"}
         </button>
       )}
 
       {open && (
         <div className="wallet__panel" id={panelId} ref={panelRef} role="dialog" aria-label="Wallet">
-          {connected ? (
+          {address ? (
             <>
               <div className="wallet__row">
-                <div className="stack-2">
+                <div>
                   <div className="label">Wallet</div>
-                  <div className="mono" style={{ fontSize: 14 }}>{shortAddress(connection.address!)}</div>
+                  <div className="mono" style={{ marginTop: 4 }}>{shortAddress(address)}</div>
                 </div>
                 <button className="btn btn--ghost btn--sm" onClick={copy} aria-label="Copy address">
-                  {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
-                  {copied ? "Copied" : "Copy"}
+                  {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}{copied ? "Copied" : "Copy"}
                 </button>
               </div>
               <div className="wallet__row">
-                <div className="stack-2">
+                <div>
                   <div className="label">Network</div>
-                  <div className="body-sm">{onArc ? NETWORK_NAME : <>Other network <span className="mono muted">({connection.chainId})</span></>}</div>
+                  <div className="small" style={{ marginTop: 4 }}>
+                    {onArc ? NETWORK_NAME : <>Other network <span className="mono secondary">({connection.chainId})</span></>}
+                  </div>
                 </div>
-                {onArc ? (
-                  <span className="mono muted">{arcChain.id}</span>
-                ) : (
-                  <button className="btn btn--blue btn--sm" onClick={wallet.switchToArc} disabled={wallet.switching}>
-                    {wallet.switching ? "Approve…" : "Switch to Arc"}
+                {!onArc && (
+                  <button className="btn btn--primary btn--sm" onClick={wallet.switchToArc} disabled={wallet.switching}>
+                    {wallet.switching ? "Confirm in wallet…" : "Switch to Arc"}
                   </button>
                 )}
               </div>
               <div className="wallet__row">
-                <div className="stack-2">
+                <div>
                   <div className="label">USDC</div>
-                  <div className="mono-lg" style={{ fontSize: 20 }}>
+                  <div className="mono" style={{ marginTop: 4, fontSize: 20, fontWeight: 600 }}>
                     {balance.data === undefined ? (balance.isError ? "Unavailable" : "…") : formatUsdc(balance.data, { symbol: false })}
                   </div>
                 </div>
-                <a className="link body-sm" href={explorer.address(connection.address!)} target="_blank" rel="noopener noreferrer">
+                <a className="link small" href={explorer.address(address)} target="_blank" rel="noopener noreferrer">
                   Explorer <ArrowUpRight aria-hidden="true" />
                 </a>
               </div>
-              {IS_MAINNET && <p className="body-sm muted" style={{ marginTop: 8 }}>Mainnet uses real USDC. Transactions can't be reversed.</p>}
+              {IS_MAINNET && <p className="xs secondary">Mainnet uses real USDC.</p>}
               <Status tone="error">{wallet.error}</Status>
-              <button className="btn btn--secondary btn--block" style={{ marginTop: 16 }} onClick={() => { setOpen(false); wallet.disconnect(); }}>
+              <button className="btn btn--secondary btn--block" style={{ marginTop: 12 }} onClick={() => { setOpen(false); wallet.disconnect(); }}>
                 <LogOut aria-hidden="true" /> Disconnect
               </button>
             </>
           ) : (
-            <div className="stack-3">
+            <div className="stack" style={{ ["--gap" as string]: "10px" }}>
               <div className="label">Choose a wallet</div>
               {wallet.connectors.map((c) => (
                 <button key={c.uid} className="btn btn--secondary btn--block" style={{ justifyContent: "flex-start" }} disabled={wallet.connecting} onClick={() => wallet.connect(c.id)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   {c.icon ? <img src={c.icon} alt="" width={20} height={20} style={{ borderRadius: 5 }} /> : <Wallet aria-hidden="true" />}
                   {c.name}
                 </button>
               ))}
-              <p className="body-sm muted">Connecting only shares your address. It never moves funds.</p>
             </div>
           )}
         </div>
       )}
-      {!open && !connected && wallet.error && (
+      {!open && !address && wallet.error && (
         <div className="wallet__panel" role="alert">
-          <p className="body-sm">{wallet.error}</p>
+          <p className="small">{wallet.error}</p>
           <button className="btn btn--ghost btn--sm" style={{ marginTop: 8 }} onClick={wallet.clearError}>Dismiss</button>
         </div>
       )}
     </div>
   );
-}
-
-function useMounted() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  return mounted;
 }
