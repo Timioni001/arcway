@@ -1,0 +1,14 @@
+node_modules
+.next
+.env
+.env.local
+.env.*.local
+out
+*.tsbuildinfo
+.DS_Store
+
+# Foundry
+contracts/cache
+contracts/out
+contracts/broadcast
+contracts/lib
