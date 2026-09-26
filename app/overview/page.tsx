@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Activity } from "../../components/Activity";
 import { NextStep } from "../../components/NextStep";
-import { ActivityStrip, CategoryBars, ConnectBanner, NetworkCard, NewApps, OverviewStats } from "../../components/Overview";
+import { FeeCalculator } from "../../components/FeeCalculator";
+import { ActivityStrip, CategoryBars, ConnectBanner, NetworkCard, NewApps, OverviewStats, SavedApps } from "../../components/Overview";
 
 export const metadata: Metadata = { title: "Overview" };
 
@@ -32,6 +33,11 @@ export default function OverviewPage() {
       <div className="dash dash--even">
         <CategoryBars />
         <NewApps />
+      </div>
+
+      <div className="dash dash--even">
+        <FeeCalculator />
+        <SavedApps />
       </div>
     </div>
   );

@@ -191,3 +191,23 @@ describe("streaks", () => {
     expect(days[6].day).toBe("2026-09-26");
   });
 });
+
+import { FEE_ACTIONS, feeUsd, formatUsd } from "../lib/fees";
+describe("fees", () => {
+  it("prices gas in USDC (18-decimal native units)", () => {
+    // 65k gas at 20 gwei = 0.0013 USDC
+    expect(feeUsd(65_000n, 20_000_000_000n)).toBeCloseTo(0.0013, 10);
+    expect(feeUsd(65_000n, 20_000_000_000n, 1000)).toBeCloseTo(1.3, 10);
+    expect(feeUsd(65_000n, 20_000_000_000n, -3)).toBe(0);
+  });
+  it("formats small costs without rounding them to zero", () => {
+    expect(formatUsd(0)).toBe("$0");
+    expect(formatUsd(0.00001)).toBe("<$0.0001");
+    expect(formatUsd(0.0013)).toBe("$0.0013");
+    expect(formatUsd(0.25)).toBe("$0.250");
+    expect(formatUsd(1234.5)).toBe("$1,234.50");
+  });
+  it("has one estimate per action", () => {
+    expect(new Set(FEE_ACTIONS.map((a) => a.id)).size).toBe(FEE_ACTIONS.length);
+  });
+});

@@ -3,7 +3,7 @@
 import { Compass, IdCard, LayoutDashboard, Target, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ARC_DOCS_URL, BRIDGE_URL, IS_MAINNET, NETWORK_NAME, SUBMIT_APP_URL } from "../lib/config";
+import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET, NETWORK_NAME, SUBMIT_APP_URL } from "../lib/config";
 import { Logo } from "./Logo";
 import { SearchPalette } from "./SearchPalette";
 import { ThemeToggle } from "./ThemeToggle";
@@ -92,7 +92,14 @@ export function Footer() {
             <img className="for-dark" src="/brand/arc/arc-logo-light.svg" alt="Arc" width={146} height={50} />
           </div>
         </div>
-        <div className="footer__base">© {new Date().getFullYear()} Arcway · Independent, not affiliated with Circle.</div>
+        <div className="footer__base">
+          <span>© {new Date().getFullYear()} Arcway · Independent, not affiliated with Circle.</span>
+          <nav aria-label="Legal" className="footer__legal">
+            <Link href="/terms">Terms of Use</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+            <a href={CONTACT_URL} target="_blank" rel="noopener noreferrer">Contact</a>
+          </nav>
+        </div>
       </div>
     </footer>
   );
