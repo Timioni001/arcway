@@ -1,63 +1,63 @@
 /* ==========================================================================
-   Arcway V2 visual system (docs/UI_BRIEF.md, "V2").
-   White-first, one ice→navy blue spectrum, navy for depth.
-   Signature blue #3D91BE is for brand surfaces; royal #2464A5 carries text
-   and button fills because white on #3D91BE is only 3.5:1.
+   Arcway V3 visual system: white-first, brighter professional blue.
+   Primary #3298D8 is for accents, charts and active states; #246CB0 carries
+   text and button fills (5.5:1 on white). Dark mode is rich blue, never grey.
    ========================================================================== */
 
 :root {
   /* Spectrum */
-  --ice: #F4FAFC;
-  --pale: #E8F5F9;
-  --sky: #C9EAF3;
-  --light-blue: #78C6DE;
-  --blue: #3D91BE;
-  --royal: #2464A5;
-  --deep: #193F7A;
-  --navy-900: #080D3D;
+  --ice: #F7FAFC;
+  --pale: #EAF7FC;
+  --sky: #A9DDF4;
+  --light-blue: #4FB4EA;
+  --blue: #3298D8;
+  --royal: #246CB0;
+  --deep: #173E78;
+  --navy-900: #10224A;
 
   /* Semantic (light) */
-  --background: #F6FAFC;
+  --background: #F7FAFC;
   --surface: #FFFFFF;
-  --surface-soft: #E8F5F9;
-  --surface-blue: #C9EAF3;
-  --primary: #3D91BE;
-  --primary-hover: #2464A5;
-  --primary-strong: #193F7A;
-  --navy: #080D3D;
+  --surface-soft: #EAF7FC;
+  --surface-blue: #D6EFFA;
+  --primary: #3298D8;
+  --primary-hover: #246CB0;
+  --primary-strong: #173E78;
+  --navy: #10224A;
 
-  --text: #0B1220;
+  --text: #132238;
   --text-secondary: #64748B;
   --text-muted: #94A3B8;
-  --border: #DCE6EE;
-  --border-strong: #C9D8E4;
+  --border: #DCE8F0;
+  --border-strong: #C6D9E6;
 
   --success: #16835B;
   --warning: #975A16;
   --error: #C23434;
 
-  --action: #2464A5;
-  --action-hover: #193F7A;
+  --action: #246CB0;
+  --action-hover: #173E78;
   --action-text: #FFFFFF;
-  --link: #2464A5;
-  --nav-active-bg: #E8F5F9;
-  --nav-active-text: #2464A5;
-  --badge-bg: #E8F5F9;
-  --badge-text: #2464A5;
-  --header-bg: rgba(255, 255, 255, .86);
-  --rail-bg: #FBFDFE;
-  --rail-hover: #F0F7FA;
-  --panel: #080D3D;
-  --panel-2: #0D164D;
-  --skeleton: #E8F5F9;
-  --focus: #3D91BE;
-  --grad: linear-gradient(100deg, #193F7A 0%, #2464A5 35%, #3D91BE 70%, #78C6DE 100%);
-  --grad-tile-1: linear-gradient(145deg, #78C6DE, #3D91BE);
-  --grad-tile-2: linear-gradient(145deg, #3D91BE, #2464A5);
-  --grad-tile-3: linear-gradient(145deg, #2464A5, #193F7A);
+  --link: #246CB0;
+  --nav-active-bg: #EAF7FC;
+  --nav-active-text: #246CB0;
+  --badge-bg: #EAF7FC;
+  --badge-text: #246CB0;
+  --header-bg: rgba(255, 255, 255, .88);
+  --rail-bg: #FFFFFF;
+  --rail-hover: #F2F9FD;
+  --panel: #10224A;
+  --panel-2: #173E78;
+  --skeleton: #EAF7FC;
+  --focus: #3298D8;
+  --grad: linear-gradient(100deg, #246CB0 0%, #3298D8 45%, #4FB4EA 80%, #A9DDF4 100%);
+  --grad-brand: linear-gradient(160deg, #A9DDF4 0%, #4FB4EA 38%, #3298D8 70%, #246CB0 100%);
+  --grad-tile-1: linear-gradient(145deg, #75C9F3, #3298D8);
+  --grad-tile-2: linear-gradient(145deg, #4FB4EA, #246CB0);
+  --grad-tile-3: linear-gradient(145deg, #3298D8, #173E78);
 
-  --shadow-card: 0 1px 2px rgba(25, 63, 122, 0.04), 0 8px 30px rgba(25, 63, 122, 0.06);
-  --shadow-feature: 0 18px 50px rgba(25, 63, 122, 0.12);
+  --shadow-card: 0 1px 2px rgba(23, 62, 120, 0.04), 0 8px 28px rgba(23, 62, 120, 0.06);
+  --shadow-feature: 0 18px 48px rgba(23, 62, 120, 0.12);
 
   /* Shape and rhythm */
   --r-xs: 8px;
@@ -81,46 +81,46 @@
   color-scheme: light;
 }
 
-/* Dark: the deep end of the same spectrum, never black + grey. */
+/* Dark: rich blue, never black + grey. */
 :root.dark {
-  --background: #080D3D;
-  --surface: #111F5D;
-  --surface-soft: #0D164D;
-  --surface-blue: #162A6B;
-  --primary: #3D91BE;
-  --primary-hover: #78C6DE;
-  --primary-strong: #A9DFEB;
-  --navy: #05082B;
+  --background: #07152B;
+  --surface: #0D2342;
+  --surface-soft: #0A1C37;
+  --surface-blue: #12335B;
+  --primary: #4FB4EA;
+  --primary-hover: #75C9F3;
+  --primary-strong: #A9DDF4;
+  --navy: #050F20;
 
-  --text: #F5FAFF;
-  --text-secondary: #A7B8D0;
-  --text-muted: #7184A5;
-  --border: #253B70;
-  --border-strong: #35528A;
+  --text: #F4FAFF;
+  --text-secondary: #A9BCD0;
+  --text-muted: #7F95AF;
+  --border: #1D3B61;
+  --border-strong: #2A4F7C;
 
   --success: #4CC795;
   --warning: #E0A84F;
   --error: #FF8A8A;
 
-  --action: #2A6BB3;
-  --action-hover: #2464A5;
-  --action-text: #FFFFFF;
-  --link: #78C6DE;
-  --nav-active-bg: #162A6B;
-  --nav-active-text: #A9DFEB;
-  --badge-bg: #162A6B;
-  --badge-text: #A9DFEB;
-  --header-bg: rgba(8, 13, 61, .86);
-  --rail-bg: #0A1147;
-  --rail-hover: #111D5A;
-  --panel: #05082B;
-  --panel-2: #0A1244;
-  --skeleton: #162A6B;
-  --focus: #78C6DE;
-  --grad: linear-gradient(100deg, #78C6DE 0%, #A9DFEB 60%, #F5FAFF 100%);
+  --action: #4FB4EA;
+  --action-hover: #75C9F3;
+  --action-text: #07152B;
+  --link: #75C9F3;
+  --nav-active-bg: #12335B;
+  --nav-active-text: #A9DDF4;
+  --badge-bg: #12335B;
+  --badge-text: #A9DDF4;
+  --header-bg: rgba(7, 21, 43, .86);
+  --rail-bg: #081A33;
+  --rail-hover: #0F2A4D;
+  --panel: #050F20;
+  --panel-2: #0A1C37;
+  --skeleton: #12335B;
+  --focus: #75C9F3;
+  --grad: linear-gradient(100deg, #4FB4EA 0%, #75C9F3 55%, #F4FAFF 100%);
 
   --shadow-card: none;
-  --shadow-feature: 0 18px 50px rgba(0, 0, 0, .25);
+  --shadow-feature: 0 18px 50px rgba(0, 0, 0, .3);
 
   color-scheme: dark;
 }
@@ -220,8 +220,8 @@ dl, dd, figure { margin: 0; }
 .btn svg { width: 16px; height: 16px; stroke-width: 1.5; flex: none; }
 .btn--primary { background: var(--action); color: var(--action-text); }
 .btn--primary:hover { background: var(--action-hover); }
-:root.dark .btn--primary { box-shadow: inset 0 1px 0 rgba(169, 223, 235, .35), 0 0 0 1px rgba(120, 198, 222, .35), 0 8px 24px -10px rgba(120, 198, 222, .55); }
-:root.dark .btn--primary:hover { box-shadow: inset 0 1px 0 rgba(169, 223, 235, .45), 0 0 0 1px var(--light-blue), 0 10px 28px -8px rgba(120, 198, 222, .7); }
+:root.dark .btn--primary { box-shadow: inset 0 1px 0 rgba(169, 221, 244, .35), 0 0 0 1px rgba(79, 180, 234, .35), 0 8px 24px -10px rgba(79, 180, 234, .55); }
+:root.dark .btn--primary:hover { box-shadow: inset 0 1px 0 rgba(169, 221, 244, .45), 0 0 0 1px var(--light-blue), 0 10px 28px -8px rgba(79, 180, 234, .7); }
 .btn--secondary { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
 .btn--secondary:hover { border-color: var(--primary); }
 .btn--ghost { background: transparent; color: var(--link); padding: 0 8px; }
@@ -282,7 +282,7 @@ dl, dd, figure { margin: 0; }
 /* ---------- Loading ---------- */
 .skeleton { background: var(--skeleton); border-radius: 8px; position: relative; overflow: hidden; }
 .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .5), transparent); animation: shimmer 1.6s infinite; }
-:root.dark .skeleton::after { background: linear-gradient(90deg, transparent, rgba(169, 223, 235, .08), transparent); }
+:root.dark .skeleton::after { background: linear-gradient(90deg, transparent, rgba(169, 221, 244, .08), transparent); }
 @keyframes shimmer { to { transform: translateX(100%); } }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }

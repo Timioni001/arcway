@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 export const CELEBRATE_EVENT = "arcway:celebrate";
-const COLORS = ["#C9EAF3", "#78C6DE", "#3D91BE", "#2464A5", "#16A34A", "#F5FAFF"];
+const COLORS = ["#A9DDF4", "#4FB4EA", "#3298D8", "#246CB0", "#16A34A", "#F4FAFF"];
 
 /** A short burst of confetti when XP is claimed. Skipped entirely with reduced motion. */
 export function Celebrate() {

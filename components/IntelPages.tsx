@@ -198,7 +198,7 @@ export function SignalsView() {
 export function ProtocolActivity({ app }: { app: ArcApp }) {
   const measurable = appContracts(app).length > 0;
   const q = useProtocolIntel(app.slug, measurable);
-  if (!measurable) return <span className="xs secondary">Not measurable</span>;
+  if (!measurable) return <span className="xs secondary">Coming soon</span>;
   if (q.isPending) return <span className="skeleton" style={{ display: "inline-block", width: 60, height: 14 }} />;
   if (q.isError || !q.data) return <span className="xs secondary">Unavailable</span>;
   const p = q.data.data;
@@ -247,7 +247,7 @@ export function ProtocolDirectory() {
         ))}
       </div>
       <p className="xs secondary intel-note">
-        Activity is measured only for protocols that publish their contracts. <a className="link" href={explorer.home} target="_blank" rel="noopener noreferrer">Source: {explorer.name} <ArrowUpRight aria-hidden="true" style={{ width: 12, display: "inline" }} /></a>
+        Activity appears for protocols that publish their contracts; others show “coming soon”. <a className="link" href={explorer.home} target="_blank" rel="noopener noreferrer">Source: {explorer.name} <ArrowUpRight aria-hidden="true" style={{ width: 12, display: "inline" }} /></a>
       </p>
     </>
   );

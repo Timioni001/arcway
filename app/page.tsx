@@ -1,110 +1,182 @@
-import { ArrowRight, ArrowUpRight, Code2, Network, Target } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, Bot, Code2, Gem, Network, PiggyBank, Send, Target, TrendingUp, Trophy, type LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { Fragment } from "react";
-import { Campaign } from "../components/Campaign";
+import { Fragment, type ReactNode } from "react";
 import { AppMark } from "../components/CategoryIcon";
 import { EcosystemMap } from "../components/EcosystemMap";
-import { FeaturedProtocol, LiveNow, PulsePanel, RadarPanel, SignalsPanel, SnapshotGrid } from "../components/HomeIntel";
-import { PanelHead, SourceTag } from "../components/IntelBits";
+import { FloatingDots } from "../components/FloatingDots";
+import { HeroArt } from "../components/HeroArt";
+import { ArcRightNow, DiscoverApps, LearnArcLink, MoreLink, PulsePreview, WhatsNew } from "../components/Onboarding";
 import { Reveal } from "../components/Reveal";
 import { builderMark, buildersFrom } from "../lib/builders";
-import { SUBMIT_APP_URL } from "../lib/config";
-import { APPS, appContracts, discoverApps } from "../lib/registry";
+import { ARC_DOCS_URL } from "../lib/config";
+import { APPS, CATEGORIES, categoryCounts, discoverApps, type Category } from "../lib/registry";
+
+function Head({ id, kicker, title, lede, action }: { id: string; kicker: string; title: string; lede?: ReactNode; action?: ReactNode }) {
+  return (
+    <div className="ohead">
+      <div>
+        <div className="ohead__kicker">{kicker}</div>
+        <h2 id={id} className="ohead__title">{title}</h2>
+        {lede && <p className="ohead__lede">{lede}</p>}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+type Path = { icon: LucideIcon; title: string; body: string; href: string; cats: Category[] };
+const PATHS: Path[] = [
+  { icon: Send, title: "Move money", body: "Send, receive and bring dollars to Arc.", href: "/ecosystem?category=Payments#protocols", cats: ["Payments", "Bridges", "Wallets"] },
+  { icon: ArrowLeftRight, title: "Trade", body: "Swap stablecoins and currencies.", href: "/ecosystem?category=Trading#protocols", cats: ["Trading", "FX"] },
+  { icon: PiggyBank, title: "Earn", body: "Put dollars to work in lending markets.", href: `/ecosystem?category=${encodeURIComponent("Lend & Earn")}#protocols`, cats: ["Lend & Earn"] },
+  { icon: Code2, title: "Build", body: "See who's building and what they ship.", href: "/builders", cats: [] },
+  { icon: Network, title: "Explore", body: "Browse the whole ecosystem at once.", href: "/ecosystem", cats: [...CATEGORIES] }
+];
+
+const PILLARS: { icon: LucideIcon; title: string; body: string }[] = [
+  { icon: Send, title: "Payments", body: "Send and receive dollars as easily as a message. Network fees are paid in USDC too." },
+  { icon: TrendingUp, title: "Markets", body: "Trade stablecoins and currencies on apps built for fast, final settlement." },
+  { icon: Gem, title: "Assets", body: "Tokenized assets and collectibles, issued and held on an open network." },
+  { icon: Bot, title: "Agents", body: "Software that can hold and move money for you, within rules you set." }
+];
 
 export default function Home() {
-  const featured = discoverApps(APPS).find((a) => a.featured);
-  const builders = buildersFrom().slice(0, 6);
+  const live = APPS.filter((a) => a.active && !a.sample);
+  const counts = categoryCounts(live);
+  const builders = buildersFrom();
   const words = ["Understand", "what’s", "happening", "on"];
 
   return (
-    <div className="container page page--home">
-      <section className="ihero" aria-labelledby="hero-title">
-        <div className="ihero__copy">
-          <span className="eyebrow enter"><b>Arc</b>Ecosystem intelligence</span>
-          <h1 id="hero-title" className="ihero__title">
-            {words.map((w, i) => (
-              <Fragment key={w}><span className="word" style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</Fragment>
-            ))}
-            <span className="word gradient-text" style={{ "--i": words.length } as React.CSSProperties}>Arc.</span>
-          </h1>
-          <p className="ihero__sub enter enter-3">Explore applications, activity, builders and emerging signals across the Arc ecosystem.</p>
-          <div className="row enter enter-3" style={{ marginTop: 28, gap: 10 }}>
-            <Link href="/ecosystem" className="btn btn--primary">Explore ecosystem <ArrowRight aria-hidden="true" /></Link>
-            <Link href="/pulse" className="btn btn--secondary">View live activity</Link>
+    <div className="page page--home">
+      {/* 1. Hero */}
+      <section className="hero hero--v3" aria-labelledby="hero-title">
+        <div className="container hero__grid">
+          <div className="hero__copy">
+            <span className="eyebrow enter"><b>Arc</b>Ecosystem intelligence</span>
+            <h1 id="hero-title" className="hero__title">
+              {words.map((w, i) => (
+                <Fragment key={w}><span className="word" style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</Fragment>
+              ))}
+              <span className="word gradient-text" style={{ "--i": words.length } as React.CSSProperties}>Arc.</span>
+            </h1>
+            <p className="hero__sub enter enter-3">Explore the people, applications, markets and activity shaping the Arc ecosystem.</p>
+            <div className="hero__actions row enter enter-3">
+              <Link href="/ecosystem" className="btn btn--primary">Explore Arc <ArrowRight aria-hidden="true" /></Link>
+              <Link href="#how-arc" className="btn btn--secondary">How Arc works</Link>
+            </div>
           </div>
-          <p className="ihero__trust enter enter-3">
-            Every number shows its source and period. <Link href="/settings#data" className="link">How we measure</Link>
-          </p>
+          <HeroArt />
         </div>
-        <div className="ihero__live enter enter-2"><LiveNow /></div>
       </section>
 
-      <section className="band" aria-labelledby="snapshot-title">
-        <SnapshotGrid />
-      </section>
-
-      <section className="band" aria-labelledby="map-title">
-        <PanelHead icon={Network} title="Ecosystem map" id="map-title">
-          <Link href="/ecosystem" className="link small">Open ecosystem <ArrowRight aria-hidden="true" /></Link>
-        </PanelHead>
-        <Reveal><EcosystemMap compact /></Reveal>
-      </section>
-
-      <div className="split">
-        <section className="panel" aria-labelledby="pulse-title"><PulsePanel /></section>
-        <section className="panel" aria-labelledby="radar-title"><RadarPanel /></section>
-      </div>
-
-      {featured && (
-        <section className="band" aria-label="Featured protocol intelligence">
-          <FeaturedProtocol app={featured} />
-        </section>
-      )}
-
-      <div className="split split--wide-left">
-        <section className="panel" aria-labelledby="signals-title"><SignalsPanel /></section>
-        <section className="panel" aria-labelledby="builders-title">
-          <PanelHead icon={Code2} title="Builder activity" id="builders-title">
-            <SourceTag source="project" period="Registry" />
-          </PanelHead>
-          <ul className="brows">
-            {builders.map((b) => {
-              const contracts = b.apps.reduce((s, a) => s + appContracts(a).length, 0);
+      <div className="container">
+        {/* 2. Discovery paths */}
+        <section className="osec" aria-labelledby="paths-title">
+          <Head id="paths-title" kicker="Start here" title="What are you looking for?" />
+          <ul className="dpaths">
+            {PATHS.map((p, i) => {
+              const n = p.cats.reduce((s, c) => s + counts[c], 0);
               return (
-                <li key={b.id}>
-                  <Link href={`/builders/${b.id}`} className="brow">
-                    <AppMark app={builderMark(b)} size="sm" />
-                    <span className="brow__main">
-                      <span className="brow__name">{b.name}</span>
-                      <span className="xs secondary">{b.apps.map((a) => a.name).join(", ")}</span>
+                <Reveal as="li" key={p.title} delay={i * 60}>
+                  <Link href={p.href} className="dpath">
+                    <span className="dpath__icon"><p.icon aria-hidden="true" /></span>
+                    <span className="dpath__title">{p.title}</span>
+                    <span className="dpath__body">{p.body}</span>
+                    <span className="dpath__foot">
+                      <span>{p.title === "Build" ? `${builders.length} builders` : `${n} app${n === 1 ? "" : "s"}`}</span>
+                      <ArrowRight aria-hidden="true" />
                     </span>
-                    <span className="brow__stat mono xs">{contracts ? `${contracts} contract${contracts === 1 ? "" : "s"}` : `${b.apps.length} app${b.apps.length === 1 ? "" : "s"}`}</span>
                   </Link>
-                </li>
+                </Reveal>
               );
             })}
           </ul>
-          <Link href="/builders" className="link small panel__more">All builders <ArrowRight aria-hidden="true" /></Link>
         </section>
       </div>
 
-      <section className="band" aria-labelledby="quests-title">
-        <PanelHead icon={Target} title="Quests" id="quests-title">
-          <Link href="/quests" className="link small">All quests <ArrowRight aria-hidden="true" /></Link>
-        </PanelHead>
-        <Reveal><Campaign /></Reveal>
+      {/* 3. Arc, at a glance (blue section) */}
+      <section className="glance" id="how-arc" aria-labelledby="glance-title">
+        <FloatingDots count={26} seed={3} />
+        <div className="container glance__grid">
+          <div className="glance__copy">
+            <div className="ohead__kicker">Arc, at a glance</div>
+            <h2 id="glance-title" className="glance__title">An open network for money on the internet.</h2>
+            <p className="glance__lede">Arc is an open network for financial applications, stablecoin settlement and internet-native economic activity.</p>
+            <LearnArcLink href={ARC_DOCS_URL} />
+          </div>
+          <ul className="pillars">
+            {PILLARS.map((p) => (
+              <li key={p.title} className="pillar">
+                <span className="pillar__icon"><p.icon aria-hidden="true" /></span>
+                <span className="pillar__title">{p.title}</span>
+                <span className="pillar__body">{p.body}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
-      <section className="closing" aria-labelledby="build-title">
-        <div>
-          <h2 id="build-title" className="h3">Building on Arc?</h2>
-          <p className="secondary" style={{ marginTop: 6 }}>List your protocol so people can find it, follow it and see its activity.</p>
-        </div>
-        <div className="row" style={{ gap: 10 }}>
-          <a href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer" className="btn btn--secondary">
-            Get listed <ArrowUpRight aria-hidden="true" /><span className="visually-hidden"> (opens in a new tab)</span>
-          </a>
-          <Link href="/builders" className="btn btn--ghost">Explore builders <ArrowRight aria-hidden="true" /></Link>
+      <div className="container">
+        {/* 4. Arc right now */}
+        <section className="osec" aria-labelledby="now-title">
+          <Head id="now-title" kicker="Arc right now" title="A living ecosystem" lede="What's listed on Arcway today, and how busy the network is." />
+          <ArcRightNow apps={live.length} builders={builders.length} categories={CATEGORIES.length} />
+        </section>
+
+        {/* 5. Explore the ecosystem */}
+        <section className="osec" aria-labelledby="map-title">
+          <Head id="map-title" kicker="Explore the ecosystem" title="How it fits together" lede="Payments, trading, lending, assets, FX, agents, bridges and wallets, and the apps in each." action={<MoreLink href="/ecosystem">Explore full ecosystem</MoreLink>} />
+          <Reveal><EcosystemMap compact /></Reveal>
+        </section>
+
+        {/* 6. What's new */}
+        <section className="osec" aria-labelledby="new-title">
+          <Head id="new-title" kicker="What's new" title="Changes on Arc today" lede="New contracts, verifications and shifts in activity, each with its period and source." action={<MoreLink href="/radar">Open Radar</MoreLink>} />
+          <WhatsNew />
+        </section>
+
+        {/* 7. Discover applications */}
+        <section className="osec" aria-labelledby="apps-title">
+          <Head id="apps-title" kicker="Discover applications" title="Apps on Arc" action={<MoreLink href="/apps">Explore apps</MoreLink>} />
+          <DiscoverApps apps={discoverApps(APPS).filter((a) => !a.sample).slice(0, 6)} />
+        </section>
+
+        {/* 8. Who's building */}
+        <section className="osec" aria-labelledby="builders-title">
+          <Head id="builders-title" kicker="Who's building" title="The teams behind Arc's apps" action={<MoreLink href="/builders">Explore builders</MoreLink>} />
+          <ul className="bchips">
+            {builders.slice(0, 8).map((b) => (
+              <li key={b.id}>
+                <Link href={`/builders/${b.id}`} className="bchip">
+                  <AppMark app={builderMark(b)} size="sm" />
+                  <span><span className="bchip__name">{b.name}</span><span className="xs secondary">{b.apps.map((a) => a.name).join(", ")}</span></span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* 9. Arc Pulse preview */}
+        <section className="osec" aria-labelledby="pulse-title">
+          <Head id="pulse-title" kicker="Arc Pulse" title="Happening now" lede="App use, new contracts and USDC moving across Arc, in plain words." action={<MoreLink href="/pulse">View live activity</MoreLink>} />
+          <PulsePreview />
+        </section>
+      </div>
+
+      {/* 10. Quests (blue section) */}
+      <section className="glance glance--quests" aria-labelledby="quests-title">
+        <FloatingDots count={16} seed={19} />
+        <div className="container quests-band">
+          <div>
+            <div className="ohead__kicker">Quests</div>
+            <h2 id="quests-title" className="glance__title">Learn Arc by doing.</h2>
+            <ol className="quest-steps">
+              <li><Network aria-hidden="true" />Explore Arc</li>
+              <li><Target aria-hidden="true" />Complete missions</li>
+              <li><Trophy aria-hidden="true" />Earn XP</li>
+            </ol>
+          </div>
+          <Link href="/quests" className="btn btn--on-blue">Explore quests <ArrowRight aria-hidden="true" /></Link>
         </div>
       </section>
     </div>

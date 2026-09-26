@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Discover apps on Arc, complete quests and build your passport.",
     start_url: "/overview",
     display: "standalone",
-    background_color: "#F6FAFC",
-    theme_color: "#080D3D",
+    background_color: "#F7FAFC",
+    theme_color: "#10224A",
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icon-512.png", sizes: "512x512", type: "image/png" },

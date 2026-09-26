@@ -6,13 +6,13 @@ export function LogoMark({ className = "logo__mark", id = "aw-mark" }: { classNa
     <svg className={className} viewBox="0 0 32 32" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#3D91BE" />
-          <stop offset="1" stopColor="#193F7A" />
+          <stop stopColor="#3298D8" />
+          <stop offset="1" stopColor="#173E78" />
         </linearGradient>
       </defs>
       <rect width="32" height="32" rx="9" fill={`url(#${id})`} />
       <path d="M8 23v-6a8 8 0 0 1 16 0" stroke="#FFFFFF" strokeWidth="2.6" strokeLinecap="round" />
-      <circle cx="24" cy="22" r="2.8" fill="#C9EAF3" />
+      <circle cx="24" cy="22" r="2.8" fill="#A9DDF4" />
     </svg>
   );
 }

@@ -367,16 +367,38 @@ test("mobile uses a top dropdown and a five-item bottom bar", async ({ page, isM
   await expect(menu).toBeHidden();
 });
 
-test("overview shows sourced network metrics, pulse and signals", async ({ page }) => {
+test("overview onboards: hero, five paths, Arc explained, live context", async ({ page }) => {
   await open(page, "/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Understand what’s happening on Arc.");
+  await expect(page.locator(".hero").getByRole("link", { name: "Explore Arc" })).toHaveAttribute("href", "/ecosystem");
+  await expect(page.locator(".hero").getByRole("link", { name: "How Arc works" })).toHaveAttribute("href", "#how-arc");
+  const paths = page.getByRole("region", { name: "What are you looking for?" }).locator(".dpath");
+  await expect(paths).toHaveCount(5);
+  for (const t of ["Move money", "Trade", "Earn", "Build", "Explore"]) await expect(paths.filter({ hasText: t }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "An open network for money on the internet." })).toBeVisible();
+  // Live activity comes from data, with its source; the overview never leads with raw contract counts.
+  await expect(page.locator(".now__item--live .now__value")).toHaveText(/\d/);
+  await expect(page.locator(".emap__stats dd", { hasText: /^0$/ })).toHaveCount(0);
+  // The pulse preview hides failed and raw contract calls.
+  await expect(page.locator(".pulse-preview .pulse-row").first()).toBeVisible();
+  await expect(page.locator(".pulse-preview .pulse-row[data-kind='call'], .pulse-preview .pulse-row[data-failed]")).toHaveCount(0);
+  // Connect is available but secondary: not a hero action.
+  await expect(page.locator(".hero").getByRole("button", { name: /Connect/ })).toHaveCount(0);
+});
+
+test("radar keeps the full network snapshot with sources", async ({ page }) => {
+  await open(page, "/radar");
   const snapshot = page.locator(".metrics");
   await expect(snapshot.locator(".metric")).toHaveCount(INTEL.snapshot.data.metrics.length);
-  // Every metric states its source and period.
   expect(await snapshot.locator(".metric .src").count()).toBe(INTEL.snapshot.data.metrics.length);
-  await expect(page.locator(".pulse-row").first()).toBeVisible();
-  await expect(page.locator(".signal").first()).toBeVisible();
-  await expect(page.getByRole("link", { name: "Explore ecosystem" })).toHaveAttribute("href", "/ecosystem");
+});
+
+test("overview explains itself when live data is unavailable", async ({ page }) => {
+  await page.unroute("**/api/intel/**");
+  await mockIntel(page, { fail: true });
+  await open(page, "/");
+  await expect(page.locator(".now__value--soon")).toHaveText("Coming soon");
+  await expect(page.getByText("Live activity data coming soon")).toBeVisible();
 });
 
 test("when Arc data is unreachable, nothing is guessed", async ({ page }) => {
@@ -411,9 +433,9 @@ test("protocol pages show identity, contracts or an honest gap", async ({ page }
   await open(page, "/apps/uniswap");
   await expect(page.getByRole("heading", { level: 1, name: "Uniswap" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Onchain activity" })).toBeVisible();
-  await expect(page.getByRole("table", { name: "Published contracts" }).or(page.getByText("Not measurable yet"))).toBeVisible();
+  await expect(page.getByRole("table", { name: "Published contracts" }).or(page.getByText("Activity data coming soon"))).toBeVisible();
   await open(page, "/apps/aave");
-  await expect(page.getByText("Not measurable yet")).toBeVisible();
+  await expect(page.getByText("Activity data coming soon")).toBeVisible();
 });
 
 test("following builds a watchlist with a live count", async ({ page, isMobile }) => {

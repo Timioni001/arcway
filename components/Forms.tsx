@@ -2,15 +2,14 @@ import type { CSSProperties } from "react";
 
 /**
  * Arcway signature: overlapping vertical forms stepping through the blue
- * spectrum (sky → navy). Reads as route / layers / gateway. Pure CSS.
+ * spectrum (sky → blue). Reads as route / layers / gateway. Pure CSS.
  */
 const FORMS = [
-  { c: "#C9EAF3", x: -150, y: 46 },
-  { c: "#78C6DE", x: -90, y: 22 },
-  { c: "#3D91BE", x: -30, y: -2 },
-  { c: "#2464A5", x: 30, y: -26 },
-  { c: "#193F7A", x: 90, y: -50 },
-  { c: "#080D3D", x: 150, y: -74 }
+  { c: "#A9DDF4", x: -120, y: 38 },
+  { c: "#75C9F3", x: -60, y: 14 },
+  { c: "#4FB4EA", x: 0, y: -10 },
+  { c: "#3298D8", x: 60, y: -34 },
+  { c: "#246CB0", x: 120, y: -58 }
 ];
 
 export function Forms() {

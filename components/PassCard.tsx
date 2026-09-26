@@ -31,7 +31,7 @@ export function PassCardView({ address, xp, done }: { address?: string; xp: numb
         <div>
           <div className="pass__label">{address ? level.name : "Your level"}</div>
           <div className="pass__xp" style={{ marginTop: 8 }}>{String(shown).padStart(3, "0")} XP</div>
-          <div className="mono" style={{ marginTop: 10, fontSize: 13, color: "#A9DFEB" }}>{address ? shortAddress(address) : "0x0000…0000"}</div>
+          <div className="mono" style={{ marginTop: 10, fontSize: 13, color: "#A9DDF4" }}>{address ? shortAddress(address) : "0x0000…0000"}</div>
         </div>
         <div className="pass__dots" aria-hidden="true">
           {done.map((d, i) => <i key={i} data-on={d} />)}

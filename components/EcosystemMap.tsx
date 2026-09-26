@@ -95,9 +95,9 @@ export function EcosystemMap({ compact = false }: { compact?: boolean }) {
           <defs>
             <clipPath id="emap-clip" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5" /></clipPath>
             <radialGradient id="emap-core" cx=".35" cy=".3" r=".8">
-              <stop offset="0" stopColor="#78C6DE" />
-              <stop offset=".55" stopColor="#2464A5" />
-              <stop offset="1" stopColor="#080D3D" />
+              <stop offset="0" stopColor="#4FB4EA" />
+              <stop offset=".55" stopColor="#246CB0" />
+              <stop offset="1" stopColor="#10224A" />
             </radialGradient>
           </defs>
 
@@ -173,7 +173,7 @@ export function EcosystemMap({ compact = false }: { compact?: boolean }) {
                 <div><dt>Categories</dt><dd className="mono">{layout.nodes.filter((n) => n.kind === "category").length}</dd></div>
                 <div><dt>Apps</dt><dd className="mono">{apps.length}</dd></div>
                 <div><dt>Builders</dt><dd className="mono">{builders.length}</dd></div>
-                <div><dt>Published contracts</dt><dd className="mono">{contracts}</dd></div>
+                {contracts > 0 && <div><dt>Published contracts</dt><dd className="mono">{contracts}</dd></div>}
               </dl>
               <p className="xs secondary">Hover, focus or select a node to trace its connections. Relationships come from each project&apos;s listing.</p>
             </>

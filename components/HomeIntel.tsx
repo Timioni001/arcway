@@ -8,39 +8,7 @@ import { useIntel, useProtocolIntel } from "../lib/hooks/useIntel";
 import type { Change, RadarContract } from "../lib/intel";
 import { STATUS_LABEL, type ArcApp } from "../lib/registry";
 import { AppMark } from "./CategoryIcon";
-import { Delta, Entity, Freshness, IntelGate, MetricTile, PanelHead, PulseList, SignalList, SourceTag, Sparkline, compact, formatMetric } from "./Intel";
-
-/** Hero companion: the network right now, from the explorer. */
-export function LiveNow() {
-  const q = useIntel("snapshot");
-  const m = (id: string) => q.data?.data.metrics.find((x) => x.id === id);
-  const tx = m("tx-day");
-  const bt = m("block-time");
-  const nc = m("contracts-new");
-  return (
-    <section className="livenow" aria-labelledby="livenow-title">
-      <div className="livenow__head">
-        <h2 id="livenow-title" className="livenow__title"><Gauge aria-hidden="true" />Arc right now</h2>
-        <Freshness fetchedAt={q.data?.fetchedAt} fetching={q.isFetching && !q.isPending} unavailable={q.data?.unavailable} />
-      </div>
-      <IntelGate query={q} rows={5}>
-        <div className="livenow__chart">
-          <Sparkline points={q.data?.data.chart.slice(-30) ?? []} height={110} />
-          <SourceTag source="observed" period="Daily transactions, last 30 days (UTC)" />
-        </div>
-        <dl className="livenow__stats">
-          {[tx, bt, nc].filter(Boolean).map((x) => (
-            <div key={x!.id}>
-              <dt>{x!.label}</dt>
-              <dd className="mono">{formatMetric(x!)}</dd>
-              <span className="xs secondary">{x!.period}</span>
-            </div>
-          ))}
-        </dl>
-      </IntelGate>
-    </section>
-  );
-}
+import { Delta, Entity, Freshness, IntelGate, MetricTile, PanelHead, PulseList, SignalList, SourceTag, compact } from "./Intel";
 
 export function SnapshotGrid() {
   const q = useIntel("snapshot");
@@ -173,7 +141,7 @@ export function FeaturedProtocol({ app }: { app: ArcApp }) {
               <div><dt>Last active</dt><dd className="mono">{p.lastActive ? timeAgo(p.lastActive) : "—"}</dd><SourceTag source="observed" period="Latest transaction" /></div>
               <div><dt>Verified contracts</dt><dd className="mono">{p.contracts.filter((c) => c.verified).length}/{p.contracts.length}</dd><SourceTag source="observed" period="Explorer" /></div>
             </dl>
-          ) : <p className="small secondary">No published contracts on this network yet, so activity can&apos;t be measured.</p>)}
+          ) : <p className="small secondary">Activity data coming soon.</p>)}
         </IntelGate>
         <div className="row" style={{ gap: 10, marginTop: 16 }}>
           <Link href={`/apps/${app.slug}`} className="btn btn--primary btn--sm">Open protocol <ArrowRight aria-hidden="true" /></Link>

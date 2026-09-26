@@ -18,8 +18,8 @@ export function ProtocolIntelView({ slug, measurable }: { slug: string; measurab
         <div className="intel-empty" style={{ borderStyle: "solid" }}>
           <FileCode2 aria-hidden="true" style={{ color: "var(--text-muted)" }} />
           <div>
-            <div style={{ fontWeight: 600 }}>Not measurable yet</div>
-            <p className="small secondary">This team hasn&apos;t published contract addresses for {NETWORK_NAME}. Activity appears here once they do. Nothing is estimated in the meantime.</p>
+            <div style={{ fontWeight: 600 }}>Activity data coming soon</div>
+            <p className="small secondary">Onchain activity appears here once the team publishes its contract addresses for {NETWORK_NAME}. Nothing is estimated in the meantime.</p>
           </div>
           <a className="btn btn--secondary btn--sm" href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer">Submit contracts <ArrowUpRight aria-hidden="true" /></a>
         </div>

@@ -16,15 +16,15 @@ export default async function Image({ params }: { params: Promise<{ address: str
     (
       <OgFrame>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 26, letterSpacing: 4, color: "#A9DFEB", textTransform: "uppercase" }}>{s.level}</div>
+          <div style={{ fontSize: 26, letterSpacing: 4, color: "#A9DDF4", textTransform: "uppercase" }}>{s.level}</div>
           <div style={{ fontSize: 128, fontWeight: 700, lineHeight: 1, marginTop: 12, letterSpacing: -4 }}>{`${s.xp} XP`}</div>
           <div style={{ display: "flex", gap: 14, marginTop: 28, alignItems: "center" }}>
             {Array.from({ length: s.total }, (_, i) => (
-              <div key={i} style={{ width: 56, height: 10, borderRadius: 10, background: i < s.badges ? "#78C6DE" : "rgba(245,250,255,.2)" }} />
+              <div key={i} style={{ width: 56, height: 10, borderRadius: 10, background: i < s.badges ? "#4FB4EA" : "rgba(245,250,255,.2)" }} />
             ))}
-            <div style={{ fontSize: 26, color: "#C9EAF3", marginLeft: 12 }}>{`${s.badges}/${s.total} badges`}</div>
+            <div style={{ fontSize: 26, color: "#A9DDF4", marginLeft: 12 }}>{`${s.badges}/${s.total} badges`}</div>
           </div>
-          <div style={{ fontSize: 28, marginTop: 24, color: "#A9DFEB", fontFamily: "monospace" }}>{valid ? shortAddress(getAddress(address)) : ""}</div>
+          <div style={{ fontSize: 28, marginTop: 24, color: "#A9DDF4", fontFamily: "monospace" }}>{valid ? shortAddress(getAddress(address)) : ""}</div>
         </div>
       </OgFrame>
     ),
