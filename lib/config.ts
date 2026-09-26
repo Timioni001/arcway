@@ -30,7 +30,7 @@ export const PASSPORT_ADDRESS = optionalAddress(process.env.NEXT_PUBLIC_PASSPORT
 /** Where "Bring USDC" sends people. Testnet defaults to Circle's faucet. */
 export const BRIDGE_URL =
   process.env.NEXT_PUBLIC_BRIDGE_URL ||
-  (IS_MAINNET ? "https://developers.circle.com/cctp" : "https://faucet.circle.com");
+  (IS_MAINNET ? "https://portal.arc.io" : "https://faucet.circle.com");
 
 const explorerBase = arcChain.blockExplorers?.default.url.replace(/\/$/, "") ?? "";
 

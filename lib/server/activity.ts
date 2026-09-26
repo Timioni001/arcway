@@ -24,7 +24,9 @@ type BlockscoutTx = {
 /** Recent transactions sent by `address`, from the explorer's Blockscout v2 API. */
 export async function fetchActivity(address: Address, fetchImpl: typeof fetch = fetch): Promise<ActivityItem[]> {
   if (!explorer.apiV2) throw new Error("No explorer API configured for this network");
-  const res = await fetchImpl(`${explorer.apiV2}/addresses/${address}/transactions?filter=from`, {
+  // Optional key for higher explorer rate limits (Blockscout Pro API).
+  const key = process.env.EXPLORER_API_KEY ? `&apikey=${encodeURIComponent(process.env.EXPLORER_API_KEY)}` : "";
+  const res = await fetchImpl(`${explorer.apiV2}/addresses/${address}/transactions?filter=from${key}`, {
     headers: { accept: "application/json" },
     next: { revalidate: 15 }
   } as RequestInit);

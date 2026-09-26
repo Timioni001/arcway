@@ -228,3 +228,11 @@ test("the app can be installed", async ({ request }) => {
   expect(m.name).toBe("Arcway");
   expect((await request.get("/icon-512.png")).status()).toBe(200);
 });
+
+test("health check reports launch readiness as JSON", async ({ request }) => {
+  const res = await request.get("/api/health");
+  expect([200, 503]).toContain(res.status());
+  const h = await res.json();
+  expect(h).toMatchObject({ network: expect.stringMatching(/testnet|mainnet/), passport: expect.any(Object), verifier: expect.any(Object) });
+  expect(JSON.stringify(h)).not.toMatch(/private|0x[0-9a-f]{64}/i);
+});

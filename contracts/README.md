@@ -2,7 +2,11 @@
 
 ## ArcwayPassport
 
-Minimal on-chain reputation registry.
+Minimal on-chain reputation registry: XP, quest completions and badges written by
+an authorised verifier. Two-step ownership, per-quest XP cap, zero-address checks.
+
+`script/Deploy.s.sol` deploys it and, if `VERIFIER_ADDRESS` is set, authorises the
+verifier in the same run. Mainnet steps: `../docs/DEPLOY.md`.
 
 ### Local test
 

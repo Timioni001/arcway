@@ -32,6 +32,13 @@ export const passportAbi = [
   },
   {
     type: "function",
+    name: "verifier",
+    stateMutability: "view",
+    inputs: [{ name: "", type: "address" }],
+    outputs: [{ name: "", type: "bool" }]
+  },
+  {
+    type: "function",
     name: "completeQuest",
     stateMutability: "nonpayable",
     inputs: [
