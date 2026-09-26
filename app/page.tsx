@@ -1,4 +1,6 @@
 import { ArrowLeftRight, ArrowRight, Bot, Code2, Gem, Network, PiggyBank, Send, Target, TrendingUp, Trophy, type LucideIcon } from "lucide-react";
+import { IconOrb, type OrbHue } from "../components/IconOrb";
+import { PassportPromo } from "../components/PassportPromo";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import { AppMark } from "../components/CategoryIcon";
@@ -24,20 +26,20 @@ function Head({ id, kicker, title, lede, action }: { id: string; kicker: string;
   );
 }
 
-type Path = { icon: LucideIcon; title: string; body: string; href: string; cats: Category[] };
+type Path = { icon: LucideIcon; hue: OrbHue; title: string; body: string; href: string; cats: Category[] };
 const PATHS: Path[] = [
-  { icon: Send, title: "Move money", body: "Send, receive and bring dollars to Arc.", href: "/ecosystem?category=Payments#protocols", cats: ["Payments", "Bridges", "Wallets"] },
-  { icon: ArrowLeftRight, title: "Trade", body: "Swap stablecoins and currencies.", href: "/ecosystem?category=Trading#protocols", cats: ["Trading", "FX"] },
-  { icon: PiggyBank, title: "Earn", body: "Put dollars to work in lending markets.", href: `/ecosystem?category=${encodeURIComponent("Lend & Earn")}#protocols`, cats: ["Lend & Earn"] },
-  { icon: Code2, title: "Build", body: "See who's building and what they ship.", href: "/builders", cats: [] },
-  { icon: Network, title: "Explore", body: "Browse the whole ecosystem at once.", href: "/ecosystem", cats: [...CATEGORIES] }
+  { icon: Send, hue: "blue", title: "Move money", body: "Send, receive and bring dollars to Arc.", href: "/ecosystem?category=Payments#protocols", cats: ["Payments", "Bridges", "Wallets"] },
+  { icon: ArrowLeftRight, hue: "teal", title: "Trade", body: "Swap stablecoins and currencies.", href: "/ecosystem?category=Trading#protocols", cats: ["Trading", "FX"] },
+  { icon: PiggyBank, hue: "green", title: "Earn", body: "Put dollars to work in lending markets.", href: `/ecosystem?category=${encodeURIComponent("Lend & Earn")}#protocols`, cats: ["Lend & Earn"] },
+  { icon: Code2, hue: "violet", title: "Build", body: "See who's building and what they ship.", href: "/builders", cats: [] },
+  { icon: Network, hue: "amber", title: "Explore", body: "Browse the whole ecosystem at once.", href: "/ecosystem", cats: [...CATEGORIES] }
 ];
 
-const PILLARS: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: Send, title: "Payments", body: "Send and receive dollars as easily as a message. Network fees are paid in USDC too." },
-  { icon: TrendingUp, title: "Markets", body: "Trade stablecoins and currencies on apps built for fast, final settlement." },
-  { icon: Gem, title: "Assets", body: "Tokenized assets and collectibles, issued and held on an open network." },
-  { icon: Bot, title: "Agents", body: "Software that can hold and move money for you, within rules you set." }
+const PILLARS: { icon: LucideIcon; hue: OrbHue; title: string; body: string }[] = [
+  { icon: Send, hue: "sky", title: "Payments", body: "Send and receive dollars as easily as a message. Network fees are paid in USDC too." },
+  { icon: TrendingUp, hue: "teal", title: "Markets", body: "Trade stablecoins and currencies on apps built for fast, final settlement." },
+  { icon: Gem, hue: "pink", title: "Assets", body: "Tokenized assets and collectibles, issued and held on an open network." },
+  { icon: Bot, hue: "amber", title: "Agents", body: "Software that can hold and move money for you, within rules you set." }
 ];
 
 export default function Home() {
@@ -79,7 +81,7 @@ export default function Home() {
               return (
                 <Reveal as="li" key={p.title} delay={i * 60}>
                   <Link href={p.href} className="dpath">
-                    <span className="dpath__icon"><p.icon aria-hidden="true" /></span>
+                    <IconOrb icon={p.icon} hue={p.hue} />
                     <span className="dpath__title">{p.title}</span>
                     <span className="dpath__body">{p.body}</span>
                     <span className="dpath__foot">
@@ -107,7 +109,7 @@ export default function Home() {
           <ul className="pillars">
             {PILLARS.map((p) => (
               <li key={p.title} className="pillar">
-                <span className="pillar__icon"><p.icon aria-hidden="true" /></span>
+                <IconOrb icon={p.icon} hue={p.hue} size="sm" glass />
                 <span className="pillar__title">{p.title}</span>
                 <span className="pillar__body">{p.body}</span>
               </li>
@@ -161,6 +163,11 @@ export default function Home() {
           <Head id="pulse-title" kicker="Arc Pulse" title="Happening now" lede="App use, new contracts and USDC moving across Arc, in plain words." action={<MoreLink href="/pulse">View live activity</MoreLink>} />
           <PulsePreview />
         </section>
+
+        {/* Passport and XP: the reason to come back */}
+        <section className="osec" aria-labelledby="passport-title">
+          <PassportPromo />
+        </section>
       </div>
 
       {/* 10. Quests (blue section) */}
@@ -171,9 +178,9 @@ export default function Home() {
             <div className="ohead__kicker">Quests</div>
             <h2 id="quests-title" className="glance__title">Learn Arc by doing.</h2>
             <ol className="quest-steps">
-              <li><Network aria-hidden="true" />Explore Arc</li>
-              <li><Target aria-hidden="true" />Complete missions</li>
-              <li><Trophy aria-hidden="true" />Earn XP</li>
+              <li><IconOrb icon={Network} hue="sky" size="sm" />Explore Arc</li>
+              <li><IconOrb icon={Target} hue="amber" size="sm" />Complete missions</li>
+              <li><IconOrb icon={Trophy} hue="pink" size="sm" />Earn XP</li>
             </ol>
           </div>
           <Link href="/quests" className="btn btn--on-blue">Explore quests <ArrowRight aria-hidden="true" /></Link>
