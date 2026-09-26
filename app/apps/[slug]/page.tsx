@@ -7,7 +7,7 @@ import { OpenAppButton } from "../../../components/OpenAppButton";
 import { ExternalLink } from "../../../components/Status";
 import { NETWORK_NAME, explorer } from "../../../lib/config";
 import { shortAddress, timeAgo } from "../../../lib/format";
-import { APPS, appLink, getApp } from "../../../lib/registry";
+import { APPS, appContracts, appLink, getApp, isVerified } from "../../../lib/registry";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -32,7 +32,8 @@ export default async function AppDetail({ params }: Props) {
   const app = getApp((await params).slug);
   if (!app) notFound();
   const href = appLink(app);
-  const contracts = app.contractAddresses;
+  const contracts = appContracts(app);
+  const verified = isVerified(app);
 
   return (
     <div className="container page">
@@ -90,16 +91,16 @@ export default async function AppDetail({ params }: Props) {
             <dl className="facts">
               <div><dt>Category</dt><dd>{app.category}</dd></div>
               <div><dt>Network</dt><dd>{NETWORK_NAME}</dd></div>
-              <div><dt>Verified by Arcway</dt><dd><Fact ok={app.verified}>{app.verified ? "Yes" : "Not yet"}</Fact></dd></div>
-              <div><dt>Counts for quests</dt><dd><Fact ok={app.verified && !app.sample}>{app.verified && !app.sample ? "Yes" : "No"}</Fact></dd></div>
+              <div><dt>Verified by Arcway</dt><dd><Fact ok={verified}>{verified ? "Yes" : "Not yet"}</Fact></dd></div>
+              <div><dt>Counts for quests</dt><dd><Fact ok={verified}>{verified ? "Yes" : "Not yet"}</Fact></dd></div>
               {contracts.length > 0 && (
                 <div>
                   <dt>Contract</dt>
                   <dd>{contracts.map((a) => <a key={a} className="mono link" href={explorer.address(a)} target="_blank" rel="noopener noreferrer">{shortAddress(a)}</a>)}</dd>
                 </div>
               )}
-              {app.verification?.sourceUrl && <div><dt>Source code</dt><dd><ExternalLink href={app.verification.sourceUrl}>Public</ExternalLink></dd></div>}
-              {app.verification && <div><dt>Last checked</dt><dd>{timeAgo(app.verification.checkedAt)}</dd></div>}
+              {verified && app.verification && <div><dt>Checked against</dt><dd><ExternalLink href={app.verification.sourceUrl}>Team&apos;s source</ExternalLink></dd></div>}
+              {verified && app.verification && <div><dt>Last checked</dt><dd>{timeAgo(app.verification.checkedAt)}</dd></div>}
             </dl>
           </section>
         </aside>

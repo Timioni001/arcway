@@ -1,18 +1,12 @@
 import { ArrowRight, ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { STATUS_LABEL, type ArcApp } from "../lib/registry";
-import { CategoryTile } from "./CategoryIcon";
+import { STATUS_LABEL, isVerified, type ArcApp } from "../lib/registry";
+import { AppMark } from "./CategoryIcon";
 import { Forms } from "./Forms";
 
-/** The app's own logo in a controlled container, or its category icon until one is added. */
+/** Kept for existing call sites: the app's mark. */
 export function AppLogo({ app, size = "md" }: { app: ArcApp; size?: "md" | "lg" }) {
-  if (!app.logo) return <CategoryTile category={app.category} size={size} />;
-  return (
-    <span className={`app-logo${size === "lg" ? " app-logo--lg" : ""}`} aria-hidden="true">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={app.logo} alt="" />
-    </span>
-  );
+  return <AppMark app={app} size={size} />;
 }
 
 /** One status badge, plus Verified only when there's a verification basis. Text, not colour alone. */
@@ -24,7 +18,7 @@ export function AppBadges({ app }: { app: ArcApp }) {
       ) : (
         <span className={`badge ${app.status === "live" ? "badge--live" : ""}`}><span className="dot" />{app.status === "live" ? "Live" : STATUS_LABEL[app.status]}</span>
       )}
-      {app.verified && <span className="badge"><ShieldCheck aria-hidden="true" />Verified</span>}
+      {isVerified(app) && <span className="badge"><ShieldCheck aria-hidden="true" />Verified</span>}
     </span>
   );
 }

@@ -12,3 +12,5 @@ contracts/cache
 contracts/out
 contracts/broadcast
 contracts/lib
+test-results
+playwright-report

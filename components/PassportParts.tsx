@@ -6,6 +6,7 @@ import { useArcwayState } from "../lib/hooks/context";
 import { useCountUp } from "../lib/hooks/useCountUp";
 import { levelFor } from "../lib/levels";
 import { visitedApps } from "../lib/visited";
+import { Medal } from "./Medal";
 
 export function ProfileCard() {
   const { xp, connection, progress } = useArcwayState();
@@ -53,19 +54,19 @@ export function PassportStats() {
   );
 }
 
-/** One badge per starter quest; earned once it's recorded onchain. */
+/** One badge per starter quest; earned once it's claimed. */
 export function Badges() {
   const { quests, connection } = useArcwayState();
   const connected = connection.status === "connected";
   return (
     <ul className="badges">
-      {quests.map((q) => {
+      {quests.map((q, i) => {
         const earned = connected && q.status === "completed";
         return (
-          <li key={q.id} className="badge-tile" data-earned={earned}>
-            <span className="badge-tile__art" aria-hidden="true"><i /><i /><i /></span>
+          <li key={q.id} className="badge-tile spotlight" data-earned={earned}>
+            <Medal questId={q.id} index={i} earned={earned} />
             <span className="small" style={{ fontWeight: 600 }}>{q.title}</span>
-            <span className="xs secondary">{earned ? "Earned" : "Not earned yet"}</span>
+            <span className="xs secondary">{earned ? "Earned" : `+${q.xp} XP · not earned yet`}</span>
           </li>
         );
       })}

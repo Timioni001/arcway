@@ -1,22 +1,17 @@
 'use client';
 
 import { ArrowUpRight, CircleAlert, Clock, Wallet } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { apiFetch, type ActivityItem } from "../lib/api";
+import type { ActivityItem } from "../lib/api";
 import { explorer } from "../lib/config";
 import { dayLabel, shortAddress, timeAgo } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
+import { useActivity } from "../lib/hooks/useActivity";
 import { StateBlock } from "./Section";
 
 /** Clean timeline grouped by day, not an explorer table. */
 export function Activity({ limit = 20 }: { limit?: number }) {
-  const { address, connection } = useArcwayState();
-  const activity = useQuery({
-    queryKey: ["arcway", "activity", address],
-    queryFn: () => apiFetch<{ items: ActivityItem[] }>(`/api/activity?address=${address}`),
-    enabled: Boolean(address),
-    refetchInterval: 30_000
-  });
+  const { connection } = useArcwayState();
+  const activity = useActivity();
 
   if (connection.status !== "connected") {
     return <StateBlock icon={Wallet} title="No wallet connected">Connect a wallet to see your activity on Arc.</StateBlock>;

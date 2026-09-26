@@ -1,40 +1,47 @@
-import { ArrowLeftRight, Bot, Coins, FlaskConical, Gem, Landmark, Send, Server, Wrench, type LucideIcon } from "lucide-react";
-import { CATEGORIES, type Category } from "../lib/registry";
+import { ArrowLeftRight, Bot, Coins, Gem, PiggyBank, Send, Wallet, Waypoints, type LucideIcon } from "lucide-react";
+import type { CSSProperties } from "react";
+import type { ArcApp, Category } from "../lib/registry";
 
-const ICONS: Record<Category, LucideIcon> = {
-  Payments: Send,
-  Trading: ArrowLeftRight,
-  DeFi: Landmark,
-  FX: Coins,
-  Assets: Gem,
-  Tools: Wrench,
-  Agents: Bot,
-  Infrastructure: Server,
-  Experiments: FlaskConical
+type Meta = { icon: LucideIcon; color: string; blurb: string };
+
+/** Each category owns one colour (all ≥3:1 on their tint in both themes) and one icon. */
+export const CATEGORY_META: Record<Category, Meta> = {
+  Payments: { icon: Send, color: "#2F6FDB", blurb: "Send, spend and get paid" },
+  Trading: { icon: ArrowLeftRight, color: "#0B8F87", blurb: "Swap and trade tokens" },
+  "Lend & Earn": { icon: PiggyBank, color: "#15803D", blurb: "Earn interest or borrow" },
+  FX: { icon: Coins, color: "#6E56CF", blurb: "Trade currencies" },
+  Bridges: { icon: Waypoints, color: "#C2410C", blurb: "Move money to Arc" },
+  Wallets: { icon: Wallet, color: "#A16207", blurb: "Hold and manage your money" },
+  "AI Agents": { icon: Bot, color: "#BE3A8C", blurb: "Assistants that act for you" },
+  Assets: { icon: Gem, color: "#DC3545", blurb: "Collectibles and tokenized assets" }
 };
 
-export const CATEGORY_BLURB: Record<Category, string> = {
-  Payments: "Send and receive USDC",
-  Trading: "Swap and trade",
-  DeFi: "Lend, borrow and earn",
-  FX: "Exchange currencies",
-  Assets: "Tokenized real-world assets",
-  Tools: "Wallets and utilities",
-  Agents: "AI that can pay and act",
-  Infrastructure: "Bridges and building blocks",
-  Experiments: "New and unusual ideas"
-};
-
-/** Rotates through three shades of the blue family so a grid of tiles has rhythm. */
-export function shadeFor(category: Category): 1 | 2 | 3 {
-  return ((CATEGORIES.indexOf(category) % 3) + 1) as 1 | 2 | 3;
-}
+const style = (category: Category) => ({ "--cat": CATEGORY_META[category].color }) as CSSProperties;
 
 export function CategoryTile({ category, size = "md" }: { category: Category; size?: "xs" | "md" | "lg" }) {
-  const Icon = ICONS[category];
+  const Icon = CATEGORY_META[category].icon;
   return (
-    <span className={`tile${size === "md" ? "" : ` tile--${size}`}`} data-shade={shadeFor(category)} aria-hidden="true">
+    <span className={`ctile${size === "md" ? "" : ` ctile--${size}`}`} style={style(category)} aria-hidden="true">
       <Icon />
     </span>
   );
+}
+
+function initials(name: string) {
+  const words = name.split(/\s+/).filter(Boolean);
+  return (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 1)).toUpperCase();
+}
+
+/** An app's mark: its own logo when added, otherwise a monogram in its category colour. */
+export function AppMark({ app, size = "md" }: { app: ArcApp; size?: "sm" | "md" | "lg" }) {
+  const cls = `ctile ctile--mono${size === "md" ? "" : ` ctile--${size}`}`;
+  if (app.logo) {
+    return (
+      <span className={`${cls} ctile--logo`} style={style(app.category)} aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={app.logo} alt="" />
+      </span>
+    );
+  }
+  return <span className={cls} style={style(app.category)} aria-hidden="true">{initials(app.name)}</span>;
 }

@@ -1,11 +1,13 @@
-import { ArrowRight, ArrowUpRight, BadgeCheck, Check, Trophy, Wallet } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
 import Link from "next/link";
+import { Fragment } from "react";
 import { BuilderCard, GetListedCard } from "../components/Builders";
 import { HeroArt } from "../components/HeroArt";
 import { AppShowcase, CategoryGrid, HowItWorks } from "../components/HomeSections";
 import { NextStepBar } from "../components/NextStepBar";
-import { PassCard } from "../components/PassCard";
-import { QuestPath } from "../components/QuestPath";
+import { Campaign } from "../components/Campaign";
+import { LiveMarquee } from "../components/LiveMarquee";
+import { PassportSection } from "../components/PassportSection";
 import { Reveal } from "../components/Reveal";
 import { SectionHeader } from "../components/Section";
 import { buildersFrom } from "../lib/builders";
@@ -25,8 +27,11 @@ export default function Home() {
         <div className="container hero__grid">
           <div className="hero__copy">
             <span className="eyebrow enter"><b>Arc</b>Apps, quests and your passport</span>
-            <h1 id="hero-title" className="hero__title enter enter-2">
-              Discover what&apos;s being built on <span className="gradient-text">Arc.</span>
+            <h1 id="hero-title" className="hero__title">
+              {["Discover", "what’s", "being", "built", "on"].map((w, i) => (
+                <Fragment key={w}><span className="word" style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</Fragment>
+              ))}
+              <span className="word gradient-text shimmer" style={{ "--i": 5 } as React.CSSProperties}>Arc.</span>
             </h1>
             <p className="hero__sub enter enter-3">
               Find apps worth trying, complete quick quests and build a passport of everything you do.
@@ -47,6 +52,10 @@ export default function Home() {
 
       <div className="container">
         <NextStepBar />
+      </div>
+      <LiveMarquee />
+
+      <div className="container">
 
         <section className="section" aria-labelledby="cats-title">
           <SectionHeader
@@ -77,27 +86,15 @@ export default function Home() {
           <SectionHeader
             label="Quests"
             titleId="quests-title"
-            title="Your first four quests."
-            sub="Each takes a few minutes. We check them automatically."
+            title="Start with the Arc Starter campaign."
+            sub="Four short quests. We check them automatically."
             action={<Link href="/quests" className="link">All quests <ArrowRight aria-hidden="true" /></Link>}
           />
-          <QuestPath />
+          <Reveal><Campaign /></Reveal>
         </section>
 
         <section className="section" id={SECTIONS.passport} aria-labelledby="passport-title">
-          <div className="showcase">
-            <Reveal className="showcase__copy">
-              <div className="label" style={{ color: "var(--link)", marginBottom: 10 }}>Passport</div>
-              <h2 id="passport-title" className="h2">A passport that grows with you.</h2>
-              <ul className="feature-list">
-                <li><span className="tile" data-shade="1"><Trophy aria-hidden="true" /></span><span><b>Earn XP</b><br /><span className="small secondary">Every quest you finish adds to your level.</span></span></li>
-                <li><span className="tile" data-shade="2"><BadgeCheck aria-hidden="true" /></span><span><b>Collect badges</b><br /><span className="small secondary">One for each milestone you reach.</span></span></li>
-                <li><span className="tile" data-shade="3"><Wallet aria-hidden="true" /></span><span><b>Yours to keep</b><br /><span className="small secondary">Tied to your wallet, not an account.</span></span></li>
-              </ul>
-              <Link href="/passport" className="btn btn--primary" style={{ marginTop: 32 }}>Open passport <ArrowRight aria-hidden="true" /></Link>
-            </Reveal>
-            <Reveal className="showcase__card"><PassCard /></Reveal>
-          </div>
+          <Reveal><PassportSection /></Reveal>
         </section>
 
         <section className="section" aria-labelledby="builders-title">

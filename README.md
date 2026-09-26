@@ -62,8 +62,9 @@ See `docs/DEPLOY.md` for step-by-step Vercel instructions (no local setup needed
 npm install
 cp .env.example .env.local   # defaults to Arc Testnet
 npm run dev
-npm test                     # journey, quest, registry and helper logic
+npm test                     # unit tests: journey, quests, registry, streaks, helpers
 npm run typecheck
+npm run build && npm run test:e2e   # browser tests on desktop and phone sizes
 ```
 
 Without `NEXT_PUBLIC_PASSPORT_CONTRACT` and `VERIFIER_PRIVATE_KEY` the app runs
@@ -96,9 +97,14 @@ Accessibility note: white text on the signature blue `#3D91BE` is only 3.5:1,
 so buttons and links use royal `#2464A5` (6.1:1). `#3D91BE` stays the brand
 colour for the hero forms, progress, focus and accents.
 
+Every push runs CI (`.github/workflows/ci.yml`): typecheck, unit tests, build,
+browser tests, and the contract tests.
+
 To add an app: add an entry to `APPS` in `lib/registry.ts` (optional logo in
 `public/apps/`). It gets a detail page, and its builder appears on
-`/builders` automatically.
+`/builders` automatically. Only list `contracts` that the team publishes
+themselves, per network, with `verification.sourceUrl` pointing at that source;
+that's what makes an app "Verified" and lets it count for the app quest.
 
 The Arc logo in `public/brand/arc/` is Circle's official file, used unmodified
 for "Built on Arc" attribution only. See `public/brand/arc/NOTICE.md`.
