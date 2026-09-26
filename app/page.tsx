@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { BuilderCard, GetListedCard } from "../components/Builders";
 import { HeroArt } from "../components/HeroArt";
-import { AppShowcase, CategoryGrid, HowItWorks } from "../components/HomeSections";
+import { CategoryGrid, HowItWorks, LiveOnArc } from "../components/HomeSections";
 import { NextStepBar } from "../components/NextStepBar";
 import { Campaign } from "../components/Campaign";
-import { LiveMarquee } from "../components/LiveMarquee";
+import { FeaturedApp } from "../components/AppCard";
 import { PassportSection } from "../components/PassportSection";
 import { PayPromo } from "../components/PayPromo";
 import { Reveal } from "../components/Reveal";
@@ -19,7 +19,7 @@ import { SECTIONS } from "../lib/sections";
 export default function Home() {
   const apps = discoverApps(APPS);
   const featured = apps.find((a) => a.featured);
-  const others = apps.filter((a) => a !== featured).slice(0, 3);
+  const live = apps.filter((a) => a !== featured && !a.sample);
   const builders = buildersFrom();
 
   return (
@@ -54,7 +54,6 @@ export default function Home() {
       <div className="container">
         <NextStepBar />
       </div>
-      <LiveMarquee />
 
       <div className="container">
 
@@ -69,18 +68,25 @@ export default function Home() {
         </section>
 
         <section className="section" id="how" aria-labelledby="how-title">
-          <SectionHeader label="How it works" titleId="how-title" title="Three steps to your first XP." />
+          <SectionHeader label="How it works" titleId="how-title" title="Discover, explore, take part." />
           <HowItWorks />
         </section>
 
-        <section className="section" id={SECTIONS.discover} aria-labelledby="apps-title">
+        {featured && (
+          <section className="section" id={SECTIONS.discover} aria-labelledby="featured-title">
+            <SectionHeader label="Featured" titleId="featured-title" title="Worth trying first." />
+            <Reveal><FeaturedApp app={featured} /></Reveal>
+          </section>
+        )}
+
+        <section className="section" aria-labelledby="live-title">
           <SectionHeader
-            label="Apps"
-            titleId="apps-title"
-            title="Worth trying."
-            action={<Link href="/apps" className="link">View all <ArrowRight aria-hidden="true" /></Link>}
+            label="Live on Arc"
+            titleId="live-title"
+            title={`${live.length + (featured ? 1 : 0)} apps listed on Arcway.`}
+            action={<Link href="/apps" className="link">Explore apps <ArrowRight aria-hidden="true" /></Link>}
           />
-          <AppShowcase featured={featured} others={others} />
+          <LiveOnArc apps={live.slice(0, 6)} />
         </section>
 
         <section className="section" id={SECTIONS.quests} aria-labelledby="quests-title">

@@ -1,10 +1,9 @@
-import { ArrowRight, ArrowUpRight, Compass, MousePointerClick, Trophy } from "lucide-react";
+import { ArrowRight, Compass, MousePointerClick, Trophy } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { categoryCounts, CATEGORIES, type ArcApp } from "../lib/registry";
-import { AppBadges, AppLogo } from "./AppCard";
+import { AppCard } from "./AppCard";
 import { CATEGORY_META, CategoryTile } from "./CategoryIcon";
-import { Forms } from "./Forms";
 import { Reveal } from "./Reveal";
 
 export function CategoryGrid({ apps }: { apps: ArcApp[] }) {
@@ -29,9 +28,9 @@ export function CategoryGrid({ apps }: { apps: ArcApp[] }) {
 }
 
 const STEPS = [
-  { icon: Compass, title: "Find an app", body: "Browse by what you want to do: pay, trade, save or build." },
-  { icon: MousePointerClick, title: "Try it", body: "Open the app and complete one simple action." },
-  { icon: Trophy, title: "Earn XP", body: "Claim XP and badges on your Arcway passport. Free." }
+  { icon: Compass, title: "Discover", body: "Find applications and experiments built on Arc." },
+  { icon: MousePointerClick, title: "Explore", body: "Open a project, understand what it does, and follow its links." },
+  { icon: Trophy, title: "Build / Participate", body: "Use the application, complete quests, or explore the builder ecosystem." }
 ];
 
 export function HowItWorks() {
@@ -49,43 +48,13 @@ export function HowItWorks() {
   );
 }
 
-export function AppShowcase({ featured, others }: { featured?: ArcApp; others: ArcApp[] }) {
+/** Live on Arc: real logos, real statuses. The count is the registry's own, never a made-up number. */
+export function LiveOnArc({ apps }: { apps: ArcApp[] }) {
   return (
-    <div className="bento">
-      {featured && (
-        <Reveal className="bento__cell">
-          <Link href={`/apps/${featured.slug}`} className="bento__feature hover-lift" aria-labelledby={`feat-${featured.id}`}>
-            <div className="bento__art">
-              <Forms />
-              <AppLogo app={featured} size="lg" />
-            </div>
-            <div className="bento__body">
-              <div className="row between">
-                <span className="label" style={{ color: "var(--link)" }}>Featured</span>
-                <AppBadges app={featured} />
-              </div>
-              <h3 id={`feat-${featured.id}`} className="h3">{featured.name}</h3>
-              <p className="secondary">{featured.tagline}</p>
-              <span className="link" style={{ marginTop: 4 }}>View app <ArrowRight aria-hidden="true" /></span>
-            </div>
-          </Link>
-        </Reveal>
-      )}
-      <ul className="bento__list">
-        {others.map((app, i) => (
-          <Reveal as="li" key={app.id} delay={i * 70}>
-            <Link href={`/apps/${app.slug}`} className="row-card">
-              <AppLogo app={app} />
-              <span style={{ minWidth: 0 }}>
-                <span className="h4" style={{ display: "block", fontSize: 16 }}>{app.name}</span>
-                <span className="xs secondary" style={{ display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{app.tagline}</span>
-                <span className="row-card__meta"><AppBadges app={app} /><span className="xs secondary">{app.category}</span></span>
-              </span>
-              <ArrowUpRight aria-hidden="true" />
-            </Link>
-          </Reveal>
-        ))}
-      </ul>
-    </div>
+    <ul className="cards">
+      {apps.map((app, i) => (
+        <Reveal as="li" key={app.id} delay={(i % 3) * 70}><AppCard app={app} /></Reveal>
+      ))}
+    </ul>
   );
 }

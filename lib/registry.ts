@@ -64,6 +64,7 @@ const MAINNET_LAUNCH = "2026-09-16";
 export const APPS: ArcApp[] = [
   {
     id: "uniswap",
+    logo: "/apps/uniswap.png",
     slug: "uniswap",
     name: "Uniswap",
     tagline: "Swap tokens with deep liquidity.",
@@ -105,6 +106,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "curve",
+    logo: "/apps/curve.png",
     slug: "curve",
     name: "Curve",
     tagline: "Low-slippage stablecoin swaps.",
@@ -120,6 +122,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "aave",
+    logo: "/apps/aave.png",
     slug: "aave",
     name: "Aave",
     tagline: "Earn interest on USDC, or borrow against it.",
@@ -136,6 +139,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "morpho",
+    logo: "/apps/morpho.png",
     slug: "morpho",
     name: "Morpho",
     tagline: "Curated vaults that put USDC to work.",
@@ -151,6 +155,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "hibachi",
+    logo: "/apps/hibachi.jpg",
     slug: "hibachi",
     name: "Hibachi",
     tagline: "Trade currencies with stablecoins.",
@@ -166,6 +171,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "wirex",
+    logo: "/apps/wirex.png",
     slug: "wirex",
     name: "Wirex",
     tagline: "Spend stablecoins with a card.",
@@ -196,6 +202,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "across",
+    logo: "/apps/across.png",
     slug: "across",
     name: "Across",
     tagline: "Move USDC to Arc from 17 chains.",
@@ -211,6 +218,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "circle-cctp",
+    logo: "/apps/circle-cctp.jpg",
     slug: "circle-cctp",
     name: "Circle CCTP",
     tagline: "Move native USDC between Arc and other chains.",
@@ -241,6 +249,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "metamask",
+    logo: "/apps/metamask.jpg",
     slug: "metamask",
     name: "MetaMask",
     tagline: "The popular browser and mobile wallet.",
@@ -256,6 +265,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "phantom",
+    logo: "/apps/phantom.jpg",
     slug: "phantom",
     name: "Phantom",
     tagline: "A simple multichain wallet.",
@@ -271,6 +281,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "bankr",
+    logo: "/apps/bankr.jpg",
     slug: "bankr",
     name: "Bankr",
     tagline: "An AI assistant that trades for you.",
@@ -286,6 +297,7 @@ export const APPS: ArcApp[] = [
   },
   {
     id: "opensea",
+    logo: "/apps/opensea.png",
     slug: "opensea",
     name: "OpenSea",
     tagline: "Collect and trade digital items.",
@@ -373,4 +385,42 @@ export function questEligibleContracts(apps: ArcApp[] = APPS, network: ArcNetwor
       .filter((app) => app.active && isVerified(app, network))
       .flatMap((app) => appContracts(app, network).map((a) => a.toLowerCase()))
   );
+}
+
+const DAY = 86_400_000;
+export const NEW_WINDOW_DAYS = 14;
+
+/** Listed within the last 14 days. */
+export function isNew(app: ArcApp, now: number = Date.now()): boolean {
+  const added = Date.parse(app.addedAt);
+  return !app.sample && Number.isFinite(added) && now - added >= 0 && now - added < NEW_WINDOW_DAYS * DAY;
+}
+
+export const STATUS_FILTERS = ["live", "beta", "experimental", "verified", "new"] as const;
+export type StatusFilter = (typeof STATUS_FILTERS)[number];
+export const STATUS_FILTER_LABEL: Record<StatusFilter, string> = {
+  live: "Live",
+  beta: "Beta",
+  experimental: "Experimental",
+  verified: "Verified",
+  new: "New"
+};
+
+export function matchesStatus(app: ArcApp, filter: StatusFilter, network: ArcNetwork = ARC_NETWORK, now: number = Date.now()): boolean {
+  if (filter === "verified") return isVerified(app, network);
+  if (filter === "new") return isNew(app, now);
+  return !app.sample && app.status === filter;
+}
+
+/** Only filters with at least one matching app, so no chip ever leads to an empty list. */
+export function availableStatusFilters(apps: ArcApp[], network: ArcNetwork = ARC_NETWORK, now: number = Date.now()): StatusFilter[] {
+  const active = apps.filter((a) => a.active);
+  return STATUS_FILTERS.filter((f) => active.some((a) => matchesStatus(a, f, network, now)));
+}
+
+/** The listed app that owns a contract on this network, if any. */
+export function appForContract(address: string | null | undefined, apps: ArcApp[] = APPS, network: ArcNetwork = ARC_NETWORK): ArcApp | undefined {
+  if (!address) return undefined;
+  const a = address.toLowerCase();
+  return apps.find((app) => app.active && !app.sample && appContracts(app, network).some((c) => c.toLowerCase() === a));
 }

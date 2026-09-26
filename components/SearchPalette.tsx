@@ -1,20 +1,21 @@
 'use client';
 
-import { Compass, Copy, CornerDownLeft, IdCard, Link2, Moon, Plus, Route, Search, Target, Users, type LucideIcon } from "lucide-react";
+import { Activity, Compass, Copy, CornerDownLeft, History, IdCard, Link2, Moon, Plus, Route, Search, Target, Users, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { buildersFrom } from "../lib/builders";
-import { QUESTS } from "../lib/quests";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { builderMark } from "../lib/builders";
+import { getRecent, getRecentServer, rememberSearch, subscribeRecent } from "../lib/recentSearches";
+import { searchAll, suggestedCategories } from "../lib/search";
 import { addArcToWallet } from "../lib/addToWallet";
 import { NETWORK_NAME } from "../lib/config";
 import { useArcwayState } from "../lib/hooks/context";
 import { useToast } from "../lib/hooks/toast";
 import { APPS, discoverApps } from "../lib/registry";
 import { toggleTheme } from "../lib/theme";
-import { TRAILS } from "../lib/trails";
 import { AppLogo } from "./AppCard";
+import { AppMark, CategoryTile } from "./CategoryIcon";
 
-type Item = { id: string; group: string; title: string; sub: string; href?: string; run?: () => void; icon: ReactNode; keywords?: string };
+type Item = { id: string; group: string; title: string; sub: string; href?: string; run?: () => void; icon: ReactNode; keywords?: string; fill?: string };
 
 const tile = (Icon: LucideIcon, shade: 1 | 2 | 3) => <span className="tile" data-shade={shade}><Icon aria-hidden="true" /></span>;
 
@@ -22,27 +23,39 @@ const PAGES: Item[] = [
   { id: "p-apps", group: "Pages", title: "Discover", sub: "Browse all apps", href: "/apps", icon: tile(Compass, 1) },
   { id: "p-quests", group: "Pages", title: "Quests", sub: "Earn XP", href: "/quests", icon: tile(Target, 2) },
   { id: "p-builders", group: "Pages", title: "Builders", sub: "Teams on Arc", href: "/builders", icon: tile(Users, 3) },
-  { id: "p-passport", group: "Pages", title: "Passport", sub: "Your XP and badges", href: "/passport", icon: tile(IdCard, 1) }
+  { id: "p-passport", group: "Pages", title: "Passport", sub: "Your XP and badges", href: "/passport", icon: tile(IdCard, 1) },
+  { id: "p-activity", group: "Pages", title: "Activity", sub: "Your recent transactions", href: "/activity", icon: tile(Activity, 2) }
 ];
 
-function results(term: string, actions: Item[]): Item[] {
+function results(term: string, actions: Item[], recent: string[]): Item[] {
   const t = term.trim().toLowerCase();
-  const apps = discoverApps(APPS, { search: t }).map<Item>((a) => ({
+  if (!t) {
+    const rec = recent.map<Item>((r) => ({ id: `r-${r}`, group: "Recent searches", title: r, sub: "Search again", icon: tile(History, 1), fill: r }));
+    const cats = suggestedCategories().map<Item>((c) => ({
+      id: `c-${c}`, group: "Suggested categories", title: c, sub: "Browse apps", href: `/apps?category=${encodeURIComponent(c)}`, icon: <CategoryTile category={c} size="sm" />
+    }));
+    return [...rec, ...cats, ...actions, ...PAGES];
+  }
+  const r = searchAll(t);
+  const apps = r.apps.map<Item>((a) => ({
     id: `a-${a.id}`, group: "Apps", title: a.name, sub: `${a.category} · ${a.tagline}`, href: `/apps/${a.slug}`, icon: <AppLogo app={a} />
   }));
-  if (!t) return [...actions, ...PAGES, ...apps.slice(0, 3)];
-  const quests = QUESTS.filter((q) => `${q.title} ${q.description}`.toLowerCase().includes(t)).map<Item>((q) => ({
+  const cats = r.categories.map<Item>((c) => ({
+    id: `c-${c}`, group: "Categories", title: c, sub: "Browse apps", href: `/apps?category=${encodeURIComponent(c)}`, icon: <CategoryTile category={c} size="sm" />
+  }));
+  const quests = r.quests.map<Item>((q) => ({
     id: `q-${q.id}`, group: "Quests", title: q.title, sub: `+${q.xp} XP · ${q.description}`, href: `/quests/${q.id}`, icon: tile(Target, 2)
   }));
-  const builders = buildersFrom().filter((b) => b.name.toLowerCase().includes(t)).map<Item>((b) => ({
-    id: `b-${b.id}`, group: "Builders", title: b.name, sub: `${b.apps.length} app${b.apps.length === 1 ? "" : "s"}`, href: "/builders", icon: tile(Users, 3)
+  const builders = r.builders.map<Item>((b) => ({
+    id: `b-${b.id}`, group: "Builders", title: b.name, sub: `${b.apps.length} app${b.apps.length === 1 ? "" : "s"}`, href: `/builders/${b.id}`, icon: <AppMark app={builderMark(b)} />
   }));
   const pages = PAGES.filter((p) => p.title.toLowerCase().includes(t));
-  const trails = TRAILS.filter((tr) => `${tr.title} ${tr.goal}`.toLowerCase().includes(t)).map<Item>((tr) => ({
+  const trails = r.trails.map<Item>((tr) => ({
     id: `t-${tr.id}`, group: "Trails", title: tr.title, sub: tr.goal, href: `/trails/${tr.id}`, icon: tile(Route, 1)
   }));
   const acts = actions.filter((a) => `${a.title} ${a.sub} ${a.keywords ?? ""}`.toLowerCase().includes(t));
-  return [...acts, ...apps, ...trails, ...quests, ...builders, ...pages];
+  const all: Item = { id: "s-all", group: "Search", title: `See all results for “${term.trim()}”`, sub: "Grouped by apps, categories, quests and builders", href: `/search?q=${encodeURIComponent(term.trim())}`, icon: tile(Search, 3) };
+  return [...acts, ...apps, ...cats, ...trails, ...quests, ...builders, ...pages, all];
 }
 
 /** Search everything from anywhere: ⌘K / Ctrl+K or "/". */
@@ -77,7 +90,8 @@ export function SearchPalette() {
     }
     return list;
   }, [connection.address, toast]);
-  const items = useMemo(() => results(term, actions), [term, actions]);
+  const recent = useSyncExternalStore(subscribeRecent, getRecent, getRecentServer);
+  const items = useMemo(() => results(term, actions, recent), [term, actions, recent]);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -110,6 +124,8 @@ export function SearchPalette() {
 
   const go = (item?: Item) => {
     if (!item) return;
+    if (item.fill) { setTerm(item.fill); inputRef.current?.focus(); return; }
+    if (term.trim()) rememberSearch(term);
     close();
     if (item.run) item.run();
     else if (item.href) router.push(item.href);

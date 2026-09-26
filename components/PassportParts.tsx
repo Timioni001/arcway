@@ -7,6 +7,7 @@ import { useCountUp } from "../lib/hooks/useCountUp";
 import { levelFor } from "../lib/levels";
 import { visitedApps } from "../lib/visited";
 import { Medal } from "./Medal";
+import { AddressAvatar } from "./AddressAvatar";
 
 export function ProfileCard() {
   const { xp, connection, progress } = useArcwayState();
@@ -18,7 +19,7 @@ export function ProfileCard() {
     <section className="card pad-lg" aria-labelledby="profile">
       <h2 id="profile" className="label">Profile</h2>
       <div className="profile" style={{ marginTop: 20 }}>
-        <span className="avatar avatar--lg" aria-hidden="true">{address ? address.slice(2, 3).toUpperCase() : "?"}</span>
+        <AddressAvatar address={address} size="lg" />
         <div>
           <div className="mono h4">{address ? shortAddress(address) : "Not connected"}</div>
           <div className="small secondary" style={{ marginTop: 2 }}>{level.name}</div>

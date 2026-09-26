@@ -1,11 +1,15 @@
 'use client';
 
-import { ArrowUpRight, CircleAlert, Clock, Wallet } from "lucide-react";
+import { ArrowLeftRight, ArrowUpRight, CircleAlert, Clock, Wallet } from "lucide-react";
+import Link from "next/link";
 import type { ActivityItem } from "../lib/api";
 import { explorer } from "../lib/config";
 import { dayLabel, shortAddress, timeAgo } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
 import { useActivity } from "../lib/hooks/useActivity";
+import { USDC_ADDRESS } from "../lib/config";
+import { appForContract } from "../lib/registry";
+import { AppMark } from "./CategoryIcon";
 import { StateBlock } from "./Section";
 
 /** Clean timeline grouped by day, not an explorer table. */
@@ -47,11 +51,18 @@ export function Activity({ limit = 20 }: { limit?: number }) {
         <section key={day} className="timeline__day" aria-label={day}>
           <h3 className="label">{day}</h3>
           <ul>
-            {txs.map((tx) => (
-              <li key={tx.hash} className="timeline__item" data-failed={!tx.success}>
+            {txs.map((tx) => {
+              const app = appForContract(tx.to);
+              const isUsdc = tx.to?.toLowerCase() === USDC_ADDRESS.toLowerCase();
+              return (
+              <li key={tx.hash} className="timeline__item timeline__item--rich" data-failed={!tx.success}>
+                {app ? <AppMark app={app} size="sm" /> : <span className="tile tile--sm" aria-hidden="true">{isUsdc ? <span className="usdc-mark">$</span> : <ArrowLeftRight />}</span>}
                 <div style={{ minWidth: 0 }}>
                   <div className="small" style={{ fontWeight: 500 }}>
-                    {tx.method ?? "Transfer"}{!tx.success && <span style={{ color: "var(--error)" }}> · Failed</span>}
+                    {app ? <Link href={`/apps/${app.slug}`} className="link-quiet">{app.name}</Link> : isUsdc ? "USDC" : tx.method ?? "Transfer"}
+                    {app && tx.method && <span className="secondary"> · {tx.method}</span>}
+                    {isUsdc && tx.method && <span className="secondary"> · {tx.method}</span>}
+                    {!tx.success && <span style={{ color: "var(--error)" }}> · Failed</span>}
                   </div>
                   <div className="xs secondary">
                     <span className="mono">{tx.to ? shortAddress(tx.to) : "New contract"}</span> · {timeAgo(tx.timestamp)}
@@ -61,7 +72,8 @@ export function Activity({ limit = 20 }: { limit?: number }) {
                   <ArrowUpRight aria-hidden="true" />
                 </a>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </section>
       ))}

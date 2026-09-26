@@ -82,6 +82,8 @@ export function Footer() {
               <li><a href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Arc docs</a></li>
               <li><a href={BRIDGE_URL} target="_blank" rel="noopener noreferrer">{IS_MAINNET ? "Get USDC" : "Get test USDC"}</a></li>
               <li><Link href="/pay">Create a pay link</Link></li>
+              <li><Link href="/activity">Your activity</Link></li>
+              <li><Link href="/search">Search</Link></li>
               <li><a href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer">Submit an app</a></li>
             </ul>
           </nav>

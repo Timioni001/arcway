@@ -1,16 +1,17 @@
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
-import type { BuilderView } from "../lib/builders";
+import { builderMark, type BuilderView } from "../lib/builders";
 import { SUBMIT_APP_URL } from "../lib/config";
+import { AppMark } from "./CategoryIcon";
 import { ExternalLink } from "./Status";
 
 export function BuilderCard({ builder }: { builder: BuilderView }) {
   return (
     <article className="builder-card card" aria-labelledby={`b-${builder.id}`}>
       <div className="row" style={{ gap: 14 }}>
-        <span className="avatar" aria-hidden="true">{builder.name.charAt(0)}</span>
+        <AppMark app={builderMark(builder)} />
         <div>
-          <h3 id={`b-${builder.id}`} className="h4">{builder.name}</h3>
+          <h3 id={`b-${builder.id}`} className="h4"><Link href={`/builders/${builder.id}`}>{builder.name}</Link></h3>
           <p className="xs secondary">{builder.apps.length} {builder.apps.length === 1 ? "app" : "apps"} on Arcway</p>
         </div>
       </div>

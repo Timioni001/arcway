@@ -3,7 +3,8 @@ import { expect, test, type Page } from "@playwright/test";
 const ROUTES = [
   "/", "/overview", "/apps", "/apps/uniswap", "/quests", "/quests/first-tx", "/builders", "/passport",
   "/passport/0x7a00000000000000000000000000000000092f1a", "/terms", "/privacy",
-  "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started"
+  "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
+  "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -235,4 +236,65 @@ test("health check reports launch readiness as JSON", async ({ request }) => {
   const h = await res.json();
   expect(h).toMatchObject({ network: expect.stringMatching(/testnet|mainnet/), passport: expect.any(Object), verifier: expect.any(Object) });
   expect(JSON.stringify(h)).not.toMatch(/private|0x[0-9a-f]{64}/i);
+});
+
+test("app marks use real logos or category icons, never initials", async ({ page }) => {
+  await page.goto("/apps");
+  await expect(page.locator(".app-card").first()).toBeVisible();
+  const marks = page.locator(".app-card .ctile");
+  expect(await marks.count()).toBeGreaterThan(10);
+  // Every mark holds an image or an icon, and no bare letters.
+  const texts = await marks.evaluateAll((els) => els.map((e) => (e.textContent ?? "").trim()));
+  expect(texts.filter(Boolean)).toEqual([]);
+  const logos = page.locator(".app-card .ctile--logo img");
+  expect(await logos.count()).toBeGreaterThan(8);
+  const broken = await logos.evaluateAll((imgs) => Promise.all((imgs as HTMLImageElement[]).map(async (img) => {
+    img.loading = "eager";
+    if (!img.complete) await new Promise((r) => { img.onload = img.onerror = r; });
+    return img.naturalWidth === 0 ? img.src : null;
+  })));
+  expect(broken.filter(Boolean)).toEqual([]);
+  await page.goto("/builders");
+  const avatars = await page.locator(".avatar").evaluateAll((els) => els.map((e) => (e.textContent ?? "").trim()));
+  expect(avatars.filter(Boolean)).toEqual([]);
+});
+
+test("featured card is contained and doesn't overlap the next section", async ({ page }) => {
+  await page.goto("/");
+  const card = page.locator(".featured-card").first();
+  await card.scrollIntoViewIfNeeded();
+  const cardBox = (await card.boundingBox())!;
+  const visual = (await page.locator(".featured-visual").first().boundingBox())!;
+  expect(visual.y + visual.height).toBeLessThanOrEqual(cardBox.y + cardBox.height + 1);
+  const next = (await page.getByRole("heading", { name: /apps listed on Arcway/ }).boundingBox())!;
+  expect(next.y).toBeGreaterThan(cardBox.y + cardBox.height);
+});
+
+test("status filters narrow Discover", async ({ page }) => {
+  await page.goto("/apps");
+  const all = await page.locator(".app-card").count();
+  await page.getByRole("group", { name: "Filter by status" }).getByRole("button", { name: "Beta" }).click();
+  await expect(page.locator(".app-card").first()).toBeVisible();
+  const beta = await page.locator(".app-card").count();
+  expect(beta).toBeLessThan(all);
+  expect(await page.locator(".app-card .badge", { hasText: "Beta" }).count()).toBe(beta);
+});
+
+test("search page groups results and remembers searches", async ({ page }) => {
+  await page.goto("/search");
+  await page.getByLabel(/Search apps, categories/).fill("circle");
+  await expect(page.getByRole("region", { name: "Builders" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Apps" })).toBeVisible();
+  await expect(page).toHaveURL(/q=circle/);
+  await page.getByLabel(/Search apps, categories/).fill("");
+  await expect(page.getByRole("button", { name: "circle" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Suggested categories" })).toBeVisible();
+});
+
+test("builder pages list their apps", async ({ page }) => {
+  await page.goto("/builders");
+  await page.getByRole("link", { name: "Circle", exact: true }).click();
+  await expect(page).toHaveURL(/\/builders\/circle$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Circle" })).toBeVisible();
+  await expect(page.locator(".app-card")).toHaveCount(2);
 });

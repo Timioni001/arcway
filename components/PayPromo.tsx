@@ -1,6 +1,7 @@
 import { ArrowRight, Check, QrCode, Zap } from "lucide-react";
 import Link from "next/link";
 import { Reveal } from "./Reveal";
+import { AddressAvatar } from "./AddressAvatar";
 
 /** Home section for pay links, with an example of what the payer sees. */
 export function PayPromo() {
@@ -20,7 +21,7 @@ export function PayPromo() {
         <div className="demo-pay" aria-hidden="true">
           <span className="demo-pay__tag">Example</span>
           <div className="row" style={{ gap: 12 }}>
-            <span className="avatar">M</span>
+            <AddressAvatar address="0x8f3a5c21d9e7b4a60c1f" />
             <span><span className="label">Pay</span><br /><span className="mono" style={{ fontWeight: 600 }}>0x7A00…2f1A</span></span>
           </div>
           <div className="demo-pay__amount"><span className="mono">25</span> <span className="secondary">USDC</span></div>

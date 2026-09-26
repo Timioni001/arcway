@@ -100,9 +100,9 @@
   --warning: #E0A84F;
   --error: #FF8A8A;
 
-  --action: #78C6DE;
-  --action-hover: #A9DFEB;
-  --action-text: #080D3D;
+  --action: #2A6BB3;
+  --action-hover: #2464A5;
+  --action-text: #FFFFFF;
   --link: #78C6DE;
   --nav-active-bg: #162A6B;
   --nav-active-text: #A9DFEB;
@@ -214,6 +214,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .btn svg { width: 16px; height: 16px; stroke-width: 1.5; flex: none; }
 .btn--primary { background: var(--action); color: var(--action-text); }
 .btn--primary:hover { background: var(--action-hover); }
+:root.dark .btn--primary { box-shadow: inset 0 1px 0 rgba(169, 223, 235, .35), 0 0 0 1px rgba(120, 198, 222, .35), 0 8px 24px -10px rgba(120, 198, 222, .55); }
+:root.dark .btn--primary:hover { box-shadow: inset 0 1px 0 rgba(169, 223, 235, .45), 0 0 0 1px var(--light-blue), 0 10px 28px -8px rgba(120, 198, 222, .7); }
 .btn--secondary { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
 .btn--secondary:hover { border-color: var(--primary); }
 .btn--ghost { background: transparent; color: var(--link); padding: 0 8px; }

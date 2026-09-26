@@ -1,4 +1,6 @@
+import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Activity } from "../../components/Activity";
 import { NextStep } from "../../components/NextStep";
 import { FeeCalculator } from "../../components/FeeCalculator";
@@ -20,7 +22,10 @@ export default function OverviewPage() {
         <div className="dash__main">
           <ActivityStrip />
           <section aria-labelledby="recent-title">
-            <h2 id="recent-title" className="h4" style={{ margin: "8px 0 14px" }}>Recent activity</h2>
+            <div className="row between" style={{ margin: "8px 0 14px" }}>
+              <h2 id="recent-title" className="h4">Recent activity</h2>
+              <Link href="/activity" className="link small">View all <ArrowRight aria-hidden="true" /></Link>
+            </div>
             <Activity limit={6} />
           </section>
         </div>

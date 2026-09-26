@@ -249,3 +249,62 @@ describe("trails", () => {
     expect(trailProgress(t, [`${t.id}:${t.steps[0].id}`, "other:x"])).toEqual({ done: 1, total: t.steps.length, complete: false });
   });
 });
+
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { appForContract, availableStatusFilters, isNew, matchesStatus } from "../lib/registry";
+import { builderId, builderMark, getBuilder } from "../lib/builders";
+import { resultCount, searchAll, suggestedCategories } from "../lib/search";
+import { addressHues } from "../lib/avatar";
+describe("status filters", () => {
+  const base = ALL_APPS[0];
+  it("marks apps new only within 14 days", () => {
+    const now = Date.parse("2026-09-26T00:00:00Z");
+    expect(isNew({ ...base, addedAt: "2026-09-20" }, now)).toBe(true);
+    expect(isNew({ ...base, addedAt: "2026-09-01" }, now)).toBe(false);
+    expect(isNew({ ...base, addedAt: "2026-10-01" }, now)).toBe(false);
+    expect(isNew({ ...base, addedAt: "2026-09-20", sample: true }, now)).toBe(false);
+  });
+  it("only offers filters that match at least one app", () => {
+    const now = Date.parse("2026-12-31T00:00:00Z");
+    const filters = availableStatusFilters(ALL_APPS, "mainnet", now);
+    expect(filters).toContain("live");
+    expect(filters).not.toContain("new");
+    for (const f of filters) expect(ALL_APPS.some((a) => a.active && matchesStatus(a, f, "mainnet", now))).toBe(true);
+  });
+  it("maps a contract back to its app", () => {
+    const uni = ALL_APPS.find((a) => a.id === "uniswap")!;
+    const c = uni.contracts!.mainnet![0];
+    expect(appForContract(c.toUpperCase().replace("0X", "0x"), ALL_APPS, "mainnet")?.id).toBe("uniswap");
+    expect(appForContract("0x0000000000000000000000000000000000000001", ALL_APPS, "mainnet")).toBeUndefined();
+    expect(appForContract(null)).toBeUndefined();
+  });
+});
+
+describe("logos", () => {
+  it("point at files that exist", () => {
+    for (const a of ALL_APPS) if (a.logo) expect(existsSync(join(process.cwd(), "public", a.logo)), a.id).toBe(true);
+  });
+  it("builders use a real logo when any of their apps has one", () => {
+    for (const b of buildersFrom()) if (b.apps.some((a) => a.logo)) expect(builderMark(b).logo).toBeTruthy();
+  });
+});
+
+describe("builders and search", () => {
+  it("builds stable slugs and finds builders by them", () => {
+    expect(builderId("Uniswap Labs")).toBe("uniswap-labs");
+    expect(getBuilder("uniswap-labs")?.apps.map((a) => a.id)).toContain("uniswap");
+    expect(getBuilder("nope")).toBeUndefined();
+  });
+  it("groups results by kind", () => {
+    expect(resultCount(searchAll(""))).toBe(0);
+    const r = searchAll("circle");
+    expect(r.builders.map((b) => b.id)).toContain("circle");
+    expect(searchAll("pay").categories).toContain("Payments");
+    expect(suggestedCategories(3)).toHaveLength(3);
+  });
+  it("gives every address its own avatar hues", () => {
+    expect(addressHues("0xabcdef123456")).toEqual(addressHues("0xABCDEF123456"));
+    expect(addressHues("0x111111222222")).not.toEqual(addressHues("0x999999888888"));
+  });
+});

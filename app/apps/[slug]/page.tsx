@@ -5,7 +5,9 @@ import { notFound } from "next/navigation";
 import { AppBadges, AppLogo } from "../../../components/AppCard";
 import { OpenAppButton } from "../../../components/OpenAppButton";
 import { SaveButton } from "../../../components/SaveButton";
+import { AppMark } from "../../../components/CategoryIcon";
 import { ExternalLink } from "../../../components/Status";
+import { builderId } from "../../../lib/builders";
 import { NETWORK_NAME, explorer } from "../../../lib/config";
 import { shortAddress, timeAgo } from "../../../lib/format";
 import { APPS, appContracts, appLink, getApp, isVerified } from "../../../lib/registry";
@@ -78,8 +80,8 @@ export default async function AppDetail({ params }: Props) {
               <h2 id="builder" className="h4">Builder</h2>
               <div className="row between" style={{ marginTop: 14 }}>
                 <span className="row" style={{ gap: 12 }}>
-                  <span className="avatar" aria-hidden="true">{app.builder.name.charAt(0)}</span>
-                  <span style={{ fontWeight: 600 }}>{app.builder.name}</span>
+                  <AppMark app={app} size="sm" />
+                  <Link href={`/builders/${builderId(app.builder.name)}`} className="link" style={{ fontWeight: 600 }}>{app.builder.name}</Link>
                 </span>
                 {app.builder.github && <ExternalLink href={app.builder.github}>GitHub</ExternalLink>}
               </div>

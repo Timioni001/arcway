@@ -15,6 +15,7 @@ import { useToast } from "../lib/hooks/toast";
 import { useWallet } from "../lib/hooks/useWallet";
 import { parseAmount } from "../lib/pay";
 import { CELEBRATE_EVENT } from "./Celebrate";
+import { AddressAvatar } from "./AddressAvatar";
 
 type Phase =
   | { kind: "idle" }
@@ -84,7 +85,7 @@ export function PayCheckout({ to, amount: fixed, note }: { to: Address; amount?:
   return (
     <div className="checkout card">
       <div className="checkout__head">
-        <span className="avatar avatar--lg" aria-hidden="true">{to.slice(2, 3).toUpperCase()}</span>
+        <AddressAvatar address={to} size="lg" />
         <div style={{ minWidth: 0 }}>
           <h1 className="checkout__title"><span className="label">Pay</span><span className="h4 mono">{shortAddress(to)}</span></h1>
           <Link href={`/passport/${to}`} className="link xs">View their passport</Link>
