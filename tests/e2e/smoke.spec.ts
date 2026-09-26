@@ -272,12 +272,16 @@ test("featured card is contained and doesn't overlap the next section", async ({
 
 test("status filters narrow Discover", async ({ page }) => {
   await page.goto("/apps");
-  const all = await page.locator(".app-card").count();
-  await page.getByRole("group", { name: "Filter by status" }).getByRole("button", { name: "Beta" }).click();
-  await expect(page.locator(".app-card").first()).toBeVisible();
-  const beta = await page.locator(".app-card").count();
-  expect(beta).toBeLessThan(all);
-  expect(await page.locator(".app-card .badge", { hasText: "Beta" }).count()).toBe(beta);
+  const cards = page.locator(".app-card");
+  await expect(cards.first()).toBeVisible();
+  const all = await cards.count();
+  const betaButton = page.getByRole("group", { name: "Filter by status" }).getByRole("button", { name: "Beta" });
+  await betaButton.click();
+  await expect(betaButton).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => cards.count()).toBeLessThan(all);
+  const beta = await cards.count();
+  expect(beta).toBeGreaterThan(0);
+  await expect(page.locator(".app-card .badge", { hasText: "Beta" })).toHaveCount(beta);
 });
 
 test("search page groups results and remembers searches", async ({ page }) => {
