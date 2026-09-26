@@ -31,7 +31,7 @@ function watchErrors(page: Page) {
 for (const route of ROUTES) {
   test(`${route} renders cleanly`, async ({ page }) => {
     const errors = watchErrors(page);
-    await page.goto(route);
+    await open(page, route);
     await expect(page.locator("h1").first()).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
     expect(overflow, "no sideways scrolling").toBe(false);
@@ -41,7 +41,7 @@ for (const route of ROUTES) {
 
 test("search pop-up finds an app and opens it", async ({ page, isMobile }) => {
   test.skip(isMobile, "keyboard shortcut is a desktop feature");
-  await page.goto("/");
+  await open(page, "/");
   await page.keyboard.press("Control+k");
   const input = page.getByRole("combobox");
   await expect(input).toBeFocused();
@@ -52,14 +52,14 @@ test("search pop-up finds an app and opens it", async ({ page, isMobile }) => {
 });
 
 test("category links open Discover filtered", async ({ page }) => {
-  await page.goto("/apps?category=Lend%20%26%20Earn");
+  await open(page, "/apps?category=Lend%20%26%20Earn");
   await expect(page.getByRole("button", { name: /Lend & Earn/ })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("link", { name: /Aave/ }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: /Uniswap/ })).toHaveCount(0);
 });
 
 test("dark theme toggles and persists", async ({ page, isMobile }) => {
-  await page.goto("/");
+  await open(page, "/");
   const html = page.locator("html");
   const wasDark = await html.evaluate((el) => el.classList.contains("dark"));
   if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
@@ -70,13 +70,13 @@ test("dark theme toggles and persists", async ({ page, isMobile }) => {
 });
 
 test("quest page asks to connect when no wallet", async ({ page }) => {
-  await page.goto("/quests/first-tx");
+  await open(page, "/quests/first-tx");
   await expect(page.getByRole("heading", { level: 1, name: "First transaction" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Connect wallet" }).last()).toBeVisible();
 });
 
 test("connecting with no wallet installed explains what to do", async ({ page }) => {
-  await page.goto("/overview");
+  await open(page, "/overview");
   await page.locator(".next-bar").getByRole("button", { name: /Connect wallet/ }).click();
   await expect(page.getByRole("alert").first()).toContainText("No browser wallet found");
 });
@@ -95,7 +95,7 @@ test("a connected wallet shows its address", async ({ page }) => {
       }
     };
   });
-  await page.goto("/passport");
+  await open(page, "/passport");
   await page.locator(".next-bar, .card").getByRole("button", { name: /Connect wallet/ }).first().click();
   await expect(page.getByText("0x7A00…2f1A").filter({ visible: true }).first()).toBeVisible();
 });
@@ -114,7 +114,7 @@ test("APIs validate input and fail safely", async ({ request }) => {
 });
 
 test("footer links to Terms and Privacy", async ({ page }) => {
-  await page.goto("/");
+  await open(page, "/");
   const legal = page.getByRole("navigation", { name: "Legal" });
   await legal.getByRole("link", { name: "Privacy Policy" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Privacy Policy" })).toBeVisible();
@@ -123,7 +123,7 @@ test("footer links to Terms and Privacy", async ({ page }) => {
 });
 
 test("following an app shows it under Following and survives a reload", async ({ page }) => {
-  await page.goto("/apps");
+  await open(page, "/apps");
   await page.getByRole("button", { name: "Follow Aave" }).click();
   await expect(page.getByRole("button", { name: "Unfollow Aave" })).toHaveAttribute("aria-pressed", "true");
   await page.reload();
@@ -133,7 +133,7 @@ test("following an app shows it under Following and survives a reload", async ({
 });
 
 test("sorting A–Z orders apps by name", async ({ page }) => {
-  await page.goto("/apps");
+  await open(page, "/apps");
   await page.getByLabel("Sort apps").selectOption("az");
   const names = await page.locator(".app-card h3").allTextContents();
   expect(names.length).toBeGreaterThan(3);
@@ -141,7 +141,7 @@ test("sorting A–Z orders apps by name", async ({ page }) => {
 });
 
 test("passport lookup validates the address", async ({ page }) => {
-  await page.goto("/passport");
+  await open(page, "/passport");
   const input = page.getByLabel("Look up a passport");
   await input.fill("hello");
   await page.getByRole("button", { name: "View" }).click();
@@ -158,7 +158,7 @@ test("an invalid passport address is a 404", async ({ page }) => {
 });
 
 test("fee calculator responds to the slider", async ({ page }) => {
-  await page.goto("/overview");
+  await open(page, "/overview");
   await expect(page.getByRole("heading", { name: "What things cost on Arc" })).toBeVisible();
   await page.getByLabel("How many times").fill("500");
   await expect(page.getByText("500 times")).toBeVisible();
@@ -186,7 +186,7 @@ const MOCK_WALLET = () => {
 };
 
 test("create a pay link with amount, note and QR", async ({ page }) => {
-  await page.goto("/pay");
+  await open(page, "/pay");
   await page.getByLabel("Pay to").fill("0x7a00000000000000000000000000000000092f1a");
   await page.getByLabel(/^Amount/).fill("12.5");
   await page.getByLabel(/^Note/).fill("Lunch");
@@ -198,34 +198,34 @@ test("create a pay link with amount, note and QR", async ({ page }) => {
 
 test("pay link walks the payer through connecting", async ({ page }) => {
   await page.addInitScript(MOCK_WALLET);
-  await page.goto("/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee");
+  await open(page, "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee");
   await expect(page.getByText("“Coffee”")).toBeVisible();
   await page.getByRole("button", { name: "Connect wallet to pay" }).click();
   await expect(page.getByRole("button", { name: "Send 5 USDC" }).or(page.getByRole("link", { name: /Not enough USDC/ }))).toBeVisible();
 });
 
 test("bad pay link parameters are ignored, bad addresses 404", async ({ page }) => {
-  await page.goto("/pay/0x7a00000000000000000000000000000000092f1a?amount=-3");
+  await open(page, "/pay/0x7a00000000000000000000000000000000092f1a?amount=-3");
   await expect(page.getByLabel("Amount")).toHaveValue("");
   const res = await page.goto("/pay/nope");
   expect(res?.status()).toBe(404);
 });
 
 test("trail steps can be marked done and persist", async ({ page }) => {
-  await page.goto("/trails/earn");
+  await open(page, "/trails/earn");
   const progress = page.locator(".trail-head__progress");
   await expect(progress).toContainText("0/4");
   await page.getByRole("button", { name: "Mark as done" }).first().click();
   await expect(progress).toContainText("1/4");
   await page.reload();
   await expect(progress).toContainText("1/4");
-  await page.goto("/apps");
+  await open(page, "/apps");
   await expect(page.getByRole("link", { name: /Earn on your USDC/ })).toContainText("Continue");
 });
 
 test("search actions run commands", async ({ page, isMobile }) => {
   test.skip(isMobile, "keyboard shortcut is a desktop feature");
-  await page.goto("/");
+  await open(page, "/");
   const html = page.locator("html");
   const wasDark = await html.evaluate((el) => el.classList.contains("dark"));
   await page.keyboard.press("Control+k");
@@ -251,7 +251,7 @@ test("health check reports launch readiness as JSON", async ({ request }) => {
 });
 
 test("app marks use real logos or category icons, never initials", async ({ page }) => {
-  await page.goto("/apps");
+  await open(page, "/apps");
   await expect(page.locator(".app-card").first()).toBeVisible();
   const marks = page.locator(".app-card .ctile");
   expect(await marks.count()).toBeGreaterThan(10);
@@ -266,13 +266,13 @@ test("app marks use real logos or category icons, never initials", async ({ page
     return img.naturalWidth === 0 ? img.src : null;
   })));
   expect(broken.filter(Boolean)).toEqual([]);
-  await page.goto("/builders");
+  await open(page, "/builders");
   const avatars = await page.locator(".avatar").evaluateAll((els) => els.map((e) => (e.textContent ?? "").trim()));
   expect(avatars.filter(Boolean)).toEqual([]);
 });
 
 test("featured card is contained and doesn't overlap what follows", async ({ page }) => {
-  await page.goto("/apps");
+  await open(page, "/apps");
   const card = page.locator(".featured-card").first();
   await card.scrollIntoViewIfNeeded();
   const cardBox = (await card.boundingBox())!;
@@ -283,7 +283,7 @@ test("featured card is contained and doesn't overlap what follows", async ({ pag
 });
 
 test("status filters narrow Discover", async ({ page }) => {
-  await page.goto("/apps");
+  await open(page, "/apps");
   const cards = page.locator(".app-card");
   await expect(cards.first()).toBeVisible();
   const all = await cards.count();
@@ -297,7 +297,7 @@ test("status filters narrow Discover", async ({ page }) => {
 });
 
 test("search page groups results and remembers searches", async ({ page }) => {
-  await page.goto("/search");
+  await open(page, "/search");
   await page.getByLabel(/Search apps, categories/).fill("circle");
   await expect(page.getByRole("region", { name: "Builders" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Apps" })).toBeVisible();
@@ -308,7 +308,7 @@ test("search page groups results and remembers searches", async ({ page }) => {
 });
 
 test("builder pages list their apps", async ({ page }) => {
-  await page.goto("/builders");
+  await open(page, "/builders");
   await page.getByRole("link", { name: "Circle", exact: true }).click();
   await expect(page).toHaveURL(/\/builders\/circle$/);
   await expect(page.getByRole("heading", { level: 1, name: "Circle" })).toBeVisible();
