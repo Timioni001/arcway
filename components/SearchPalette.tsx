@@ -1,14 +1,20 @@
 'use client';
 
-import { Compass, CornerDownLeft, IdCard, Search, Target, Users, type LucideIcon } from "lucide-react";
+import { Compass, Copy, CornerDownLeft, IdCard, Link2, Moon, Plus, Route, Search, Target, Users, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { buildersFrom } from "../lib/builders";
 import { QUESTS } from "../lib/quests";
+import { addArcToWallet } from "../lib/addToWallet";
+import { NETWORK_NAME } from "../lib/config";
+import { useArcwayState } from "../lib/hooks/context";
+import { useToast } from "../lib/hooks/toast";
 import { APPS, discoverApps } from "../lib/registry";
+import { toggleTheme } from "../lib/theme";
+import { TRAILS } from "../lib/trails";
 import { AppLogo } from "./AppCard";
 
-type Item = { id: string; group: string; title: string; sub: string; href: string; icon: ReactNode };
+type Item = { id: string; group: string; title: string; sub: string; href?: string; run?: () => void; icon: ReactNode; keywords?: string };
 
 const tile = (Icon: LucideIcon, shade: 1 | 2 | 3) => <span className="tile" data-shade={shade}><Icon aria-hidden="true" /></span>;
 
@@ -19,12 +25,12 @@ const PAGES: Item[] = [
   { id: "p-passport", group: "Pages", title: "Passport", sub: "Your XP and badges", href: "/passport", icon: tile(IdCard, 1) }
 ];
 
-function results(term: string): Item[] {
+function results(term: string, actions: Item[]): Item[] {
   const t = term.trim().toLowerCase();
   const apps = discoverApps(APPS, { search: t }).map<Item>((a) => ({
     id: `a-${a.id}`, group: "Apps", title: a.name, sub: `${a.category} · ${a.tagline}`, href: `/apps/${a.slug}`, icon: <AppLogo app={a} />
   }));
-  if (!t) return [...PAGES, ...apps.slice(0, 4)];
+  if (!t) return [...actions, ...PAGES, ...apps.slice(0, 3)];
   const quests = QUESTS.filter((q) => `${q.title} ${q.description}`.toLowerCase().includes(t)).map<Item>((q) => ({
     id: `q-${q.id}`, group: "Quests", title: q.title, sub: `+${q.xp} XP · ${q.description}`, href: `/quests/${q.id}`, icon: tile(Target, 2)
   }));
@@ -32,7 +38,11 @@ function results(term: string): Item[] {
     id: `b-${b.id}`, group: "Builders", title: b.name, sub: `${b.apps.length} app${b.apps.length === 1 ? "" : "s"}`, href: "/builders", icon: tile(Users, 3)
   }));
   const pages = PAGES.filter((p) => p.title.toLowerCase().includes(t));
-  return [...apps, ...quests, ...builders, ...pages];
+  const trails = TRAILS.filter((tr) => `${tr.title} ${tr.goal}`.toLowerCase().includes(t)).map<Item>((tr) => ({
+    id: `t-${tr.id}`, group: "Trails", title: tr.title, sub: tr.goal, href: `/trails/${tr.id}`, icon: tile(Route, 1)
+  }));
+  const acts = actions.filter((a) => `${a.title} ${a.sub} ${a.keywords ?? ""}`.toLowerCase().includes(t));
+  return [...acts, ...apps, ...trails, ...quests, ...builders, ...pages];
 }
 
 /** Search everything from anywhere: ⌘K / Ctrl+K or "/". */
@@ -44,7 +54,30 @@ export function SearchPalette() {
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listId = useId();
-  const items = useMemo(() => results(term), [term]);
+  const { connection } = useArcwayState();
+  const toast = useToast();
+  const actions = useMemo<Item[]>(() => {
+    const list: Item[] = [
+      { id: "x-pay", group: "Actions", title: "Create a pay link", sub: "Get paid in USDC with a link or QR", href: "/pay", icon: tile(Link2, 2), keywords: "request money qr" },
+      {
+        id: "x-add", group: "Actions", title: `Add ${NETWORK_NAME} to wallet`, sub: "One click, no connecting needed", icon: tile(Plus, 3), keywords: "network metamask",
+        run: async () => {
+          const r = await addArcToWallet();
+          toast(r === "added" ? `${NETWORK_NAME} is in your wallet` : r === "no-wallet" ? "No browser wallet found" : "Nothing changed in your wallet");
+        }
+      },
+      { id: "x-theme", group: "Actions", title: "Switch theme", sub: "Light or dark", icon: tile(Moon, 1), keywords: "dark light mode", run: () => { toggleTheme(); } }
+    ];
+    if (connection.address) {
+      const address = connection.address;
+      list.push({
+        id: "x-copy", group: "Actions", title: "Copy my address", sub: address, icon: tile(Copy, 2), keywords: "wallet",
+        run: async () => { try { await navigator.clipboard.writeText(address); toast("Address copied"); } catch { toast("Couldn't copy"); } }
+      });
+    }
+    return list;
+  }, [connection.address, toast]);
+  const items = useMemo(() => results(term, actions), [term, actions]);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -78,7 +111,8 @@ export function SearchPalette() {
   const go = (item?: Item) => {
     if (!item) return;
     close();
-    router.push(item.href);
+    if (item.run) item.run();
+    else if (item.href) router.push(item.href);
   };
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -105,7 +139,7 @@ export function SearchPalette() {
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Search apps, quests, builders…"
+                placeholder="Search or type a command…"
                 role="combobox"
                 aria-expanded="true"
                 aria-controls={listId}

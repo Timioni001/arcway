@@ -1,6 +1,6 @@
 'use client';
 
-import { Compass, IdCard, LayoutDashboard, Target, Users } from "lucide-react";
+import { Compass, IdCard, LayoutDashboard, Send, Target, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET, NETWORK_NAME, SUBMIT_APP_URL } from "../lib/config";
@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/apps", label: "Discover", icon: Compass },
   { href: "/quests", label: "Quests", icon: Target },
+  { href: "/pay", label: "Pay", icon: Send },
   { href: "/builders", label: "Builders", icon: Users },
   { href: "/passport", label: "Passport", icon: IdCard }
 ] as const;
@@ -80,6 +81,7 @@ export function Footer() {
             <ul>
               <li><a href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Arc docs</a></li>
               <li><a href={BRIDGE_URL} target="_blank" rel="noopener noreferrer">{IS_MAINNET ? "Get USDC" : "Get test USDC"}</a></li>
+              <li><Link href="/pay">Create a pay link</Link></li>
               <li><a href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer">Submit an app</a></li>
             </ul>
           </nav>

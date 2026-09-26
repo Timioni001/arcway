@@ -13,6 +13,15 @@ The product goal is simple:
 
 > **Help a user enter Arc, know what to do next, complete useful actions, and build a portable record of their Arc activity.**
 
+## Features
+
+- **Discover**: live Arc apps by category, search, saved apps, and guided trails (step-by-step paths like "Earn on your USDC").
+- **Quests**: the Arc Starter campaign, checked automatically from onchain activity; claim XP for free.
+- **Passport**: XP, levels and badges on Arc, with a public, shareable page and preview image for every wallet.
+- **Pay links**: request USDC with a link or QR code; payers send in a couple of taps.
+- **Overview**: XP, day streak, 14-day activity, network status, live fee calculator.
+- **Everywhere**: Ctrl/Cmd+K search with quick actions, one-click "Add Arc to wallet", light/dark themes, installable on phones.
+
 ## MVP
 
 The first release is intentionally small:

@@ -211,3 +211,41 @@ describe("fees", () => {
     expect(new Set(FEE_ACTIONS.map((a) => a.id)).size).toBe(FEE_ACTIONS.length);
   });
 });
+
+import { buildPayPath, cleanNote, parseAmount, readPayRequest } from "../lib/pay";
+describe("pay links", () => {
+  it("parses amounts into 6-decimal USDC", () => {
+    expect(parseAmount("10")).toMatchObject({ ok: true, value: 10_000_000n, text: "10" });
+    expect(parseAmount(" 2.50 ")).toMatchObject({ ok: true, value: 2_500_000n, text: "2.5" });
+    expect(parseAmount("1,000")).toMatchObject({ ok: true, value: 1_000_000_000n });
+    expect(parseAmount("007.10")).toMatchObject({ ok: true, text: "7.1" });
+  });
+  it("rejects bad amounts with a reason", () => {
+    for (const bad of ["", "0", "abc", "1.2345678", "-5", ".", "2000000"]) expect(parseAmount(bad).ok, bad).toBe(false);
+  });
+  it("cleans notes and builds canonical links", () => {
+    expect(cleanNote("  Coffee <script>\u0000 ")).toBe("Coffee script");
+    expect(cleanNote("x".repeat(200))).toHaveLength(80);
+    expect(buildPayPath("0x7a00000000000000000000000000000000092f1a", "5", "Lunch & coffee"))
+      .toBe("/pay/0x7A00000000000000000000000000000000092f1A?amount=5&note=Lunch+%26+coffee");
+  });
+  it("reads requests defensively", () => {
+    expect(readPayRequest("nope", {})).toBeNull();
+    const r = readPayRequest("0x7a00000000000000000000000000000000092f1a", { amount: "-1", note: "hi" })!;
+    expect(r.amount).toBeUndefined();
+    expect(r.note).toBe("hi");
+  });
+});
+
+import { APPS as ALL_APPS } from "../lib/registry";
+import { TRAILS, trailProgress } from "../lib/trails";
+describe("trails", () => {
+  it("only link to apps that exist", () => {
+    const slugs = new Set(ALL_APPS.map((a) => a.slug));
+    for (const t of TRAILS) for (const s of t.steps) if (s.appSlug) expect(slugs.has(s.appSlug), `${t.id}:${s.id}`).toBe(true);
+  });
+  it("counts progress per trail", () => {
+    const t = TRAILS[0];
+    expect(trailProgress(t, [`${t.id}:${t.steps[0].id}`, "other:x"])).toEqual({ done: 1, total: t.steps.length, complete: false });
+  });
+});

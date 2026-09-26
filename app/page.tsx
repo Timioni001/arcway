@@ -8,6 +8,7 @@ import { NextStepBar } from "../components/NextStepBar";
 import { Campaign } from "../components/Campaign";
 import { LiveMarquee } from "../components/LiveMarquee";
 import { PassportSection } from "../components/PassportSection";
+import { PayPromo } from "../components/PayPromo";
 import { Reveal } from "../components/Reveal";
 import { SectionHeader } from "../components/Section";
 import { buildersFrom } from "../lib/builders";
@@ -62,7 +63,7 @@ export default function Home() {
             label="Categories"
             titleId="cats-title"
             title="What do you want to do?"
-            action={<Link href="/apps" className="link">All apps <ArrowRight aria-hidden="true" /></Link>}
+            action={<Link href="/apps" className="link">Or start with a guided trail <ArrowRight aria-hidden="true" /></Link>}
           />
           <CategoryGrid apps={APPS} />
         </section>
@@ -95,6 +96,10 @@ export default function Home() {
 
         <section className="section" id={SECTIONS.passport} aria-labelledby="passport-title">
           <Reveal><PassportSection /></Reveal>
+        </section>
+
+        <section className="section" aria-labelledby="pay-title">
+          <PayPromo />
         </section>
 
         <section className="section" aria-labelledby="builders-title">

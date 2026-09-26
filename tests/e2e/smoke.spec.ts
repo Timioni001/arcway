@@ -2,7 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 const ROUTES = [
   "/", "/overview", "/apps", "/apps/uniswap", "/quests", "/quests/first-tx", "/builders", "/passport",
-  "/passport/0x7a00000000000000000000000000000000092f1a", "/terms", "/privacy"
+  "/passport/0x7a00000000000000000000000000000000092f1a", "/terms", "/privacy",
+  "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -154,4 +155,76 @@ test("share images render", async ({ request }) => {
   const home = await request.get("/opengraph-image");
   expect(home.status()).toBe(200);
   expect(home.headers()["content-type"]).toContain("image/png");
+});
+
+const MOCK_WALLET = () => {
+  (window as unknown as { ethereum: unknown }).ethereum = {
+    isMetaMask: true,
+    on() {},
+    removeListener() {},
+    request: async ({ method }: { method: string }) => {
+      if (method === "eth_requestAccounts" || method === "eth_accounts") return ["0x1111111111111111111111111111111111111111"];
+      if (method === "eth_chainId") return "0x4cef52";
+      if (method === "wallet_requestPermissions") return [{}];
+      if (method === "wallet_addEthereumChain") return null;
+      return null;
+    }
+  };
+};
+
+test("create a pay link with amount, note and QR", async ({ page }) => {
+  await page.goto("/pay");
+  await page.getByLabel("Pay to").fill("0x7a00000000000000000000000000000000092f1a");
+  await page.getByLabel(/^Amount/).fill("12.5");
+  await page.getByLabel(/^Note/).fill("Lunch");
+  await expect(page.getByRole("img", { name: "QR code for your pay link" }).locator("svg")).toBeVisible();
+  await expect(page.locator(".pay-preview__url")).toContainText("/pay/0x7A00000000000000000000000000000000092f1A?amount=12.5&note=Lunch");
+  await page.getByLabel(/^Amount/).fill("1.1234567");
+  await expect(page.getByRole("alert").filter({ hasText: "6 decimal" })).toBeVisible();
+});
+
+test("pay link walks the payer through connecting", async ({ page }) => {
+  await page.addInitScript(MOCK_WALLET);
+  await page.goto("/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee");
+  await expect(page.getByText("“Coffee”")).toBeVisible();
+  await page.getByRole("button", { name: "Connect wallet to pay" }).click();
+  await expect(page.getByRole("button", { name: "Send 5 USDC" }).or(page.getByRole("link", { name: /Not enough USDC/ }))).toBeVisible();
+});
+
+test("bad pay link parameters are ignored, bad addresses 404", async ({ page }) => {
+  await page.goto("/pay/0x7a00000000000000000000000000000000092f1a?amount=-3");
+  await expect(page.getByLabel("Amount")).toHaveValue("");
+  const res = await page.goto("/pay/nope");
+  expect(res?.status()).toBe(404);
+});
+
+test("trail steps can be marked done and persist", async ({ page }) => {
+  await page.goto("/trails/earn");
+  const progress = page.locator(".trail-head__progress");
+  await expect(progress).toContainText("0/4");
+  await page.getByRole("button", { name: "Mark as done" }).first().click();
+  await expect(progress).toContainText("1/4");
+  await page.reload();
+  await expect(progress).toContainText("1/4");
+  await page.goto("/apps");
+  await expect(page.getByRole("link", { name: /Earn on your USDC/ })).toContainText("Continue");
+});
+
+test("search actions run commands", async ({ page, isMobile }) => {
+  test.skip(isMobile, "keyboard shortcut is a desktop feature");
+  await page.goto("/");
+  const html = page.locator("html");
+  const wasDark = await html.evaluate((el) => el.classList.contains("dark"));
+  await page.keyboard.press("Control+k");
+  await page.getByRole("combobox").fill("theme");
+  await page.keyboard.press("Enter");
+  expect(await html.evaluate((el) => el.classList.contains("dark"))).toBe(!wasDark);
+});
+
+test("the app can be installed", async ({ request }) => {
+  const res = await request.get("/manifest.webmanifest");
+  expect(res.status()).toBe(200);
+  const m = await res.json();
+  expect(m.name).toBe("Arcway");
+  expect((await request.get("/icon-512.png")).status()).toBe(200);
 });
