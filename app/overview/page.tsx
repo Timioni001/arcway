@@ -1,21 +1,22 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, UserRound } from "lucide-react";
+import { PageHead } from "../../components/PageHead";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Activity } from "../../components/Activity";
 import { NextStep } from "../../components/NextStep";
+import { NextStepBar } from "../../components/NextStepBar";
 import { FeeCalculator } from "../../components/FeeCalculator";
-import { ActivityStrip, CategoryBars, ConnectBanner, NetworkCard, NewApps, OverviewStats, SavedApps } from "../../components/Overview";
+import { ActivityStrip, CategoryBars, NetworkCard, NewApps, OverviewStats, SavedApps } from "../../components/Overview";
 
-export const metadata: Metadata = { title: "Overview" };
+export const metadata: Metadata = { title: "Your Arc", description: "Your progress, activity and followed apps on Arc." };
 
 export default function OverviewPage() {
   return (
     <div className="container page">
-      <div className="label" style={{ color: "var(--link)" }}>Overview</div>
-      <h1 className="h1" style={{ marginTop: 10 }}>Your Arc at a glance</h1>
-      <p className="lead" style={{ margin: "12px 0 32px" }}>Progress, activity and what&apos;s new, in one place.</p>
-
-      <ConnectBanner />
+      <PageHead icon={UserRound} kicker="Your Arc" title="Your Arc at a glance" lead="Your progress, activity and followed apps, in one place." />
+      <div style={{ height: 20 }} />
+      <NextStepBar />
+      <div style={{ height: 20 }} />
       <OverviewStats />
 
       <div className="dash">

@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Search, SearchX } from "lucide-react";
+import { Bookmark, Search, SearchX } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useId, useMemo, useState } from "react";
 import { buildersFrom } from "../lib/builders";
@@ -54,7 +54,7 @@ export function Discover() {
       <div className="discover-bar">
       <div className="filters" role="group" aria-label="Filter by category">
         <button className="chip" aria-pressed={savedOnly} onClick={() => setSavedOnly((v) => !v)}>
-          <Heart aria-hidden="true" style={{ width: 14, height: 14 }} />Saved{saved.length ? <span className="mono xs">{saved.length}</span> : null}
+          <Bookmark aria-hidden="true" style={{ width: 14, height: 14 }} />Following{saved.length ? <span className="mono xs">{saved.length}</span> : null}
         </button>
         <button className="chip" aria-pressed={category === null} onClick={() => setCategory(null)}>All</button>
         {categories.map((c) => (
@@ -85,8 +85,8 @@ export function Discover() {
       <p className="visually-hidden" role="status">{total} results</p>
 
       {total === 0 ? (
-        <StateBlock icon={savedOnly && !saved.length ? Heart : SearchX} title={savedOnly && !saved.length ? "No saved apps yet" : "No results"} actions={<button className="btn btn--secondary btn--sm" onClick={() => { setSearch(""); setCategory(null); setSavedOnly(false); setStatus(null); }}>Show all apps</button>}>
-          {savedOnly && !saved.length ? "Tap the heart on any app to save it here." : category && !term ? `No ${category.toLowerCase()} apps listed yet. New apps are added regularly.` : "Try another word or category."}
+        <StateBlock icon={savedOnly && !saved.length ? Bookmark : SearchX} title={savedOnly && !saved.length ? "Not following any apps yet" : "No results"} actions={<button className="btn btn--secondary btn--sm" onClick={() => { setSearch(""); setCategory(null); setSavedOnly(false); setStatus(null); }}>Show all apps</button>}>
+          {savedOnly && !saved.length ? "Tap the bookmark on any app to follow it." : category && !term ? `No ${category.toLowerCase()} apps listed yet. New apps are added regularly.` : "Try another word or category."}
         </StateBlock>
       ) : (
         <>

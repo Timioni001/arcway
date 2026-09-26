@@ -1,10 +1,21 @@
 import { expect, test, type Page } from "@playwright/test";
+import { INTEL, mockIntel } from "./intelFixtures";
+
+// Live Arc data is served from fixtures so every test is deterministic.
+test.beforeEach(async ({ page }) => { await mockIntel(page); });
+
+/** Navigate and wait until React has hydrated, so clicks are never lost on a slow machine. */
+async function open(page: Page, path: string) {
+  await page.goto(path);
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+}
 
 const ROUTES = [
   "/", "/overview", "/apps", "/apps/uniswap", "/quests", "/quests/first-tx", "/builders", "/passport",
   "/passport/0x7a00000000000000000000000000000000092f1a", "/terms", "/privacy",
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
-  "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs"
+  "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
+  "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -47,10 +58,11 @@ test("category links open Discover filtered", async ({ page }) => {
   await expect(page.getByRole("link", { name: /Uniswap/ })).toHaveCount(0);
 });
 
-test("dark theme toggles and persists", async ({ page }) => {
+test("dark theme toggles and persists", async ({ page, isMobile }) => {
   await page.goto("/");
   const html = page.locator("html");
   const wasDark = await html.evaluate((el) => el.classList.contains("dark"));
+  if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
   await page.getByRole("button", { name: /Switch to (dark|light) theme/ }).click();
   await expect(html).toHaveClass(wasDark ? /^(?!.*\bdark\b)/ : /\bdark\b/);
   await page.reload();
@@ -64,7 +76,7 @@ test("quest page asks to connect when no wallet", async ({ page }) => {
 });
 
 test("connecting with no wallet installed explains what to do", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/overview");
   await page.locator(".next-bar").getByRole("button", { name: /Connect wallet/ }).click();
   await expect(page.getByRole("alert").first()).toContainText("No browser wallet found");
 });
@@ -85,7 +97,7 @@ test("a connected wallet shows its address", async ({ page }) => {
   });
   await page.goto("/passport");
   await page.locator(".next-bar, .card").getByRole("button", { name: /Connect wallet/ }).first().click();
-  await expect(page.getByText("0x7A00…2f1A").first()).toBeVisible();
+  await expect(page.getByText("0x7A00…2f1A").filter({ visible: true }).first()).toBeVisible();
 });
 
 test("unknown pages show a helpful 404", async ({ page }) => {
@@ -110,12 +122,12 @@ test("footer links to Terms and Privacy", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Terms of Use" })).toBeVisible();
 });
 
-test("saving an app shows it under Saved and survives a reload", async ({ page }) => {
+test("following an app shows it under Following and survives a reload", async ({ page }) => {
   await page.goto("/apps");
-  await page.getByRole("button", { name: "Save Aave" }).click();
-  await expect(page.getByRole("button", { name: "Remove Aave" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Follow Aave" }).click();
+  await expect(page.getByRole("button", { name: "Unfollow Aave" })).toHaveAttribute("aria-pressed", "true");
   await page.reload();
-  await page.getByRole("button", { name: /^Saved/ }).click();
+  await page.getByRole("button", { name: /^Following/ }).click();
   await expect(page.getByRole("link", { name: /Aave/ }).first()).toBeVisible();
   await expect(page.getByRole("link", { name: /Uniswap/ })).toHaveCount(0);
 });
@@ -259,14 +271,14 @@ test("app marks use real logos or category icons, never initials", async ({ page
   expect(avatars.filter(Boolean)).toEqual([]);
 });
 
-test("featured card is contained and doesn't overlap the next section", async ({ page }) => {
-  await page.goto("/");
+test("featured card is contained and doesn't overlap what follows", async ({ page }) => {
+  await page.goto("/apps");
   const card = page.locator(".featured-card").first();
   await card.scrollIntoViewIfNeeded();
   const cardBox = (await card.boundingBox())!;
   const visual = (await page.locator(".featured-visual").first().boundingBox())!;
   expect(visual.y + visual.height).toBeLessThanOrEqual(cardBox.y + cardBox.height + 1);
-  const next = (await page.getByRole("heading", { name: /apps listed on Arcway/ }).boundingBox())!;
+  const next = (await page.locator(".results .app-card").first().boundingBox())!;
   expect(next.y).toBeGreaterThan(cardBox.y + cardBox.height);
 });
 
@@ -301,4 +313,159 @@ test("builder pages list their apps", async ({ page }) => {
   await expect(page).toHaveURL(/\/builders\/circle$/);
   await expect(page.getByRole("heading", { level: 1, name: "Circle" })).toBeVisible();
   await expect(page.locator(".app-card")).toHaveCount(2);
+});
+
+// ---------------------------------------------------------------- intelligence layer
+
+test("desktop uses a left rail with the full navigation", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop layout");
+  await open(page, "/pulse");
+  const main = page.getByRole("navigation", { name: "Main" });
+  for (const label of ["Overview", "Ecosystem", "Pulse", "Radar", "Builders", "Signals", "Apps", "Quests"]) {
+    await expect(main.getByRole("link", { name: label })).toBeVisible();
+  }
+  await expect(main.getByRole("link", { name: "Pulse" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("navigation", { name: "More" }).getByRole("link", { name: "Watchlist" })).toBeVisible();
+  const rail = page.locator(".rail");
+  expect((await rail.boundingBox())!.x).toBeLessThan(5);
+  // Collapse, and the choice survives a reload.
+  await page.getByRole("button", { name: "Toggle sidebar" }).click();
+  await expect.poll(async () => (await rail.boundingBox())!.width).toBeLessThan(100);
+  await page.reload();
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  expect((await rail.boundingBox())!.width).toBeLessThan(100);
+  await expect(main.getByRole("link", { name: "Radar" })).toBeAttached();
+});
+
+test("tablet starts with a collapsed rail that expands on demand", async ({ page, isMobile }) => {
+  test.skip(isMobile, "tablet layout");
+  await page.setViewportSize({ width: 1000, height: 800 });
+  await open(page, "/");
+  const rail = page.locator(".rail");
+  expect((await rail.boundingBox())!.width).toBeLessThan(100);
+  await page.getByRole("button", { name: "Toggle sidebar" }).click();
+  await expect.poll(async () => (await rail.boundingBox())!.width).toBeGreaterThan(200);
+  await page.keyboard.press("Escape");
+  await expect.poll(async () => (await rail.boundingBox())!.width).toBeLessThan(100);
+});
+
+test("mobile uses a top dropdown and a five-item bottom bar", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "mobile layout");
+  await open(page, "/");
+  await expect(page.locator(".rail")).toBeHidden();
+  const quick = page.getByRole("navigation", { name: "Quick" });
+  await expect(quick.getByRole("link")).toHaveCount(5);
+  await page.getByRole("button", { name: /Current section: Overview/ }).click();
+  const menu = page.getByRole("navigation", { name: "Main menu" });
+  for (const label of ["Ecosystem", "Pulse", "Radar", "Builders", "Signals", "Apps", "Quests", "Watchlist", "Settings"]) {
+    await expect(menu.getByRole("link", { name: new RegExp(`^${label}`) })).toBeVisible();
+  }
+  const box = (await menu.getByRole("link", { name: /^Signals/ }).boundingBox())!;
+  expect(box.height).toBeGreaterThanOrEqual(44);
+  await menu.getByRole("link", { name: /^Signals/ }).click();
+  await expect(page).toHaveURL(/\/signals$/);
+  await expect(menu).toBeHidden();
+});
+
+test("overview shows sourced network metrics, pulse and signals", async ({ page }) => {
+  await open(page, "/");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Understand what’s happening on Arc.");
+  const snapshot = page.locator(".metrics");
+  await expect(snapshot.locator(".metric")).toHaveCount(INTEL.snapshot.data.metrics.length);
+  // Every metric states its source and period.
+  expect(await snapshot.locator(".metric .src").count()).toBe(INTEL.snapshot.data.metrics.length);
+  await expect(page.locator(".pulse-row").first()).toBeVisible();
+  await expect(page.locator(".signal").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Explore ecosystem" })).toHaveAttribute("href", "/ecosystem");
+});
+
+test("when Arc data is unreachable, nothing is guessed", async ({ page }) => {
+  await page.unroute("**/api/intel/**");
+  await mockIntel(page, { fail: true });
+  await open(page, "/pulse");
+  await expect(page.getByRole("alert").filter({ hasText: "Arc data is unavailable right now" }).first()).toBeVisible();
+  await expect(page.locator(".pulse-row")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Try again" }).first()).toBeVisible();
+});
+
+test("pulse filters by event type", async ({ page }) => {
+  await open(page, "/pulse");
+  const chip = page.getByRole("group", { name: "Filter activity" }).getByRole("button", { name: /^Deployment/ });
+  await chip.click();
+  await expect(chip).toHaveAttribute("aria-pressed", "true");
+  const kinds = await page.locator(".pulse-row").evaluateAll((rows) => rows.map((r) => r.getAttribute("data-kind")));
+  expect(kinds.length).toBeGreaterThan(0);
+  expect(new Set(kinds)).toEqual(new Set(["deploy"]));
+});
+
+test("ecosystem map traces relationships", async ({ page }) => {
+  await open(page, "/ecosystem");
+  await page.getByRole("button", { name: /^Trading, \d+ apps/ }).first().click();
+  const panel = page.locator(".emap__panel");
+  await expect(panel.getByRole("heading", { name: "Trading" })).toBeVisible();
+  await expect(panel.getByRole("link", { name: "Uniswap" })).toBeVisible();
+  await expect(page.locator(".emap__node[data-dim='true']").first()).toBeAttached();
+});
+
+test("protocol pages show identity, contracts or an honest gap", async ({ page }) => {
+  await open(page, "/apps/uniswap");
+  await expect(page.getByRole("heading", { level: 1, name: "Uniswap" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Onchain activity" })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Published contracts" }).or(page.getByText("Not measurable yet"))).toBeVisible();
+  await open(page, "/apps/aave");
+  await expect(page.getByText("Not measurable yet")).toBeVisible();
+});
+
+test("following builds a watchlist with a live count", async ({ page, isMobile }) => {
+  await open(page, "/apps/uniswap");
+  await page.getByRole("button", { name: "Follow", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Following", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await open(page, "/builders/circle");
+  await page.getByRole("button", { name: "Follow", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Following", exact: true })).toHaveAttribute("aria-pressed", "true");
+  if (!isMobile) await expect(page.getByRole("link", { name: "Watchlist, 2 followed" })).toBeVisible();
+  await open(page, "/watchlist");
+  await expect(page.getByRole("region", { name: "Protocols" }).getByRole("link", { name: "Uniswap" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Builders" }).getByRole("link", { name: "Circle" })).toBeVisible();
+  await open(page, "/settings");
+  await page.getByRole("region", { name: "Data in this browser" }).getByRole("button", { name: "Clear" }).first().click();
+  await open(page, "/watchlist");
+  await expect(page.getByText("Nothing followed yet")).toBeVisible();
+});
+
+test("settings switch theme explicitly", async ({ page }) => {
+  await open(page, "/settings");
+  await expect(page.getByRole("radiogroup", { name: "Theme" }).getByRole("radio", { checked: true })).toHaveCount(1);
+  await page.getByRole("radio", { name: "Dark" }).click();
+  await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+  await page.getByRole("radio", { name: "Light" }).click();
+  await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
+});
+
+test("search understands addresses and transaction hashes", async ({ page }) => {
+  await open(page, "/search?q=0x7a00000000000000000000000000000000092f1a");
+  const onchain = page.getByRole("region", { name: "Onchain" });
+  await expect(onchain.getByRole("link", { name: /Passport/ })).toHaveAttribute("href", "/passport/0x7a00000000000000000000000000000000092f1a");
+  await open(page, `/search?q=0x${"ab".repeat(32)}`);
+  await expect(page.getByRole("region", { name: "Onchain" }).getByRole("link", { name: /Transaction/ })).toHaveAttribute("href", /\/tx\/0xabab/);
+});
+
+test("notifications list the latest signals", async ({ page, isMobile }) => {
+  test.skip(isMobile, "bell lives in the desktop utility bar");
+  await open(page, "/radar");
+  await page.getByRole("button", { name: /^Notifications/ }).click();
+  const panel = page.getByRole("dialog", { name: "Latest signals" });
+  await expect(panel.locator(".notif__item").first()).toBeVisible();
+  await expect(panel.getByRole("link", { name: "View all" })).toHaveAttribute("href", "/signals");
+});
+
+test("intel APIs answer with data or a clean error", async ({ request }) => {
+  for (const path of ["/api/intel/snapshot", "/api/intel/pulse", "/api/intel/radar", "/api/intel/signals"]) {
+    const res = await request.get(path);
+    expect([200, 502]).toContain(res.status());
+    const body = await res.json();
+    if (res.status() === 200) expect(body).toMatchObject({ data: expect.anything(), fetchedAt: expect.any(String), unavailable: expect.any(Array) });
+    else expect(body).toMatchObject({ error: "arc_unavailable" });
+  }
+  expect((await request.get("/api/intel/protocol/not-a-protocol")).status()).toBe(404);
 });

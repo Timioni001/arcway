@@ -1,6 +1,7 @@
 'use client';
 
-import { History, Search, SearchX, Target, X } from "lucide-react";
+import { ArrowUpRight, History, IdCard, Search, SearchX, Target, X } from "lucide-react";
+import { explorer } from "../lib/config";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useMemo, useState, useSyncExternalStore } from "react";
@@ -37,7 +38,7 @@ export function SearchPage() {
       <label htmlFor={inputId} className="visually-hidden">Search apps, categories, quests and builders</label>
       <div className="search">
         <Search aria-hidden="true" />
-        <input id={inputId} type="search" autoFocus placeholder="Try “swap”, “payments” or “Circle”…" value={term} onChange={(e) => setTerm(e.target.value)} autoComplete="off" />
+        <input id={inputId} type="search" autoFocus placeholder="Try “swap”, “Circle”, or paste an address or tx hash…" value={term} onChange={(e) => setTerm(e.target.value)} autoComplete="off" />
       </div>
 
       {!trimmed ? (
@@ -79,6 +80,21 @@ export function SearchPage() {
       ) : (
         <div className="search-results">
           <p className="small secondary" role="status">{total} result{total === 1 ? "" : "s"} for “{trimmed}”</p>
+          {results.onchain && (
+            <Group title="Onchain" count={1}>
+              <ul className="list-rows">
+                {results.onchain.kind === "tx" ? (
+                  <li><a className="row-card" href={explorer.tx(results.onchain.value)} target="_blank" rel="noopener noreferrer"><span style={{ minWidth: 0 }}><span style={{ display: "block", fontWeight: 600 }}>Transaction</span><span className="mono xs secondary" style={{ wordBreak: "break-all" }}>{results.onchain.value}</span></span><ArrowUpRight aria-hidden="true" /></a></li>
+                ) : (
+                  <>
+                    {results.onchain.app && <li><Link className="row-card" href={`/apps/${results.onchain.app.slug}`}><span style={{ minWidth: 0 }}><span style={{ display: "block", fontWeight: 600 }}>{results.onchain.app.name} contract</span><span className="xs secondary">Published by the team · open protocol</span></span></Link></li>}
+                    <li><a className="row-card" href={explorer.address(results.onchain.value)} target="_blank" rel="noopener noreferrer"><span style={{ minWidth: 0 }}><span style={{ display: "block", fontWeight: 600 }}>Address on {explorer.name}</span><span className="mono xs secondary" style={{ wordBreak: "break-all" }}>{results.onchain.value}</span></span><ArrowUpRight aria-hidden="true" /></a></li>
+                    <li><Link className="row-card" href={`/passport/${results.onchain.value}`}><span style={{ minWidth: 0 }}><span style={{ display: "block", fontWeight: 600 }}><IdCard aria-hidden="true" style={{ width: 15, verticalAlign: -2, marginRight: 6 }} />Passport</span><span className="xs secondary">XP, badges and activity for this wallet</span></span></Link></li>
+                  </>
+                )}
+              </ul>
+            </Group>
+          )}
           {results.categories.length > 0 && (
             <Group title="Categories" count={results.categories.length}>
               <ul className="row" style={{ gap: 8 }}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 import { ArcwayProvider } from "../lib/hooks/context";
 import { ToastProvider } from "../lib/hooks/toast";
@@ -21,6 +21,8 @@ export function Providers({ children }: { children: ReactNode }) {
         }
       })
   );
+  // Marks the page interactive (children's effects have run); used by tests and CSS.
+  useEffect(() => { document.documentElement.dataset.hydrated = "true"; }, []);
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>

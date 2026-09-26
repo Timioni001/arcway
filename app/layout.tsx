@@ -3,7 +3,9 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
 import { NetworkNotice } from "../components/NetworkNotice";
 import { Providers } from "../components/Providers";
-import { Footer, Header, MobileNav } from "../components/Shell";
+import { BottomBar, MobileTop, Rail, Topbar } from "../components/AppShell";
+import { SearchPalette } from "../components/SearchPalette";
+import { Footer } from "../components/Shell";
 import { SpotlightTracker } from "../components/SpotlightTracker";
 import { Celebrate } from "../components/Celebrate";
 import { THEME_INIT_SCRIPT } from "../lib/theme";
@@ -20,8 +22,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   openGraph: { siteName: "Arcway", type: "website" },
   twitter: { card: "summary_large_image" },
-  title: { default: "Arcway — Discover what's being built on Arc", template: "%s · Arcway" },
-  description: "Explore apps, quests and builders on Arc."
+  title: { default: "Arcway — Understand what's happening on Arc", template: "%s · Arcway" },
+  description: "Arc ecosystem intelligence: explore applications, live activity, builders and verified signals across Arc."
 };
 
 export const viewport: Viewport = {
@@ -40,11 +42,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <a href="#main" className="skip-link visually-hidden">Skip to content</a>
         <Providers>
-          <Header />
-          <NetworkNotice />
-          <main id="main">{children}</main>
-          <Footer />
-          <MobileNav />
+          <div className="os">
+            <Rail />
+            <div className="workspace">
+              <Topbar />
+              <MobileTop />
+              <NetworkNotice />
+              <main id="main">{children}</main>
+              <Footer />
+            </div>
+          </div>
+          <BottomBar />
+          <SearchPalette />
           <SpotlightTracker />
           <Celebrate />
         </Providers>

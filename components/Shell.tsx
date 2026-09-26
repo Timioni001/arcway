@@ -1,65 +1,7 @@
-'use client';
-
-import { Compass, IdCard, LayoutDashboard, Send, Target, Users } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET, NETWORK_NAME, SUBMIT_APP_URL } from "../lib/config";
+import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET, SUBMIT_APP_URL } from "../lib/config";
+import { PRIMARY_NAV, YOU_NAV } from "../lib/nav";
 import { Logo } from "./Logo";
-import { SearchPalette } from "./SearchPalette";
-import { ThemeToggle } from "./ThemeToggle";
-import { WalletButton } from "./WalletButton";
-
-const LINKS = [
-  { href: "/overview", label: "Overview", icon: LayoutDashboard },
-  { href: "/apps", label: "Discover", icon: Compass },
-  { href: "/quests", label: "Quests", icon: Target },
-  { href: "/pay", label: "Pay", icon: Send },
-  { href: "/builders", label: "Builders", icon: Users },
-  { href: "/passport", label: "Passport", icon: IdCard }
-] as const;
-
-function useActive() {
-  const pathname = usePathname();
-  return (href: string) => pathname === href || pathname.startsWith(`${href}/`);
-}
-
-export function Header() {
-  const isActive = useActive();
-  return (
-    <header className="header">
-      <div className="container header__inner">
-        <Logo />
-        <nav className="header__nav" aria-label="Main">
-          {LINKS.map(({ href, label }) => (
-            <Link key={href} href={href} className="header__link" aria-current={isActive(href) ? "page" : undefined}>
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <div className="header__utils">
-          <SearchPalette />
-          <span className="net"><i aria-hidden="true" />{NETWORK_NAME}</span>
-          <ThemeToggle />
-          <WalletButton />
-        </div>
-      </div>
-    </header>
-  );
-}
-
-export function MobileNav() {
-  const isActive = useActive();
-  return (
-    <nav className="mobile-nav" aria-label="Main">
-      {LINKS.filter((l) => l.href !== "/builders").map(({ href, label, icon: Icon }) => (
-        <Link key={href} href={href} aria-current={isActive(href) ? "page" : undefined}>
-          <Icon aria-hidden="true" />
-          {label}
-        </Link>
-      ))}
-    </nav>
-  );
-}
 
 export function Footer() {
   return (
@@ -68,12 +10,20 @@ export function Footer() {
         <div className="footer__inner">
           <div className="footer__brand" style={{ display: "grid", gap: 14, maxWidth: 320 }}>
             <Logo />
-            <p className="small secondary">Find apps worth trying on Arc, complete quests and build your passport.</p>
+            <p className="small secondary">Arc ecosystem intelligence. Explore applications, activity, builders and signals across Arc.</p>
           </div>
           <nav aria-labelledby="f-explore">
             <h2 id="f-explore">Explore</h2>
             <ul>
-              {LINKS.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
+              {PRIMARY_NAV.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
+            </ul>
+          </nav>
+          <nav aria-labelledby="f-you">
+            <h2 id="f-you">You</h2>
+            <ul>
+              {YOU_NAV.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
+              <li><Link href="/watchlist">Watchlist</Link></li>
+              <li><Link href="/settings">Settings</Link></li>
             </ul>
           </nav>
           <nav aria-labelledby="f-res">
@@ -81,9 +31,6 @@ export function Footer() {
             <ul>
               <li><a href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Arc docs</a></li>
               <li><a href={BRIDGE_URL} target="_blank" rel="noopener noreferrer">{IS_MAINNET ? "Get USDC" : "Get test USDC"}</a></li>
-              <li><Link href="/pay">Create a pay link</Link></li>
-              <li><Link href="/activity">Your activity</Link></li>
-              <li><Link href="/search">Search</Link></li>
               <li><a href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer">Submit an app</a></li>
             </ul>
           </nav>

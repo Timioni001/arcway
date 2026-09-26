@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Flame, Heart, LayoutGrid, Target, Trophy, Wallet } from "lucide-react";
+import { ArrowRight, Bookmark, Flame, LayoutGrid, Target, Trophy, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { useBlockNumber } from "wagmi";
@@ -201,13 +201,13 @@ export function SavedApps() {
   return (
     <section className="card pad" aria-labelledby="saved-title">
       <div className="row between">
-        <h2 id="saved-title" className="h4">Saved apps</h2>
+        <h2 id="saved-title" className="h4">Followed apps</h2>
         {apps.length > 0 && <span className="mono xs secondary">{apps.length}</span>}
       </div>
       {apps.length === 0 ? (
         <div className="saved-empty">
-          <span className="state__icon"><Heart aria-hidden="true" /></span>
-          <p className="small secondary">Tap the heart on any app to keep it here.</p>
+          <span className="state__icon"><Bookmark aria-hidden="true" /></span>
+          <p className="small secondary">Follow any app to keep it here.</p>
           <Link href="/apps" className="link small">Browse apps <ArrowRight aria-hidden="true" /></Link>
         </div>
       ) : (

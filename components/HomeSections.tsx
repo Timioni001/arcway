@@ -2,7 +2,6 @@ import { ArrowRight, Compass, MousePointerClick, Trophy } from "lucide-react";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { categoryCounts, CATEGORIES, type ArcApp } from "../lib/registry";
-import { AppCard } from "./AppCard";
 import { CATEGORY_META, CategoryTile } from "./CategoryIcon";
 import { Reveal } from "./Reveal";
 
@@ -45,16 +44,5 @@ export function HowItWorks() {
         </Reveal>
       ))}
     </ol>
-  );
-}
-
-/** Live on Arc: real logos, real statuses. The count is the registry's own, never a made-up number. */
-export function LiveOnArc({ apps }: { apps: ArcApp[] }) {
-  return (
-    <ul className="cards">
-      {apps.map((app, i) => (
-        <Reveal as="li" key={app.id} delay={(i % 3) * 70}><AppCard app={app} /></Reveal>
-      ))}
-    </ul>
   );
 }

@@ -101,6 +101,7 @@ Vercel → Settings → Environment Variables, **Production** environment:
 | `NEXT_PUBLIC_ARC_NETWORK` | `mainnet` |
 | `NEXT_PUBLIC_PASSPORT_CONTRACT` | the new mainnet passport address |
 | `VERIFIER_PRIVATE_KEY` | the new verifier key (Sensitive) |
+| `EXPLORER_API_KEY` | optional: an Arc explorer (Blockscout) API key for higher rate limits on the live intelligence pages |
 
 Tip: keep your testnet values on the **Preview** environment, so preview
 deployments stay on testnet and production runs on mainnet.
@@ -115,6 +116,14 @@ Open `https://<your-site>/api/health`. You want:
 { "network": "mainnet", "rpc": { "ok": true }, "passport": { "deployed": true },
   "verifier": { "authorized": true, "low": false }, "claimsReady": true }
 ```
+
+Then check the intelligence feeds read live data (each returns `data`, `fetchedAt` and a list of any `unavailable` sources):
+
+- `https://<your-site>/api/intel/snapshot`
+- `https://<your-site>/api/intel/pulse`
+- `https://<your-site>/api/intel/signals`
+
+They are cached at the edge for 10–60 seconds, so the explorer sees only a few reads per window.
 
 Then a real run-through with small amounts:
 

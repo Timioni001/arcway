@@ -1,141 +1,112 @@
-import { ArrowRight, ArrowUpRight, Check } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2, Network, Target } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
-import { BuilderCard, GetListedCard } from "../components/Builders";
-import { HeroArt } from "../components/HeroArt";
-import { CategoryGrid, HowItWorks, LiveOnArc } from "../components/HomeSections";
-import { NextStepBar } from "../components/NextStepBar";
 import { Campaign } from "../components/Campaign";
-import { FeaturedApp } from "../components/AppCard";
-import { PassportSection } from "../components/PassportSection";
-import { PayPromo } from "../components/PayPromo";
+import { AppMark } from "../components/CategoryIcon";
+import { EcosystemMap } from "../components/EcosystemMap";
+import { FeaturedProtocol, LiveNow, PulsePanel, RadarPanel, SignalsPanel, SnapshotGrid } from "../components/HomeIntel";
+import { PanelHead, SourceTag } from "../components/IntelBits";
 import { Reveal } from "../components/Reveal";
-import { SectionHeader } from "../components/Section";
-import { buildersFrom } from "../lib/builders";
-import { ARC_DOCS_URL } from "../lib/config";
-import { APPS, discoverApps } from "../lib/registry";
-import { SECTIONS } from "../lib/sections";
+import { builderMark, buildersFrom } from "../lib/builders";
+import { SUBMIT_APP_URL } from "../lib/config";
+import { APPS, appContracts, discoverApps } from "../lib/registry";
 
 export default function Home() {
-  const apps = discoverApps(APPS);
-  const featured = apps.find((a) => a.featured);
-  const live = apps.filter((a) => a !== featured && !a.sample);
-  const builders = buildersFrom();
+  const featured = discoverApps(APPS).find((a) => a.featured);
+  const builders = buildersFrom().slice(0, 6);
+  const words = ["Understand", "what’s", "happening", "on"];
 
   return (
-    <>
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="container hero__grid">
-          <div className="hero__copy">
-            <span className="eyebrow enter"><b>Arc</b>Apps, quests and your passport</span>
-            <h1 id="hero-title" className="hero__title">
-              {["Discover", "what’s", "being", "built", "on"].map((w, i) => (
-                <Fragment key={w}><span className="word" style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</Fragment>
-              ))}
-              <span className="word gradient-text shimmer" style={{ "--i": 5 } as React.CSSProperties}>Arc.</span>
-            </h1>
-            <p className="hero__sub enter enter-3">
-              Find apps worth trying, complete quick quests and build a passport of everything you do.
-            </p>
-            <div className="hero__actions row enter enter-3">
-              <Link href="/apps" className="btn btn--primary">Explore apps <ArrowRight aria-hidden="true" /></Link>
-              <Link href="#how" className="btn btn--secondary">How it works</Link>
-            </div>
-            <ul className="trust enter enter-3">
-              <li><Check aria-hidden="true" />Free to join</li>
-              <li><Check aria-hidden="true" />No sign-up</li>
-              <li><Check aria-hidden="true" />Works with your wallet</li>
-            </ul>
+    <div className="container page page--home">
+      <section className="ihero" aria-labelledby="hero-title">
+        <div className="ihero__copy">
+          <span className="eyebrow enter"><b>Arc</b>Ecosystem intelligence</span>
+          <h1 id="hero-title" className="ihero__title">
+            {words.map((w, i) => (
+              <Fragment key={w}><span className="word" style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</Fragment>
+            ))}
+            <span className="word gradient-text" style={{ "--i": words.length } as React.CSSProperties}>Arc.</span>
+          </h1>
+          <p className="ihero__sub enter enter-3">Explore applications, activity, builders and emerging signals across the Arc ecosystem.</p>
+          <div className="row enter enter-3" style={{ marginTop: 28, gap: 10 }}>
+            <Link href="/ecosystem" className="btn btn--primary">Explore ecosystem <ArrowRight aria-hidden="true" /></Link>
+            <Link href="/pulse" className="btn btn--secondary">View live activity</Link>
           </div>
-          <HeroArt />
+          <p className="ihero__trust enter enter-3">
+            Every number shows its source and period. <Link href="/settings#data" className="link">How we measure</Link>
+          </p>
         </div>
+        <div className="ihero__live enter enter-2"><LiveNow /></div>
       </section>
 
-      <div className="container">
-        <NextStepBar />
+      <section className="band" aria-labelledby="snapshot-title">
+        <SnapshotGrid />
+      </section>
+
+      <section className="band" aria-labelledby="map-title">
+        <PanelHead icon={Network} title="Ecosystem map" id="map-title">
+          <Link href="/ecosystem" className="link small">Open ecosystem <ArrowRight aria-hidden="true" /></Link>
+        </PanelHead>
+        <Reveal><EcosystemMap compact /></Reveal>
+      </section>
+
+      <div className="split">
+        <section className="panel" aria-labelledby="pulse-title"><PulsePanel /></section>
+        <section className="panel" aria-labelledby="radar-title"><RadarPanel /></section>
       </div>
 
-      <div className="container">
-
-        <section className="section" aria-labelledby="cats-title">
-          <SectionHeader
-            label="Categories"
-            titleId="cats-title"
-            title="What do you want to do?"
-            action={<Link href="/apps" className="link">Or start with a guided trail <ArrowRight aria-hidden="true" /></Link>}
-          />
-          <CategoryGrid apps={APPS} />
+      {featured && (
+        <section className="band" aria-label="Featured protocol intelligence">
+          <FeaturedProtocol app={featured} />
         </section>
+      )}
 
-        <section className="section" id="how" aria-labelledby="how-title">
-          <SectionHeader label="How it works" titleId="how-title" title="Discover, explore, take part." />
-          <HowItWorks />
-        </section>
-
-        {featured && (
-          <section className="section" id={SECTIONS.discover} aria-labelledby="featured-title">
-            <SectionHeader label="Featured" titleId="featured-title" title="Worth trying first." />
-            <Reveal><FeaturedApp app={featured} /></Reveal>
-          </section>
-        )}
-
-        <section className="section" aria-labelledby="live-title">
-          <SectionHeader
-            label="Live on Arc"
-            titleId="live-title"
-            title={`${live.length + (featured ? 1 : 0)} apps listed on Arcway.`}
-            action={<Link href="/apps" className="link">Explore apps <ArrowRight aria-hidden="true" /></Link>}
-          />
-          <LiveOnArc apps={live.slice(0, 6)} />
-        </section>
-
-        <section className="section" id={SECTIONS.quests} aria-labelledby="quests-title">
-          <SectionHeader
-            label="Quests"
-            titleId="quests-title"
-            title="Start with the Arc Starter campaign."
-            sub="Four short quests. We check them automatically."
-            action={<Link href="/quests" className="link">All quests <ArrowRight aria-hidden="true" /></Link>}
-          />
-          <Reveal><Campaign /></Reveal>
-        </section>
-
-        <section className="section" id={SECTIONS.passport} aria-labelledby="passport-title">
-          <Reveal><PassportSection /></Reveal>
-        </section>
-
-        <section className="section" aria-labelledby="pay-title">
-          <PayPromo />
-        </section>
-
-        <section className="section" aria-labelledby="builders-title">
-          <SectionHeader
-            label="Builders"
-            titleId="builders-title"
-            title="The teams behind the apps."
-            action={<Link href="/builders" className="link">All builders <ArrowRight aria-hidden="true" /></Link>}
-          />
-          <ul className="cards">
-            {builders.slice(0, 2).map((b) => <Reveal as="li" key={b.id}><BuilderCard builder={b} /></Reveal>)}
-            <Reveal as="li"><GetListedCard /></Reveal>
+      <div className="split split--wide-left">
+        <section className="panel" aria-labelledby="signals-title"><SignalsPanel /></section>
+        <section className="panel" aria-labelledby="builders-title">
+          <PanelHead icon={Code2} title="Builder activity" id="builders-title">
+            <SourceTag source="project" period="Registry" />
+          </PanelHead>
+          <ul className="brows">
+            {builders.map((b) => {
+              const contracts = b.apps.reduce((s, a) => s + appContracts(a).length, 0);
+              return (
+                <li key={b.id}>
+                  <Link href={`/builders/${b.id}`} className="brow">
+                    <AppMark app={builderMark(b)} size="sm" />
+                    <span className="brow__main">
+                      <span className="brow__name">{b.name}</span>
+                      <span className="xs secondary">{b.apps.map((a) => a.name).join(", ")}</span>
+                    </span>
+                    <span className="brow__stat mono xs">{contracts ? `${contracts} contract${contracts === 1 ? "" : "s"}` : `${b.apps.length} app${b.apps.length === 1 ? "" : "s"}`}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
-        </section>
-
-        <section className="section" aria-labelledby="build-title">
-          <Reveal className="cta">
-            <div>
-              <h2 id="build-title" className="h2">Building on Arc?</h2>
-              <p style={{ marginTop: 8 }}>Get your app in front of people looking for things to try.</p>
-            </div>
-            <div className="row">
-              <Link href="/builders" className="btn btn--on-dark">Get listed <ArrowRight aria-hidden="true" /></Link>
-              <a href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer" className="btn" style={{ color: "#F5FAFF", border: "1px solid rgba(245,250,255,.3)" }}>
-                Arc docs <ArrowUpRight aria-hidden="true" /><span className="visually-hidden"> (opens in a new tab)</span>
-              </a>
-            </div>
-          </Reveal>
+          <Link href="/builders" className="link small panel__more">All builders <ArrowRight aria-hidden="true" /></Link>
         </section>
       </div>
-    </>
+
+      <section className="band" aria-labelledby="quests-title">
+        <PanelHead icon={Target} title="Quests" id="quests-title">
+          <Link href="/quests" className="link small">All quests <ArrowRight aria-hidden="true" /></Link>
+        </PanelHead>
+        <Reveal><Campaign /></Reveal>
+      </section>
+
+      <section className="closing" aria-labelledby="build-title">
+        <div>
+          <h2 id="build-title" className="h3">Building on Arc?</h2>
+          <p className="secondary" style={{ marginTop: 6 }}>List your protocol so people can find it, follow it and see its activity.</p>
+        </div>
+        <div className="row" style={{ gap: 10 }}>
+          <a href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer" className="btn btn--secondary">
+            Get listed <ArrowUpRight aria-hidden="true" /><span className="visually-hidden"> (opens in a new tab)</span>
+          </a>
+          <Link href="/builders" className="btn btn--ghost">Explore builders <ArrowRight aria-hidden="true" /></Link>
+        </div>
+      </section>
+    </div>
   );
 }

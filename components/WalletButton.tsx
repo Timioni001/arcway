@@ -1,7 +1,9 @@
 'use client';
 
 import { ArrowUpRight, Check, ChevronDown, Copy, LogOut, Wallet } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
+import { YOU_NAV } from "../lib/nav";
 import { IS_MAINNET, NETWORK_NAME, arcChain, explorer } from "../lib/config";
 import { formatUsdc, shortAddress } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
@@ -126,6 +128,11 @@ export function WalletButton() {
                   Explorer <ArrowUpRight aria-hidden="true" />
                 </a>
               </div>
+              <nav className="wallet__you" aria-label="Your pages">
+                {YOU_NAV.map(({ href, label, icon: Icon }) => (
+                  <Link key={href} href={href} className="wallet__you-link" onClick={() => setOpen(false)}><Icon aria-hidden="true" />{label}</Link>
+                ))}
+              </nav>
               {IS_MAINNET && <p className="xs secondary">Mainnet uses real USDC.</p>}
               <Status tone="error">{wallet.error}</Status>
               <button className="btn btn--secondary btn--block" style={{ marginTop: 12 }} onClick={() => { setOpen(false); wallet.disconnect(); }}>

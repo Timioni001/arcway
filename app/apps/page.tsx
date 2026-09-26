@@ -1,18 +1,18 @@
+import { Blocks } from "lucide-react";
 import type { Metadata } from "next";
+import { PageHead } from "../../components/PageHead";
 import { Suspense } from "react";
 import { Discover } from "../../components/Discover";
 import { TrailCards } from "../../components/Trails";
 import { TRAILS } from "../../lib/trails";
 
-export const metadata: Metadata = { title: "Discover" };
+export const metadata: Metadata = { title: "Apps", description: "Browse and try apps on Arc by category, status and goal." };
 
 export default function AppsPage() {
   return (
     <div className="container page">
-      <div className="label" style={{ color: "var(--link)" }}>Discover</div>
-      <h1 className="h1" style={{ marginTop: 10 }}>Apps on Arc</h1>
-      <p className="lead" style={{ margin: "12px 0 32px" }}>Start with a goal, or search every app.</p>
-      <section aria-labelledby="trails-title" style={{ marginBottom: 56 }}>
+      <PageHead icon={Blocks} kicker="Apps" title="Apps on Arc" lead="Start with a goal, or browse every app by category and status." />
+      <section aria-labelledby="trails-title" style={{ margin: "32px 0 56px" }}>
         <h2 id="trails-title" className="h4" style={{ marginBottom: 14 }}>Start with a goal</h2>
         <TrailCards trails={TRAILS} />
       </section>

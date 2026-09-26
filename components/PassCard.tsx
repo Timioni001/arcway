@@ -24,7 +24,7 @@ export function PassCardView({ address, xp, done }: { address?: string; xp: numb
     <div className="pass" ref={ref} role="img" aria-label={`Arcway passport: ${level.name}, ${xp} XP`}>
       <Forms />
       <div className="pass__top">
-        <span className="pass__brand"><LogoMark className="logo__mark" /> arcway</span>
+        <span className="pass__brand"><LogoMark className="logo__mark" id="aw-mark-pass" /> arcway</span>
         <span className="pass__label">Passport</span>
       </div>
       <div className="pass__bottom">

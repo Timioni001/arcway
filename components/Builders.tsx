@@ -1,9 +1,13 @@
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { builderMark, type BuilderView } from "../lib/builders";
+import { appContracts } from "../lib/registry";
+import { FollowButton } from "./SaveButton";
 import { SUBMIT_APP_URL } from "../lib/config";
 import { AppMark } from "./CategoryIcon";
 import { ExternalLink } from "./Status";
+
+const contractsOf = (b: BuilderView) => b.apps.reduce((n, a) => n + appContracts(a).length, 0);
 
 export function BuilderCard({ builder }: { builder: BuilderView }) {
   return (
@@ -12,8 +16,9 @@ export function BuilderCard({ builder }: { builder: BuilderView }) {
         <AppMark app={builderMark(builder)} />
         <div>
           <h3 id={`b-${builder.id}`} className="h4"><Link href={`/builders/${builder.id}`}>{builder.name}</Link></h3>
-          <p className="xs secondary">{builder.apps.length} {builder.apps.length === 1 ? "app" : "apps"} on Arcway</p>
+          <p className="xs secondary">{builder.apps.length} {builder.apps.length === 1 ? "app" : "apps"} · {contractsOf(builder) || "no"} published contract{contractsOf(builder) === 1 ? "" : "s"}</p>
         </div>
+        <span style={{ marginLeft: "auto" }}><FollowButton kind="builder" id={builder.id} name={builder.name} variant="icon" /></span>
       </div>
       <ul className="row" style={{ gap: 8 }}>
         {builder.apps.map((a) => (

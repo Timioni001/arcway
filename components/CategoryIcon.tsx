@@ -1,4 +1,4 @@
-import { ArrowLeftRight, Bot, CircleDollarSign, Gem, PiggyBank, Send, WalletCards, Waypoints, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, Bot, CircleDollarSign, Gem, Landmark, Send, WalletCards, Waypoints, type LucideIcon } from "lucide-react";
 import type { CSSProperties } from "react";
 import type { ArcApp, Category } from "../lib/registry";
 
@@ -8,7 +8,7 @@ type Meta = { icon: LucideIcon; color: string; blurb: string };
 export const CATEGORY_META: Record<Category, Meta> = {
   Payments: { icon: Send, color: "#2F6FDB", blurb: "Send, spend and get paid" },
   Trading: { icon: ArrowLeftRight, color: "#0B8F87", blurb: "Swap and trade tokens" },
-  "Lend & Earn": { icon: PiggyBank, color: "#15803D", blurb: "Earn interest or borrow" },
+  "Lend & Earn": { icon: Landmark, color: "#15803D", blurb: "Earn interest or borrow" },
   FX: { icon: CircleDollarSign, color: "#6E56CF", blurb: "Trade currencies" },
   Bridges: { icon: Waypoints, color: "#C2410C", blurb: "Move money to Arc" },
   Wallets: { icon: WalletCards, color: "#A16207", blurb: "Hold and manage your money" },

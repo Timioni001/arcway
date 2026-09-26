@@ -36,6 +36,8 @@ const explorerBase = arcChain.blockExplorers?.default.url.replace(/\/$/, "") ?? 
 
 export const explorer = {
   name: arcChain.blockExplorers?.default.name ?? "Explorer",
+  home: explorerBase,
+  page: (path: string) => `${explorerBase}${path}`,
   tx: (hash: string) => `${explorerBase}/tx/${hash}`,
   address: (address: string) => `${explorerBase}/address/${address}`,
   /** Blockscout v2 REST base, e.g. https://testnet.arcscan.app/api/v2 */

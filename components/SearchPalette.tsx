@@ -1,6 +1,6 @@
 'use client';
 
-import { Activity, Compass, Copy, CornerDownLeft, History, IdCard, Link2, Moon, Plus, Route, Search, Target, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, Copy, CornerDownLeft, FileCode2, History, IdCard, Link2, Moon, Plus, Route, Search, Target, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { builderMark } from "../lib/builders";
@@ -12,6 +12,8 @@ import { useArcwayState } from "../lib/hooks/context";
 import { useToast } from "../lib/hooks/toast";
 import { APPS, discoverApps } from "../lib/registry";
 import { toggleTheme } from "../lib/theme";
+import { PRIMARY_NAV, SECONDARY_NAV, YOU_NAV } from "../lib/nav";
+import { explorer } from "../lib/config";
 import { AppLogo } from "./AppCard";
 import { AppMark, CategoryTile } from "./CategoryIcon";
 
@@ -19,13 +21,9 @@ type Item = { id: string; group: string; title: string; sub: string; href?: stri
 
 const tile = (Icon: LucideIcon, shade: 1 | 2 | 3) => <span className="tile" data-shade={shade}><Icon aria-hidden="true" /></span>;
 
-const PAGES: Item[] = [
-  { id: "p-apps", group: "Pages", title: "Discover", sub: "Browse all apps", href: "/apps", icon: tile(Compass, 1) },
-  { id: "p-quests", group: "Pages", title: "Quests", sub: "Earn XP", href: "/quests", icon: tile(Target, 2) },
-  { id: "p-builders", group: "Pages", title: "Builders", sub: "Teams on Arc", href: "/builders", icon: tile(Users, 3) },
-  { id: "p-passport", group: "Pages", title: "Passport", sub: "Your XP and badges", href: "/passport", icon: tile(IdCard, 1) },
-  { id: "p-activity", group: "Pages", title: "Activity", sub: "Your recent transactions", href: "/activity", icon: tile(Activity, 2) }
-];
+const PAGES: Item[] = [...PRIMARY_NAV, ...SECONDARY_NAV.filter((n) => n.href !== "/search"), ...YOU_NAV].map((n, i) => ({
+  id: `p-${n.href}`, group: "Pages", title: n.label, sub: n.blurb, href: n.href, icon: tile(n.icon, ((i % 3) + 1) as 1 | 2 | 3)
+}));
 
 function results(term: string, actions: Item[], recent: string[]): Item[] {
   const t = term.trim().toLowerCase();
@@ -36,7 +34,14 @@ function results(term: string, actions: Item[], recent: string[]): Item[] {
     }));
     return [...rec, ...cats, ...actions, ...PAGES];
   }
-  const r = searchAll(t);
+  const r = searchAll(term);
+  const onchain: Item[] = !r.onchain ? [] : r.onchain.kind === "tx"
+    ? [{ id: "o-tx", group: "Onchain", title: "View transaction", sub: r.onchain.value, run: () => { window.open(explorer.tx((r.onchain as { value: string }).value), "_blank", "noopener"); }, icon: tile(ArrowLeftRight, 2) }]
+    : [
+        ...(r.onchain.app ? [{ id: "o-app", group: "Onchain", title: `${r.onchain.app.name} contract`, sub: "Open protocol", href: `/apps/${r.onchain.app.slug}`, icon: <AppLogo app={r.onchain.app} /> }] : []),
+        { id: "o-addr", group: "Onchain", title: "View address on explorer", sub: r.onchain.value, run: () => { window.open(explorer.address((r.onchain as { value: string }).value), "_blank", "noopener"); }, icon: tile(FileCode2, 2) },
+        { id: "o-pass", group: "Onchain", title: "Open passport", sub: "XP and activity for this wallet", href: `/passport/${r.onchain.value}`, icon: tile(IdCard, 3) }
+      ];
   const apps = r.apps.map<Item>((a) => ({
     id: `a-${a.id}`, group: "Apps", title: a.name, sub: `${a.category} · ${a.tagline}`, href: `/apps/${a.slug}`, icon: <AppLogo app={a} />
   }));
@@ -55,7 +60,27 @@ function results(term: string, actions: Item[], recent: string[]): Item[] {
   }));
   const acts = actions.filter((a) => `${a.title} ${a.sub} ${a.keywords ?? ""}`.toLowerCase().includes(t));
   const all: Item = { id: "s-all", group: "Search", title: `See all results for “${term.trim()}”`, sub: "Grouped by apps, categories, quests and builders", href: `/search?q=${encodeURIComponent(term.trim())}`, icon: tile(Search, 3) };
-  return [...acts, ...apps, ...cats, ...trails, ...quests, ...builders, ...pages, all];
+  return [...onchain, ...acts, ...apps, ...cats, ...trails, ...quests, ...builders, ...pages, all];
+}
+
+const OPEN_EVENT = "arcway:search";
+
+/** Open the one search palette from any trigger. */
+export function openSearch() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
+
+/** A trigger styled for where it sits; the palette itself is mounted once by the shell. */
+export function SearchButton({ variant = "bar" }: { variant?: "bar" | "icon" }) {
+  return variant === "icon" ? (
+    <button className="icon-btn" onClick={openSearch} aria-label="Search" aria-keyshortcuts="Control+K Meta+K">
+      <Search aria-hidden="true" />
+    </button>
+  ) : (
+    <button className="search-btn" onClick={openSearch} aria-label="Search" aria-keyshortcuts="Control+K Meta+K">
+      <Search aria-hidden="true" /><span>Search Arc…</span><kbd className="kbd">⌘K</kbd>
+    </button>
+  );
 }
 
 /** Search everything from anywhere: ⌘K / Ctrl+K or "/". */
@@ -65,7 +90,7 @@ export function SearchPalette() {
   const [term, setTerm] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const returnFocus = useRef<HTMLElement | null>(null);
   const listId = useId();
   const { connection } = useArcwayState();
   const toast = useToast();
@@ -97,7 +122,7 @@ export function SearchPalette() {
     setOpen(false);
     setTerm("");
     setActive(0);
-    triggerRef.current?.focus();
+    returnFocus.current?.focus?.();
   }, []);
 
   useEffect(() => {
@@ -105,11 +130,14 @@ export function SearchPalette() {
       const typing = e.target instanceof HTMLElement && e.target.matches("input, textarea, [contenteditable]");
       if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !typing)) {
         e.preventDefault();
+        returnFocus.current = document.activeElement as HTMLElement | null;
         setOpen(true);
       }
     };
+    const onOpen = () => { returnFocus.current = document.activeElement as HTMLElement | null; setOpen(true); };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener(OPEN_EVENT, onOpen);
+    return () => { window.removeEventListener("keydown", onKey); window.removeEventListener(OPEN_EVENT, onOpen); };
   }, []);
 
   useEffect(() => {
@@ -142,9 +170,6 @@ export function SearchPalette() {
   let lastGroup = "";
   return (
     <>
-      <button ref={triggerRef} className="search-btn" onClick={() => setOpen(true)} aria-label="Search">
-        <Search aria-hidden="true" /><span>Search Arcway</span><kbd className="kbd">⌘K</kbd>
-      </button>
       {open && (
         <div className="palette-backdrop" onMouseDown={(e) => e.target === e.currentTarget && close()}>
           <div className="palette" role="dialog" aria-modal="true" aria-label="Search Arcway">
@@ -155,7 +180,7 @@ export function SearchPalette() {
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Search or type a command…"
+                placeholder="Search protocols, builders, addresses, or type a command…"
                 role="combobox"
                 aria-expanded="true"
                 aria-controls={listId}

@@ -1,26 +1,41 @@
 # Arcway
 
-**Arcway is an onboarding and discovery layer for Arc.**
+**Arc ecosystem intelligence: understand what's happening on Arc.**
 
-It combines:
-- Arc app discovery
-- cross-chain USDC onboarding
-- quests
-- on-chain reputation / passport
-- ecosystem activity
-
-The product goal is simple:
-
-> **Help a user enter Arc, know what to do next, complete useful actions, and build a portable record of their Arc activity.**
+Arc Portal is where you act on Arc. Arcway is where you understand it: which applications exist, what is happening onchain right now, what changed, who is building, and what is worth following. Discovery, quests and a passport sit on top of that.
 
 ## Features
 
-- **Discover**: live Arc apps by category, search, saved apps, and guided trails (step-by-step paths like "Earn on your USDC").
+### Intelligence
+- **Overview**: live network snapshot, ecosystem map, Arc Pulse, Arc Radar, featured protocol, builder activity and signals.
+- **Ecosystem**: interactive map of categories, apps, builders and published contracts, plus a protocol directory with observed activity.
+- **Pulse**: live feed of app interactions, contract deployments and USDC movement, each linked to its transaction.
+- **Radar**: what changed in the last 24 hours or 7 days, newly verified contracts, most used contracts, new listings.
+- **Signals**: factual, rule-based observations (activity shifts, verifications, large transfers) with evidence links. Never advice.
+- **Protocol pages**: identity, official links, published contracts with verification status, transaction counts, activity timeline, related protocols.
+
+### Participation
+- **Apps**: browse by category, status and goal, with guided trails.
 - **Quests**: the Arc Starter campaign, checked automatically from onchain activity; claim XP for free.
-- **Passport**: XP, levels and badges on Arc, with a public, shareable page and preview image for every wallet.
-- **Pay links**: request USDC with a link or QR code; payers send in a couple of taps.
-- **Overview**: XP, day streak, 14-day activity, network status, live fee calculator.
-- **Everywhere**: Ctrl/Cmd+K search with quick actions, one-click "Add Arc to wallet", light/dark themes, installable on phones.
+- **Passport**: XP, levels and badges, with a public, shareable page for every wallet.
+- **Watchlist**: follow protocols, builders and categories, with signals for what you follow.
+
+### Everywhere
+- Ctrl/Cmd+K search across protocols, builders, categories, quests, addresses and transaction hashes.
+- Notifications for new signals, light/dark/system themes, installable on phones, pay links, one-click "Add Arc to wallet".
+
+## Data trust
+
+Every number shows its source and the period it covers:
+
+| Label | Meaning |
+| --- | --- |
+| Observed | Read directly from Arc's explorer index (Blockscout API). |
+| Derived | Calculated from observed data; the method and period are shown. |
+| Project-provided | Supplied by the app team (the Arcway registry). |
+| Community | User-submitted. Not used yet. |
+
+Arcway never fabricates TVL, volume, users, growth, rewards or security status. When the explorer can't be reached, the UI says so and shows nothing rather than a guess. Server reads live in `lib/server/explorer.ts`; all derivations are pure functions in `lib/intel.ts` with unit tests.
 
 ## MVP
 

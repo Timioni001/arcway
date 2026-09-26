@@ -1,8 +1,7 @@
-import { createListStore } from "./listStore";
+import { getWatchedApps, getWatchlistServer, subscribeWatchlist, toggleWatch, watchId } from "./watchlist";
 
-/** Apps a visitor saved, kept in this browser. */
-const store = createListStore("arcway:saved-apps");
-export const getSaved = store.get;
-export const getSavedServer = store.getServer;
-export const toggleSaved = store.toggle;
-export const subscribeSaved = store.subscribe;
+/** Followed apps: a view over the watchlist (kept for existing call sites). */
+export const getSaved = getWatchedApps;
+export const getSavedServer = getWatchlistServer;
+export const toggleSaved = (appId: string) => toggleWatch(watchId("app", appId));
+export const subscribeSaved = subscribeWatchlist;
