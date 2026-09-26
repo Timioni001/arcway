@@ -5,7 +5,7 @@ import { explorer } from "../lib/config";
 import type { ClaimState } from "../lib/hooks/claims";
 import { ExternalLink } from "./Status";
 
-const STEPS = ["Verify", "Confirm", "Recorded"] as const;
+const STEPS = ["Check", "Save", "Done"] as const;
 
 /**
  * Recording states. "Recorded" only after the receipt confirms; the verifier
@@ -17,10 +17,10 @@ export function TransactionStatus({ state, onRetry }: { state: ClaimState; onRet
   const tone = state.phase === "error" ? "error" : state.phase === "recorded" ? "ok" : "info";
   const txHash = "txHash" in state ? state.txHash : undefined;
   const title = {
-    verifying: "Verifying on Arc…",
-    confirming: "Confirming on Arc…",
-    recorded: "Recorded on your passport",
-    error: "Recording failed"
+    verifying: "Checking your activity…",
+    confirming: "Adding XP to your passport…",
+    recorded: "XP claimed",
+    error: "Couldn't claim XP"
   }[state.phase];
 
   return (

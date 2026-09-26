@@ -7,6 +7,8 @@ import { usePublicClient } from "wagmi";
 import { ApiRequestError, apiFetch, type ClaimResponse } from "../api";
 import { arcChain } from "../config";
 import { humanizeError } from "../errors";
+import { getQuest } from "../quests";
+import { useToast } from "./toast";
 
 export type ClaimState =
   | { phase: "idle" }
@@ -33,6 +35,7 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
   const inFlight = useRef(new Set<string>());
   const client = usePublicClient({ chainId: arcChain.id });
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const set = useCallback((id: string, state: ClaimState) => setStates((s) => ({ ...s, [id]: state })), []);
 
@@ -53,7 +56,7 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
           set(questId, { phase: "confirming", txHash: res.txHash });
           const receipt = await client!.waitForTransactionReceipt({ hash: res.txHash as Hash, timeout: 60_000 });
           if (receipt.status !== "success") {
-            throw new ApiRequestError("submit_failed", "Recording was reverted on Arc. Nothing was lost — try again.");
+            throw new ApiRequestError("submit_failed", "Claiming didn't go through. Nothing was lost; try again.");
           }
           set(questId, { phase: "recorded", txHash: res.txHash });
         } else {
@@ -61,6 +64,8 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
         }
         await queryClient.invalidateQueries({ queryKey: ["arcway"] });
         onRecorded();
+        const quest = getQuest(questId);
+        if (quest) toast(`${quest.xp} XP claimed · ${quest.title}`);
       } catch (error) {
         const retryable = !(error instanceof ApiRequestError && error.code === "recording_unavailable");
         set(questId, {
@@ -74,7 +79,7 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
         inFlight.current.delete(questId);
       }
     },
-    [address, client, onRecorded, queryClient, set]
+    [address, client, onRecorded, queryClient, set, toast]
   );
 
   const value: ClaimsContext = {

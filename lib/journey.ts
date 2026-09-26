@@ -52,7 +52,7 @@ export function nextStep(input: JourneyInput): JourneyStep {
     return {
       id: "connect",
       title: "Connect a wallet to start",
-      body: "Arcway reads your Arc balance and activity to suggest what to do next. Connecting never moves funds.",
+      body: "See where you are and what to try next. Connecting never moves your money.",
       action: { type: "connect", label: "Connect wallet" }
     };
   }
@@ -62,13 +62,13 @@ export function nextStep(input: JourneyInput): JourneyStep {
   if (input.readError) {
     return {
       id: "read-error",
-      title: "Arc is not responding",
-      body: "We couldn't read your Arc balance. This is usually temporary.",
+      title: "We can't reach Arc right now",
+      body: "This is usually temporary.",
       action: { type: "retry", label: "Try again" }
     };
   }
   if (input.usdcBalance === undefined || input.txCount === undefined) {
-    return { id: "loading", title: "Reading your Arc activity…", body: "This takes a second." };
+    return { id: "loading", title: "Checking your progress…", body: "This takes a second." };
   }
 
   const done = (id: string) => {
@@ -83,9 +83,9 @@ export function nextStep(input: JourneyInput): JourneyStep {
   if (claimable) {
     return {
       id: "claim",
-      title: `Record “${claimable.title}” on your passport`,
-      body: `You've done it. Record it on-chain for +${claimable.xp} XP. Arcway pays the gas.`,
-      action: { type: "claim", questId: claimable.id, label: `Record +${claimable.xp} XP` }
+      title: `Claim your XP for “${claimable.title}”`,
+      body: `Nice work. Claiming is free.`,
+      action: { type: "claim", questId: claimable.id, label: `Claim ${claimable.xp} XP` }
     };
   }
 
@@ -93,7 +93,7 @@ export function nextStep(input: JourneyInput): JourneyStep {
     return {
       id: "bring-usdc",
       title: "Bring USDC to Arc",
-      body: "Arc uses USDC for gas, so a small amount of USDC is all you need to get started.",
+      body: "You'll need a little USDC to try apps on Arc.",
       action: { type: "bring-usdc", label: "Get USDC on Arc" }
     };
   }
@@ -104,7 +104,7 @@ export function nextStep(input: JourneyInput): JourneyStep {
     return {
       id: "switch-network",
       title: "Switch your wallet to Arc",
-      body: "Your wallet is on another network. Arcway will ask your wallet to switch; nothing happens without your approval.",
+      body: "Your wallet is on another network. Nothing changes without your approval.",
       action: { type: "switch-network", label: "Switch to Arc" }
     };
   }
@@ -112,8 +112,8 @@ export function nextStep(input: JourneyInput): JourneyStep {
   if (input.txCount === 0) {
     return {
       id: "first-transaction",
-      title: "Make your first Arc transaction",
-      body: "Try a small payment in an Arc app. Fees are paid in USDC and settle in under a second.",
+      title: "Try your first app",
+      body: "Make a small payment or swap in any app.",
       action: { type: "discover", label: "Find an app" }
     };
   }
@@ -121,18 +121,18 @@ export function nextStep(input: JourneyInput): JourneyStep {
   if (!done("explore-app")) {
     return {
       id: "explore-app",
-      title: "Use a verified Arc app",
-      body: "Pick an app by what you want to do. Your first interaction with a verified app counts toward your passport.",
+      title: "Explore a verified app",
+      body: "Your first action in a verified app earns XP.",
       action: { type: "discover", label: "Explore apps" }
     };
   }
 
   return {
     id: "done",
-    title: "Starter path complete",
+    title: "You've finished the starter quests",
     body: input.recordingEnabled
-      ? "Your passport is up to date. Keep exploring Arc apps to build your record."
-      : "You've done everything on the starter path. Passport recording opens soon.",
+      ? "Keep exploring apps to grow your passport."
+      : "Claiming XP opens soon. Your progress is saved.",
     action: { type: "discover", label: "Explore more apps" }
   };
 }

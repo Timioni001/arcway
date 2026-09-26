@@ -14,9 +14,9 @@ import { TransactionStatus } from "./TransactionStatus";
 function requirement(req: QuestRequirement): string {
   switch (req.kind) {
     case "hold-usdc": return `At least 1 USDC in your wallet on ${NETWORK_NAME}.`;
-    case "first-transaction": return `One transaction sent from your wallet on ${NETWORK_NAME}.`;
-    case "app-interaction": return "A successful transaction to a verified app's contract.";
-    case "complete-quests": return "The other starter quests recorded on your passport.";
+    case "first-transaction": return `At least one payment or swap from your wallet on ${NETWORK_NAME}.`;
+    case "app-interaction": return "One completed action in a verified app.";
+    case "complete-quests": return "The other three starter quests claimed.";
   }
 }
 
@@ -43,15 +43,15 @@ export function QuestDetail({ questId }: { questId: string }) {
   } else if (quest.status === "completed") {
     action = <Link href="/passport" className="btn btn--secondary btn--block">View passport <ArrowRight aria-hidden="true" /></Link>;
   } else if (quest.status === "locked") {
-    action = <p className="small secondary">Unlocks when the required quests are recorded.</p>;
+    action = <p className="small secondary">Unlocks when you claim the quests above.</p>;
   } else if (quest.status === "claimable") {
     action = recordingEnabled ? (
       state.phase !== "recorded" && (
         <button className="btn btn--primary btn--block" onClick={() => claim(quest.id)} disabled={busy} aria-busy={busy}>
-          {busy ? "Recording…" : `Record +${quest.xp} XP`}
+          {busy ? "Claiming…" : `Claim ${quest.xp} XP`}
         </button>
       )
-    ) : <p className="small secondary">Complete. Recording opens soon.</p>;
+    ) : <p className="small secondary">Done! Claiming XP opens soon.</p>;
   } else {
     action = (
       <>
@@ -91,8 +91,8 @@ export function QuestDetail({ questId }: { questId: string }) {
             <ol className="steps">{quest.steps.map((s) => <li key={s}>{s}</li>)}</ol>
           </section>
           <section className="card pad-lg" aria-labelledby="req">
-            <h2 id="req" className="h4">Requirements</h2>
-            <p className="secondary" style={{ marginTop: 10 }}>{requirement(quest.requirement)} Checked by Arcway&apos;s verifier.</p>
+            <h2 id="req" className="h4">What counts</h2>
+            <p className="secondary" style={{ marginTop: 10 }}>{requirement(quest.requirement)} We check this automatically.</p>
             {quest.lockedBy.length > 0 && (
               <div className="row" style={{ marginTop: 14, gap: 8 }}>
                 {quest.lockedBy.map((id) => (

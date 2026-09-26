@@ -8,7 +8,8 @@ export const metadata: Metadata = { title: "Passport" };
 export default function PassportPage() {
   return (
     <div className="container page">
-      <h1 className="h1" style={{ marginBottom: 32 }}>Passport</h1>
+      <div className="label" style={{ color: "var(--link)" }}>Passport</div>
+      <h1 className="h1" style={{ margin: "10px 0 32px" }}>Your record on Arc</h1>
       <div className="detail" style={{ marginTop: 0 }}>
         <ProfileCard />
         <div style={{ display: "grid", gap: 20 }}>
@@ -23,7 +24,7 @@ export default function PassportPage() {
       </section>
 
       <section className="section" style={{ paddingTop: 64 }} aria-labelledby="onchain-title">
-        <h2 id="onchain-title" className="h3" style={{ marginBottom: 20 }}>Onchain activity</h2>
+        <h2 id="onchain-title" className="h3" style={{ marginBottom: 20 }}>Recent activity</h2>
         <Activity />
       </section>
     </div>

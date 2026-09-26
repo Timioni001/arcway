@@ -8,8 +8,8 @@ import { QUESTS, questProgress, type QuestStatus, type QuestView } from "../lib/
 import { TransactionStatus } from "./TransactionStatus";
 
 export const STATUS_TEXT: Record<QuestStatus, string> = {
-  completed: "Recorded",
-  claimable: "Ready to record",
+  completed: "Claimed",
+  claimable: "Ready to claim",
   todo: "To do",
   locked: "Locked"
 };
@@ -58,7 +58,7 @@ export function QuestCard({ quest }: { quest: QuestView }) {
         {state.phase !== "idle" && <div style={{ marginBottom: 12 }}><TransactionStatus state={state} onRetry={() => claim(quest.id)} /></div>}
         {canRecord ? (
           <button className="btn btn--primary btn--block" disabled={busy} aria-busy={busy} onClick={() => claim(quest.id)}>
-            {busy ? "Recording…" : `Record +${quest.xp} XP`}
+            {busy ? "Claiming…" : `Claim ${quest.xp} XP`}
           </button>
         ) : (
           <Link href={`/quests/${quest.id}`} className="app-card__open">

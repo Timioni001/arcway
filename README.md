@@ -52,6 +52,10 @@ Arc Mainnet:
 
 See `docs/ARCHITECTURE.md` for the complete design and deployment plan.
 
+## Deploy
+
+See `docs/DEPLOY.md` for step-by-step Vercel instructions (no local setup needed).
+
 ## Development
 
 ```bash

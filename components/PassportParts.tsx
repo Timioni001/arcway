@@ -1,13 +1,11 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { PASSPORT_ADDRESS, explorer } from "../lib/config";
 import { shortAddress } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
 import { useCountUp } from "../lib/hooks/useCountUp";
 import { levelFor } from "../lib/levels";
 import { visitedApps } from "../lib/visited";
-import { ExternalLink } from "./Status";
 
 export function ProfileCard() {
   const { xp, connection, progress } = useArcwayState();
@@ -32,11 +30,6 @@ export function ProfileCard() {
       <div className="progress" style={{ marginTop: 12 }} role="progressbar" aria-label="Progress to next level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level.progress * 100)}>
         <i style={{ width: `${Math.max(2, level.progress * 100)}%` }} />
       </div>
-      {PASSPORT_ADDRESS && (
-        <p className="xs secondary" style={{ marginTop: 16 }}>
-          Stored onchain · <ExternalLink href={explorer.address(PASSPORT_ADDRESS)}>Passport contract</ExternalLink>
-        </p>
-      )}
     </section>
   );
 }
@@ -48,8 +41,8 @@ export function PassportStats() {
   const connected = connection.status === "connected";
   const stats = [
     { value: opened, label: "Apps explored" },
-    { value: quests.filter((q) => q.status === "completed").length, label: "Quests completed" },
-    { value: connected ? txCount.data ?? "—" : 0, label: "Arc transactions" }
+    { value: quests.filter((q) => q.status === "completed").length, label: "Quests done" },
+    { value: connected ? txCount.data ?? "—" : 0, label: "Transactions" }
   ];
   return (
     <ul className="stats" aria-label="Activity">

@@ -51,21 +51,21 @@ export async function checkQuest(quest: Quest, snap: ChainSnapshot): Promise<Eli
     case "first-transaction":
       return snap.txCount > 0
         ? { eligible: true }
-        : { eligible: false, reason: "No transactions from this wallet on Arc yet." };
+        : { eligible: false, reason: "No transactions from this wallet yet." };
     case "app-interaction": {
       const contracts = questEligibleContracts();
-      if (contracts.size === 0) return { eligible: false, reason: "Verified app listings are coming soon." };
-      if (snap.txCount === 0) return { eligible: false, reason: "No transactions from this wallet on Arc yet." };
+      if (contracts.size === 0) return { eligible: false, reason: "Verified apps are coming soon." };
+      if (snap.txCount === 0) return { eligible: false, reason: "No transactions from this wallet yet." };
       const items = await snap.activity();
       return items.some((tx) => tx.success && tx.to && contracts.has(tx.to.toLowerCase()))
         ? { eligible: true }
-        : { eligible: false, reason: "No successful interaction with a verified app found yet." };
+        : { eligible: false, reason: "No action in a verified app yet." };
     }
     case "complete-quests": {
       const missing = req.questIds.filter((id) => !snap.completed.has(id));
       return missing.length === 0
         ? { eligible: true }
-        : { eligible: false, reason: "Record the other starter quests first." };
+        : { eligible: false, reason: "Claim the other starter quests first." };
     }
   }
 }

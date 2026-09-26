@@ -1,12 +1,18 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { Reveal } from "./Reveal";
 
-export function SectionHeader({ title, titleId, action }: { title: ReactNode; titleId: string; action?: ReactNode }) {
+/** Section intro on the left, optional action on the right; aligned to the same grid everywhere. */
+export function SectionHeader({ label, title, titleId, sub, action }: { label?: string; title: ReactNode; titleId: string; sub?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="section-head">
-      <h2 id={titleId} className="h2">{title}</h2>
+    <Reveal className="section-head">
+      <div className="section-intro">
+        {label && <div className="label" style={{ color: "var(--link)", marginBottom: 10 }}>{label}</div>}
+        <h2 id={titleId} className="h2">{title}</h2>
+        {sub && <p className="secondary">{sub}</p>}
+      </div>
       {action}
-    </div>
+    </Reveal>
   );
 }
 
