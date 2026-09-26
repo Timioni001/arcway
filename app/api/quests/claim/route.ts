@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
   const wallet = verifierClient();
   if (!PASSPORT_ADDRESS || !wallet) {
-    return apiError(503, "recording_unavailable", "Passport recording isn't open yet. Your progress is saved on Arc and can be recorded later.");
+    return apiError(503, "recording_unavailable", "Claiming opens soon. Your progress is saved.");
   }
 
   for (const rate of [perIp(clientIp(req)), perAddress(user)]) {
@@ -41,14 +41,14 @@ export async function POST(req: Request) {
   try {
     snap = await snapshot(user);
   } catch {
-    return apiError(502, "arc_unavailable", "We couldn't reach Arc to verify this quest. Try again shortly.");
+    return apiError(502, "arc_unavailable", "We couldn't reach Arc. Try again in a moment.");
   }
   if (snap.completed.has(quest.id)) {
     return NextResponse.json({ status: "already_recorded" } satisfies ClaimResponse);
   }
 
   const result = await checkQuest(quest, snap).catch(() => undefined);
-  if (!result) return apiError(502, "arc_unavailable", "We couldn't verify this quest right now. Try again shortly.");
+  if (!result) return apiError(502, "arc_unavailable", "We couldn't check this quest. Try again in a moment.");
   if (!result.eligible) return apiError(422, "not_eligible", result.reason ?? "This quest isn't complete yet.");
 
   try {
@@ -65,6 +65,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ status: "submitted", txHash } satisfies ClaimResponse);
   } catch (error) {
     console.error("[verifier] submit failed", { user, quest: quest.id, error });
-    return apiError(502, "submit_failed", "Recording failed on Arc. You haven't lost anything — try again in a moment.");
+    return apiError(502, "submit_failed", "Claiming didn't go through. Nothing was lost; try again.");
   }
 }

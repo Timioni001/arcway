@@ -1,13 +1,16 @@
 import { ArrowRight, ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { STATUS_LABEL, type ArcApp } from "../lib/registry";
+import { CategoryTile } from "./CategoryIcon";
 import { Forms } from "./Forms";
 
+/** The app's own logo in a controlled container, or its category icon until one is added. */
 export function AppLogo({ app, size = "md" }: { app: ArcApp; size?: "md" | "lg" }) {
+  if (!app.logo) return <CategoryTile category={app.category} size={size} />;
   return (
     <span className={`app-logo${size === "lg" ? " app-logo--lg" : ""}`} aria-hidden="true">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      {app.logo ? <img src={app.logo} alt="" /> : <span>{app.name.charAt(0)}</span>}
+      <img src={app.logo} alt="" />
     </span>
   );
 }

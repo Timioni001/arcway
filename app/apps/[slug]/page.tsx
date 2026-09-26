@@ -85,21 +85,21 @@ export default async function AppDetail({ params }: Props) {
         </div>
 
         <aside className="detail__aside">
-          <section className="card pad" aria-labelledby="network">
-            <h2 id="network" className="h4" style={{ marginBottom: 16 }}>Network information</h2>
+          <section className="card pad" aria-labelledby="details">
+            <h2 id="details" className="h4" style={{ marginBottom: 16 }}>Details</h2>
             <dl className="facts">
+              <div><dt>Category</dt><dd>{app.category}</dd></div>
               <div><dt>Network</dt><dd>{NETWORK_NAME}</dd></div>
-              <div>
-                <dt>Contract</dt>
-                <dd>
-                  {contracts.length ? contracts.map((a) => (
-                    <a key={a} className="mono link" href={explorer.address(a)} target="_blank" rel="noopener noreferrer">{shortAddress(a)}</a>
-                  )) : <span className="secondary">Not listed</span>}
-                </dd>
-              </div>
-              <div><dt>Verified</dt><dd><Fact ok={app.verified}>{app.verified ? "Yes" : "Not yet"}</Fact></dd></div>
-              <div><dt>Source</dt><dd><Fact ok={Boolean(app.verification?.sourceUrl)}>{app.verification?.sourceUrl ? "Public" : "Not provided"}</Fact></dd></div>
-              <div><dt>Last checked</dt><dd className="mono">{app.verification ? timeAgo(app.verification.checkedAt) : "—"}</dd></div>
+              <div><dt>Verified by Arcway</dt><dd><Fact ok={app.verified}>{app.verified ? "Yes" : "Not yet"}</Fact></dd></div>
+              <div><dt>Counts for quests</dt><dd><Fact ok={app.verified && !app.sample}>{app.verified && !app.sample ? "Yes" : "No"}</Fact></dd></div>
+              {contracts.length > 0 && (
+                <div>
+                  <dt>Contract</dt>
+                  <dd>{contracts.map((a) => <a key={a} className="mono link" href={explorer.address(a)} target="_blank" rel="noopener noreferrer">{shortAddress(a)}</a>)}</dd>
+                </div>
+              )}
+              {app.verification?.sourceUrl && <div><dt>Source code</dt><dd><ExternalLink href={app.verification.sourceUrl}>Public</ExternalLink></dd></div>}
+              {app.verification && <div><dt>Last checked</dt><dd>{timeAgo(app.verification.checkedAt)}</dd></div>}
             </dl>
           </section>
         </aside>

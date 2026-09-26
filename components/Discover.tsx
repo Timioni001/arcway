@@ -1,28 +1,32 @@
 'use client';
 
 import { Search, SearchX } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useId, useMemo, useState } from "react";
 import { buildersFrom } from "../lib/builders";
 import { useArcwayState } from "../lib/hooks/context";
-import { APPS, CATEGORIES, categoryCounts, discoverApps, type Category } from "../lib/registry";
+import { APPS, CATEGORIES, discoverApps, type Category } from "../lib/registry";
 import { AppCard, FeaturedApp } from "./AppCard";
 import { BuilderCard } from "./Builders";
 import { QuestCard } from "./Quests";
+import { CategoryTile } from "./CategoryIcon";
 import { StateBlock } from "./Section";
 
 /** Search + filters + results. Search results reuse the same cards as everywhere else. */
 export function Discover() {
   const { quests: questViews } = useArcwayState();
-  const [category, setCategory] = useState<Category | null>(null);
+  const initial = useSearchParams().get("category");
+  const [category, setCategory] = useState<Category | null>(
+    CATEGORIES.includes(initial as Category) ? (initial as Category) : null
+  );
   const [search, setSearch] = useState("");
   const searchId = useId();
   const term = search.trim().toLowerCase();
 
-  const counts = useMemo(() => categoryCounts(APPS), []);
   const apps = useMemo(() => discoverApps(APPS, { category, search }), [category, search]);
   const quests = term ? questViews.filter((q) => `${q.title} ${q.description}`.toLowerCase().includes(term)) : [];
   const builders = term ? buildersFrom().filter((b) => b.name.toLowerCase().includes(term)) : [];
-  const categories = CATEGORIES.filter((c) => counts[c] > 0 || c === category);
+  const categories = CATEGORIES;
   const featured = !term && !category ? apps.find((a) => a.featured) : undefined;
   const total = apps.length + quests.length + builders.length;
 
@@ -36,7 +40,9 @@ export function Discover() {
       <div className="filters" role="group" aria-label="Filter by category" style={{ margin: "16px 0 32px" }}>
         <button className="chip" aria-pressed={category === null} onClick={() => setCategory(null)}>All</button>
         {categories.map((c) => (
-          <button key={c} className="chip" aria-pressed={category === c} onClick={() => setCategory(category === c ? null : c)}>{c}</button>
+          <button key={c} className="chip" aria-pressed={category === c} onClick={() => setCategory(category === c ? null : c)}>
+            <CategoryTile category={c} size="xs" />{c}
+          </button>
         ))}
       </div>
 
@@ -44,7 +50,7 @@ export function Discover() {
 
       {total === 0 ? (
         <StateBlock icon={SearchX} title="No results" actions={<button className="btn btn--secondary btn--sm" onClick={() => { setSearch(""); setCategory(null); }}>Clear search</button>}>
-          Try another word or category.
+          {category && !term ? `No ${category.toLowerCase()} apps listed yet. New apps are added regularly.` : "Try another word or category."}
         </StateBlock>
       ) : (
         <>

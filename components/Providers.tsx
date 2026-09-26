@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 import { ArcwayProvider } from "../lib/hooks/context";
+import { ToastProvider } from "../lib/hooks/toast";
 import { wagmiConfig } from "../lib/wagmi";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -23,7 +24,9 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <ArcwayProvider>{children}</ArcwayProvider>
+        <ToastProvider>
+          <ArcwayProvider>{children}</ArcwayProvider>
+        </ToastProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
