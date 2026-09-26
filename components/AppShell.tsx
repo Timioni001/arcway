@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { NETWORK_NAME } from "../lib/config";
-import { BOTTOM_NAV, PRIMARY_NAV, SECONDARY_NAV, YOU_NAV, crumbsFor, isActive, type NavItem } from "../lib/nav";
+import { BOTTOM_NAV, NAV_GROUPS, PRIMARY_NAV, SECONDARY_NAV, YOU_NAV, crumbsFor, isActive, type NavItem } from "../lib/nav";
 import { THEME_EVENT, toggleTheme } from "../lib/theme";
 import { getWatchlist, getWatchlistServer, subscribeWatchlist } from "../lib/watchlist";
 import { Logo, LogoMark } from "./Logo";
@@ -87,7 +87,12 @@ export function Rail() {
         </button>
       </div>
       <nav className="rail__nav" aria-label="Main">
-        <ul>{PRIMARY_NAV.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}</ul>
+        {NAV_GROUPS.map((g) => (
+          <div key={g.label} className="rail__group">
+            <div className="rail__heading" aria-hidden="true"><span className="rail__label">{g.label}</span></div>
+            <ul aria-label={g.label}>{g.items.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}</ul>
+          </div>
+        ))}
       </nav>
       <nav className="rail__nav rail__nav--secondary" aria-label="More">
         <ul>
@@ -207,8 +212,7 @@ export function MobileTop() {
       </button>
       <div ref={panelRef} id={panelId} className="mmenu" data-open={open} hidden={!open}>
         <nav aria-label="Main menu">
-          {group("Intelligence", PRIMARY_NAV.slice(0, 6))}
-          {group("Participate", PRIMARY_NAV.slice(6))}
+          {NAV_GROUPS.map((g) => <div key={g.label}>{group(g.label, g.items)}</div>)}
           {group("Tools", SECONDARY_NAV)}
           {group("You", YOU_NAV)}
         </nav>

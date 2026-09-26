@@ -3,7 +3,6 @@ import Link from "next/link";
 import { builderMark, type BuilderView } from "../lib/builders";
 import { appContracts } from "../lib/registry";
 import { FollowButton } from "./SaveButton";
-import { SUBMIT_APP_URL } from "../lib/config";
 import { AppMark } from "./CategoryIcon";
 import { ExternalLink } from "./Status";
 
@@ -35,11 +34,10 @@ export function BuilderCard({ builder }: { builder: BuilderView }) {
 
 export function GetListedCard() {
   return (
-    <a href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer" className="get-listed">
+    <Link href="/submit" className="get-listed">
       <span className="state__icon"><Plus aria-hidden="true" /></span>
       <span className="h4" style={{ color: "var(--text)" }}>Building on Arc?</span>
-      <span className="small">Submit your app to get listed. <ArrowUpRight aria-hidden="true" style={{ display: "inline", width: 14, verticalAlign: -2 }} /></span>
-      <span className="visually-hidden"> (opens in a new tab)</span>
-    </a>
+      <span className="small">Submit your project to get listed.</span>
+    </Link>
   );
 }

@@ -7,7 +7,10 @@
  * - project:  supplied by the app team (Arcway's registry)
  * Nothing here estimates, predicts or scores. If a source is missing, the value is null.
  */
-import type { BsAddress, BsContractCounters, BsHotContract, BsStats, BsTokenCounters, BsTokenTransfer, BsTx, BsVerifiedContract } from "./server/explorer";
+import { decodeEventLog, type Hex } from "viem";
+import { passportAbi } from "./abi";
+import { QUESTS, questHash } from "./quests";
+import type { BsAddress, BsLog, BsContractCounters, BsHotContract, BsStats, BsTokenCounters, BsTokenTransfer, BsTx, BsVerifiedContract } from "./server/explorer";
 import { APPS, appContracts, type ArcApp } from "./registry";
 import type { ArcNetwork } from "./config";
 
@@ -449,4 +452,87 @@ export function buildProtocol(input: {
 export function activeApps(protocols: ProtocolIntel[], now: number = Date.now()): { active: number; measurable: number } {
   const measurable = protocols.filter((p) => p.measurable);
   return { measurable: measurable.length, active: measurable.filter((p) => p.lastActive && now - Date.parse(p.lastActive) < DAY).length };
+}
+
+// ---------------------------------------------------------------- passport (Arcway's own contract)
+
+export type PassportExplorer = { address: string; xp: number; quests: number; lastAt: string | null };
+
+export type PassportStats = {
+  deployed: boolean;
+  address: string | null;
+  verified: boolean | null;
+  transactions: number | null;
+  passports: number;
+  xp: number;
+  completions: number;
+  byQuest: { id: string; title: string; count: number }[];
+  leaderboard: PassportExplorer[];
+  season: { label: string; start: string; leaderboard: PassportExplorer[] };
+  truncated: boolean;
+};
+
+const QUEST_BY_HASH = new Map(QUESTS.map((q) => [questHash(q.id).toLowerCase(), q]));
+
+/** Monthly seasons in UTC: "September 2026", starting on the 1st. */
+export function seasonOf(now: number) {
+  const d = new Date(now);
+  const start = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+  return { label: start.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" }), start: start.toISOString() };
+}
+
+/** Passport activity from QuestCompleted logs. Ranked by XP earned, never by balance. */
+export function buildPassportStats(input: {
+  address: string | null;
+  logs: BsLog[] | null;
+  truncated?: boolean;
+  info?: BsAddress | null;
+  counters?: { transactions_count?: string } | null;
+  now?: number;
+}): PassportStats {
+  const now = input.now ?? Date.now();
+  const season = seasonOf(now);
+  const empty: PassportStats = {
+    deployed: Boolean(input.address), address: input.address, verified: input.info?.is_verified ?? null,
+    transactions: toInt(input.counters?.transactions_count), passports: 0, xp: 0, completions: 0, byQuest: [],
+    leaderboard: [], season: { ...season, leaderboard: [] }, truncated: Boolean(input.truncated)
+  };
+  if (!input.address || !input.logs) return empty;
+
+  type Row = { user: string; quest: string; xp: number; at: string | null };
+  const rows: Row[] = [];
+  for (const log of input.logs) {
+    try {
+      const ev = decodeEventLog({ abi: passportAbi, data: log.data as Hex, topics: log.topics.filter(Boolean) as [Hex, ...Hex[]] });
+      if (ev.eventName !== "QuestCompleted") continue;
+      rows.push({ user: ev.args.user.toLowerCase(), quest: String(ev.args.questId).toLowerCase(), xp: Number(ev.args.xpAwarded), at: log.block_timestamp ?? null });
+    } catch {
+      /* not a passport event we read */
+    }
+  }
+
+  const rank = (list: Row[]): PassportExplorer[] => {
+    const m = new Map<string, PassportExplorer>();
+    for (const r of list) {
+      const e = m.get(r.user) ?? { address: r.user, xp: 0, quests: 0, lastAt: null };
+      e.xp += r.xp;
+      e.quests += 1;
+      if (r.at && (!e.lastAt || r.at > e.lastAt)) e.lastAt = r.at;
+      m.set(r.user, e);
+    }
+    return [...m.values()].sort((a, b) => b.xp - a.xp || b.quests - a.quests || (a.lastAt ?? "").localeCompare(b.lastAt ?? "")).slice(0, 25);
+  };
+
+  const byQuest = new Map<string, number>();
+  for (const r of rows) byQuest.set(r.quest, (byQuest.get(r.quest) ?? 0) + 1);
+
+  return {
+    ...empty,
+    passports: new Set(rows.map((r) => r.user)).size,
+    xp: rows.reduce((s, r) => s + r.xp, 0),
+    completions: rows.length,
+    byQuest: [...byQuest].map(([h, count]) => ({ id: QUEST_BY_HASH.get(h)?.id ?? h, title: QUEST_BY_HASH.get(h)?.title ?? "Other quest", count })).sort((a, b) => b.count - a.count),
+    leaderboard: rank(rows),
+    season: { ...season, leaderboard: rank(rows.filter((r) => r.at && r.at >= season.start)) }
+  };
 }

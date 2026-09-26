@@ -15,7 +15,8 @@ const ROUTES = [
   "/passport/0x7a00000000000000000000000000000000092f1a", "/terms", "/privacy",
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
   "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
-  "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave"
+  "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave",
+  "/leaderboard", "/submit", "/widgets", "/digest"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -490,4 +491,79 @@ test("intel APIs answer with data or a clean error", async ({ request }) => {
     else expect(body).toMatchObject({ error: "arc_unavailable" });
   }
   expect((await request.get("/api/intel/protocol/not-a-protocol")).status()).toBe(404);
+});
+
+// ---------------------------------------------------------------- sections, proof and builder tools
+
+test("navigation is grouped into four sections", async ({ page, isMobile }) => {
+  await open(page, "/");
+  if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
+  const scope = isMobile ? page.getByRole("navigation", { name: "Main menu" }) : page.getByRole("navigation", { name: "Main" });
+  for (const g of ["Understand", "Discover", "Participate", "Build on Arc"]) {
+    await expect(scope.getByText(g, { exact: true }).first()).toBeVisible();
+  }
+  await expect(scope.getByRole("link", { name: /^Submit a project/ })).toBeVisible();
+});
+
+test("the overview proves Arcway runs on Arc", async ({ page }) => {
+  await open(page, "/");
+  const proof = page.getByRole("region", { name: "Recorded on Arc, checkable by anyone" });
+  await expect(proof.getByRole("link", { name: /0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107/ })).toHaveAttribute("href", /\/address\/0xa8a4/);
+  await expect(proof.getByText("passports issued")).toBeVisible();
+  await expect(proof.locator(".proof__stat b").first()).toHaveText("2");
+});
+
+test("leaderboard ranks explorers by XP", async ({ page }) => {
+  await open(page, "/leaderboard");
+  await page.getByRole("button", { name: "All time" }).click();
+  const rows = page.locator(".lb__row");
+  await expect(rows).toHaveCount(2);
+  await expect(rows.first().locator(".lb__xp")).toHaveText("35 XP");
+  await expect(rows.first().getByRole("link")).toHaveAttribute("href", "/passport/0x7a00000000000000000000000000000000092f1a");
+});
+
+test("submitting a project checks contracts and opens a pre-filled issue", async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as unknown as { opened: string[] }).opened = [];
+    window.open = ((url: string) => { (window as unknown as { opened: string[] }).opened.push(url); return null; }) as typeof window.open;
+  });
+  await open(page, "/submit");
+  await page.getByRole("button", { name: "Continue on GitHub" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Fix the highlighted fields" })).toBeVisible();
+  await page.getByLabel("Project name").fill("Tipjar");
+  await page.getByLabel("Live app link").fill("https://tipjar.app");
+  await page.getByLabel("Category").selectOption("Payments");
+  await page.getByLabel("What it does, in one line").fill("Send USDC tips with a link.");
+  await page.getByLabel(/Contract addresses on/).fill("0x7a00000000000000000000000000000000092f1a");
+  await expect(page.locator(".check-row[data-state='ok']")).toContainText("Tipjar");
+  await page.getByLabel("Public repo").fill("https://github.com/me/tipjar");
+  await page.getByLabel("Builder profile").fill("https://x.com/me");
+  await expect(page.locator(".submit__preview")).toContainText("Tipjar");
+  await page.getByRole("button", { name: "Continue on GitHub" }).click();
+  const opened = await page.evaluate(() => (window as unknown as { opened: string[] }).opened);
+  expect(opened).toHaveLength(1);
+  const url = new URL(opened[0]);
+  expect(url.pathname).toMatch(/\/issues\/new$/);
+  expect(url.searchParams.get("title")).toBe("Listing: Tipjar");
+  expect(url.searchParams.get("body")).toContain("source verified");
+  await expect(page.getByRole("status").filter({ hasText: "opened on GitHub" })).toBeVisible();
+});
+
+test("badges and the RSS feed are served", async ({ request }) => {
+  const badge = await request.get("/api/badge/uniswap");
+  expect(badge.status()).toBe(200);
+  expect(badge.headers()["content-type"]).toContain("image/svg+xml");
+  expect(await badge.text()).toContain("Arcway");
+  expect((await request.get("/api/badge/not-an-app")).status()).toBe(404);
+  const feed = await request.get("/digest/feed.xml");
+  expect(feed.status()).toBe(200);
+  expect(feed.headers()["content-type"]).toContain("rss");
+  expect(await feed.text()).toContain("<rss");
+});
+
+test("widget builder gives copyable snippets", async ({ page }) => {
+  await open(page, "/widgets");
+  await page.getByLabel("App").selectOption("aave");
+  await expect(page.locator(".codebox pre").first()).toContainText("/api/badge/aave");
+  await expect(page.getByRole("img", { name: "Arcway badge for Aave" })).toBeVisible();
 });

@@ -1,7 +1,8 @@
 'use client';
 
 import { Activity, ArrowUpRight, BadgeCheck, FileCode2, Minus } from "lucide-react";
-import { explorer, NETWORK_NAME, SUBMIT_APP_URL } from "../lib/config";
+import Link from "next/link";
+import { explorer, NETWORK_NAME } from "../lib/config";
 import { timeAgo } from "../lib/format";
 import { useProtocolIntel } from "../lib/hooks/useIntel";
 import { Freshness, IntelGate, PanelHead, PulseList, SourceTag, compact } from "./Intel";
@@ -21,7 +22,7 @@ export function ProtocolIntelView({ slug, measurable }: { slug: string; measurab
             <div style={{ fontWeight: 600 }}>Activity data coming soon</div>
             <p className="small secondary">Onchain activity appears here once the team publishes its contract addresses for {NETWORK_NAME}. Nothing is estimated in the meantime.</p>
           </div>
-          <a className="btn btn--secondary btn--sm" href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer">Submit contracts <ArrowUpRight aria-hidden="true" /></a>
+          <Link className="btn btn--secondary btn--sm" href="/submit">Submit contracts</Link>
         </div>
       </section>
     );

@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { RINGS, layoutEcosystem, neighbours } from "../lib/ecosystem";
-import { BOTTOM_NAV, PRIMARY_NAV, crumbsFor, isActive } from "../lib/nav";
+import { BOTTOM_NAV, NAV_GROUPS, PRIMARY_NAV, crumbsFor, isActive } from "../lib/nav";
 import { onchainMatch } from "../lib/search";
 import { parseWatchId, watchId } from "../lib/watchlist";
 
 describe("navigation", () => {
   it("follows the intelligence-first order", () => {
-    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Overview", "Ecosystem", "Pulse", "Radar", "Builders", "Signals", "Apps", "Quests"]);
+    expect(NAV_GROUPS.map((g) => g.label)).toEqual(["Understand", "Discover", "Participate", "Build on Arc"]);
+    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Overview", "Ecosystem", "Pulse", "Radar", "Signals", "Apps", "Builders", "Quests", "Passport", "Leaderboard", "Submit a project", "Badges", "Arc today"]);
     expect(BOTTOM_NAV).toHaveLength(5);
   });
   it("matches the overview only at the root", () => {
@@ -54,5 +55,31 @@ describe("watchlist ids and onchain search", () => {
     expect(onchainMatch("0x7a00000000000000000000000000000000092f1a")).toMatchObject({ kind: "address" });
     expect(onchainMatch(`0x${"a".repeat(64)}`)).toEqual({ kind: "tx", value: `0x${"a".repeat(64)}` });
     expect(onchainMatch("0x123")).toBeNull();
+  });
+});
+
+import { badgeSvg } from "../lib/badge";
+import { EMPTY_SUBMISSION, submissionIssueUrl, validateSubmission } from "../lib/submit";
+
+describe("submissions and badges", () => {
+  const good = { ...EMPTY_SUBMISSION, name: "Tipjar", url: "https://tipjar.app", category: "Payments" as const, tagline: "Send USDC tips with a link.", contracts: "0x7a00000000000000000000000000000000092f1a", repo: "https://github.com/me/tipjar", profile: "https://x.com/me" };
+  it("explains every missing field in plain words", () => {
+    const e = validateSubmission(EMPTY_SUBMISSION);
+    expect(Object.keys(e).sort()).toEqual(["category", "contracts", "name", "profile", "repo", "tagline", "url"]);
+    expect(validateSubmission(good)).toEqual({});
+    expect(validateSubmission({ ...good, contracts: "0x123" }).contracts).toMatch(/valid address/);
+  });
+  it("builds a pre-filled issue with the live checks", () => {
+    const url = new URL(submissionIssueUrl(good, { "0x7a00000000000000000000000000000000092f1a": "contract, source verified" }));
+    expect(url.pathname).toMatch(/\/issues\/new$/);
+    expect(url.searchParams.get("title")).toBe("Listing: Tipjar");
+    expect(url.searchParams.get("body")).toContain("contract, source verified");
+    expect(url.searchParams.get("labels")).toBe("listing");
+  });
+  it("renders an escaped SVG badge", () => {
+    const svg = badgeSvg({ label: "Arcway", value: "1.2K tx on Arc <b>" });
+    expect(svg.startsWith("<svg")).toBe(true);
+    expect(svg).toContain("&lt;b&gt;");
+    expect(svg).not.toContain("<b>");
   });
 });

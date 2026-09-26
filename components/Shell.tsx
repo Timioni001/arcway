@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET, SUBMIT_APP_URL } from "../lib/config";
-import { PRIMARY_NAV, YOU_NAV } from "../lib/nav";
+import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET } from "../lib/config";
+import { NAV_GROUPS, YOU_NAV } from "../lib/nav";
 import { Logo } from "./Logo";
+import { FooterProof } from "./PassportProof";
 
 export function Footer() {
   return (
@@ -11,37 +12,32 @@ export function Footer() {
           <div className="footer__brand" style={{ display: "grid", gap: 14, maxWidth: 320 }}>
             <Logo />
             <p className="small secondary">Arc ecosystem intelligence. Explore applications, activity, builders and signals across Arc.</p>
+            <FooterProof />
+          <div className="built-on">
+              <span className="label">Built on</span>
+              {/* Official Arc marks, unmodified. See public/brand/arc/NOTICE.md */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="for-light" src="/brand/arc/arc-logo-dark.svg" alt="Arc" width={146} height={50} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="for-dark" src="/brand/arc/arc-logo-light.svg" alt="Arc" width={146} height={50} />
+            </div>
           </div>
-          <nav aria-labelledby="f-explore">
-            <h2 id="f-explore">Explore</h2>
-            <ul>
-              {PRIMARY_NAV.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
-            </ul>
-          </nav>
-          <nav aria-labelledby="f-you">
-            <h2 id="f-you">You</h2>
+          {NAV_GROUPS.map((g, i) => (
+            <nav key={g.label} aria-labelledby={`f-${i}`}>
+              <h2 id={`f-${i}`}>{g.label}</h2>
+              <ul>{g.items.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}</ul>
+            </nav>
+          ))}
+          <nav aria-labelledby="f-res">
+            <h2 id="f-res">You &amp; resources</h2>
             <ul>
               {YOU_NAV.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
               <li><Link href="/watchlist">Watchlist</Link></li>
-              <li><Link href="/settings">Settings</Link></li>
-            </ul>
-          </nav>
-          <nav aria-labelledby="f-res">
-            <h2 id="f-res">Resources</h2>
-            <ul>
               <li><a href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Arc docs</a></li>
               <li><a href={BRIDGE_URL} target="_blank" rel="noopener noreferrer">{IS_MAINNET ? "Get USDC" : "Get test USDC"}</a></li>
-              <li><a href={SUBMIT_APP_URL} target="_blank" rel="noopener noreferrer">Submit an app</a></li>
+              <li><a href="/digest/feed.xml">RSS feed</a></li>
             </ul>
           </nav>
-          <div className="built-on" style={{ justifySelf: "end" }}>
-            <span className="label">Built on</span>
-            {/* Official Arc marks, unmodified. See public/brand/arc/NOTICE.md */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="for-light" src="/brand/arc/arc-logo-dark.svg" alt="Arc" width={146} height={50} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="for-dark" src="/brand/arc/arc-logo-light.svg" alt="Arc" width={146} height={50} />
-          </div>
         </div>
         <div className="footer__base">
           <span>© {new Date().getFullYear()} Arcway · Independent, not affiliated with Circle.</span>

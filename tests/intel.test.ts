@@ -128,3 +128,43 @@ describe("protocol intelligence", () => {
     expect(activeApps([partial], NOW)).toEqual({ active: 0, measurable: 1 });
   });
 });
+
+import { encodeAbiParameters, encodeEventTopics } from "viem";
+import { passportAbi } from "../lib/abi";
+import { buildPassportStats, seasonOf } from "../lib/intel";
+import { questHash } from "../lib/quests";
+
+describe("passport stats", () => {
+  const log = (user: string, quest: string, xp: number, at: string) => ({
+    block_number: 1,
+    block_timestamp: at,
+    index: 0,
+    transaction_hash: "0x1",
+    topics: encodeEventTopics({ abi: passportAbi, eventName: "QuestCompleted", args: { user: user as `0x${string}`, questId: questHash(quest) } }) as string[],
+    data: encodeAbiParameters([{ type: "uint256" }], [BigInt(xp)])
+  });
+  const A = "0x1111111111111111111111111111111111111111";
+  const B = "0x2222222222222222222222222222222222222222";
+  const now = Date.parse("2026-09-26T12:00:00Z");
+  const logs = [
+    log(A, "arrive-with-usdc", 10, "2026-08-30T10:00:00Z"),
+    log(A, "first-tx", 25, "2026-09-02T10:00:00Z"),
+    log(B, "arrive-with-usdc", 10, "2026-09-10T10:00:00Z"),
+    { block_number: 2, index: 1, transaction_hash: "0x2", topics: ["0xdead"], data: "0x" }
+  ];
+  it("counts passports, XP and quests from contract events only", () => {
+    const s = buildPassportStats({ address: "0xp", logs, info: { hash: "0xp", is_verified: true }, counters: { transactions_count: "7" }, now });
+    expect(s).toMatchObject({ deployed: true, verified: true, transactions: 7, passports: 2, xp: 45, completions: 3 });
+    expect(s.byQuest[0]).toMatchObject({ id: "arrive-with-usdc", count: 2 });
+  });
+  it("ranks by XP, with a monthly season", () => {
+    const s = buildPassportStats({ address: "0xp", logs, now });
+    expect(s.leaderboard.map((r) => [r.address, r.xp])).toEqual([[A.toLowerCase(), 35], [B.toLowerCase(), 10]]);
+    expect(s.season.label).toBe("September 2026");
+    expect(s.season.leaderboard.map((r) => [r.address, r.xp])).toEqual([[A.toLowerCase(), 25], [B.toLowerCase(), 10]]);
+    expect(seasonOf(now).start).toBe("2026-09-01T00:00:00.000Z");
+  });
+  it("reports an undeployed contract without inventing numbers", () => {
+    expect(buildPassportStats({ address: null, logs: null })).toMatchObject({ deployed: false, passports: 0, xp: 0, transactions: null });
+  });
+});

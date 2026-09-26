@@ -1,5 +1,8 @@
 import type { Page } from "@playwright/test";
-import { buildProtocol, buildPulse, buildRadar, buildSignals, buildSnapshot, normalizeChart, type Intel } from "../../lib/intel";
+import { encodeAbiParameters, encodeEventTopics } from "viem";
+import { passportAbi } from "../../lib/abi";
+import { questHash } from "../../lib/quests";
+import { buildPassportStats, buildProtocol, buildPulse, buildRadar, buildSignals, buildSnapshot, normalizeChart, type Intel } from "../../lib/intel";
 import { APPS } from "../../lib/registry";
 
 /**
@@ -69,12 +72,31 @@ export const INTEL = {
   }))
 };
 
+const passportLogs = [
+  { user: "0x7a00000000000000000000000000000000092f1a", quest: "arrive-with-usdc", xp: 10 },
+  { user: "0x7a00000000000000000000000000000000092f1a", quest: "first-tx", xp: 25 },
+  { user: "0x1111111111111111111111111111111111111111", quest: "arrive-with-usdc", xp: 10 }
+].map((l, i) => ({
+  block_number: 100 + i,
+  block_timestamp: iso(i * 3_600_000),
+  index: 0,
+  transaction_hash: hex(9000 + i, 64),
+  topics: encodeEventTopics({ abi: passportAbi, eventName: "QuestCompleted", args: { user: l.user as `0x${string}`, questId: questHash(l.quest) } }) as string[],
+  data: encodeAbiParameters([{ type: "uint256" }], [BigInt(l.xp)])
+}));
+
+export const EXTRA: Record<string, unknown> = {
+  passport: env(buildPassportStats({ address: "0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107", logs: passportLogs, info: { hash: "0xa8a4", is_verified: true }, counters: { transactions_count: "3" }, now })),
+  check: env({ address: "0x7a00000000000000000000000000000000092f1a", isContract: true, verified: true, name: "Tipjar", transactions: 42 })
+};
+
 /** Serve fixtures for every intel endpoint. `fail` makes them return the real error shape. */
 export async function mockIntel(page: Page, { fail = false }: { fail?: boolean } = {}) {
   await page.route("**/api/intel/**", async (route) => {
     if (fail) return route.fulfill({ status: 502, json: { error: "arc_unavailable", message: "Arc data is unavailable right now." } });
     const path = new URL(route.request().url()).pathname.replace("/api/intel/", "");
     const key = path.startsWith("protocol/") ? "protocol" : (path as keyof typeof INTEL);
+    if (path in EXTRA) return route.fulfill({ json: EXTRA[path] });
     const body = key === "protocol" && !path.endsWith("/uniswap") ? { ...INTEL.protocol, data: { ...INTEL.protocol.data, slug: path.split("/")[1], measurable: false, contracts: [], txCount: null, lastActive: null, recent: [] } } : INTEL[key];
     return body ? route.fulfill({ json: body }) : route.fulfill({ status: 404, json: { error: "invalid_request", message: "Not found." } });
   });

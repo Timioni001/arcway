@@ -20,6 +20,7 @@ export function AppBadges({ app, showNew = true }: { app: ArcApp; showNew?: bool
       ) : (
         <span className={`badge ${app.status === "live" ? "badge--live" : ""}`}><span className="dot" />{app.status === "live" ? "Live" : STATUS_LABEL[app.status]}</span>
       )}
+      {app.community && <span className="badge badge--community" title="Submitted by the community. Not reviewed by Arcway yet.">Community</span>}
       {isVerified(app) && <span className="badge"><ShieldCheck aria-hidden="true" />Verified</span>}
       {showNew && isNew(app) && <span className="badge badge--new">New</span>}
     </span>

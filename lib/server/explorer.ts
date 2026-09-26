@@ -64,6 +64,15 @@ export type BsVerifiedContract = {
   transactions_count?: number | null;
 };
 
+export type BsLog = {
+  block_number: number;
+  block_timestamp?: string | null;
+  data: string;
+  topics: (string | null)[];
+  transaction_hash: string;
+  index: number;
+};
+
 export type BsTokenCounters = { token_holders_count?: string; transfers_count?: string };
 export type BsAddressCounters = { transactions_count?: string; token_transfers_count?: string };
 
@@ -118,3 +127,17 @@ export const getTokenCounters = (token: string) => get<BsTokenCounters>(`/tokens
 export const getAddress = (address: string) => get<BsAddress>(`/addresses/${address}`, 300);
 export const getAddressCounters = (address: string) => get<BsAddressCounters>(`/addresses/${address}/counters`, 120);
 export const getAddressTxs = (address: string) => get<{ items?: BsTx[] }>(`/addresses/${address}/transactions`, 30).then((b) => b.items ?? []);
+
+/** Every event log a contract emitted, newest first, up to `maxPages` pages (50 each). */
+export async function getAddressLogs(address: string, maxPages = 20): Promise<{ items: BsLog[]; truncated: boolean }> {
+  const items: BsLog[] = [];
+  let params: Record<string, unknown> | null = {};
+  for (let page = 0; page < maxPages && params; page++) {
+    const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString();
+    const body: { items?: BsLog[]; next_page_params?: Record<string, unknown> | null } =
+      await get(`/addresses/${address}/logs${qs ? `?${qs}` : ""}`, 60);
+    items.push(...(body.items ?? []));
+    params = body.next_page_params ?? null;
+  }
+  return { items, truncated: params !== null };
+}

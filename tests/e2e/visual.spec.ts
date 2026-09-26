@@ -3,7 +3,7 @@ import { mockIntel } from "./intelFixtures";
 
 /** Screenshots for design review. Run with VISUAL=1; skipped in CI. */
 const OUT = process.env.VISUAL_OUT ?? "test-results/visual";
-const PAGES = ["/", "/ecosystem", "/pulse", "/radar", "/signals", "/apps/uniswap", "/builders", "/watchlist", "/settings", "/apps"];
+const PAGES = ["/", "/ecosystem", "/pulse", "/radar", "/signals", "/apps/uniswap", "/builders", "/watchlist", "/settings", "/apps", "/leaderboard", "/submit", "/widgets", "/digest"];
 
 test.describe("visual", () => {
   test.skip(!process.env.VISUAL, "visual review only");

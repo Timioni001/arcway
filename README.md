@@ -20,6 +20,12 @@ Arc Portal is where you act on Arc. Arcway is where you understand it: which app
 - **Passport**: XP, levels and badges, with a public, shareable page for every wallet.
 - **Watchlist**: follow protocols, builders and categories, with signals for what you follow.
 
+### Build on Arc
+- **Submit a project**: builders list their Arc mainnet app in two minutes. Contract addresses are checked live on the explorer, the submission opens as a pre-filled GitHub issue, and the app shows with a Community label until reviewed.
+- **Badges**: a live "on Arc" SVG badge for any listed app (`/api/badge/<slug>`), with Markdown and HTML snippets.
+- **Arc today**: a daily digest page and an RSS feed (`/digest/feed.xml`) of signals.
+- **Onchain proof and leaderboard**: passports issued, XP recorded and a monthly-season leaderboard, all read from the Arcway Passport contract's events.
+
 ### Everywhere
 - Ctrl/Cmd+K search across protocols, builders, categories, quests, addresses and transaction hashes.
 - Notifications for new signals, light/dark/system themes, installable on phones, pay links, one-click "Add Arc to wallet".

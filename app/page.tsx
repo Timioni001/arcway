@@ -1,6 +1,7 @@
 import { ArrowLeftRight, ArrowRight, Bot, Code2, Gem, Network, PiggyBank, Send, Target, TrendingUp, Trophy, type LucideIcon } from "lucide-react";
 import { IconOrb, type OrbHue } from "../components/IconOrb";
 import { PassportPromo } from "../components/PassportPromo";
+import { PassportProof } from "../components/PassportProof";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import { AppMark } from "../components/CategoryIcon";
@@ -167,6 +168,11 @@ export default function Home() {
         {/* Passport and XP: the reason to come back */}
         <section className="osec" aria-labelledby="passport-title">
           <PassportPromo />
+        </section>
+
+        <section className="osec" aria-labelledby="proof-title">
+          <Head id="proof-title" kicker="Onchain on Arc" title="Recorded on Arc, checkable by anyone" lede="Every XP claim is a transaction to Arcway's own contract on Arc. Open it on the explorer and see for yourself." action={<MoreLink href="/leaderboard">See the leaderboard</MoreLink>} />
+          <PassportProof />
         </section>
       </div>
 

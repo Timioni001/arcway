@@ -1,11 +1,11 @@
-import { ARC_NETWORK, USDC_ADDRESS, explorer } from "../config";
+import { ARC_NETWORK, PASSPORT_ADDRESS, USDC_ADDRESS, explorer } from "../config";
 import {
-  activeApps, buildProtocol, buildPulse, buildRadar, buildSignals, buildSnapshot,
+  activeApps, buildPassportStats, buildProtocol, type PassportStats, buildPulse, buildRadar, buildSignals, buildSnapshot,
   type Intel, type ProtocolIntel, type PulseEvent, type Radar, type Signal, type Snapshot
 } from "../intel";
 import { APPS, appContracts, getApp, type ArcApp } from "../registry";
 import {
-  getAddress, getAddressCounters, getAddressTxs, getContractCounters, getHotContracts, getLatestTxs,
+  getAddress, getAddressCounters, getAddressLogs, getAddressTxs, getContractCounters, getHotContracts, getLatestTxs,
   getStats, getTokenCounters, getTokenTransfers, getTxChart, getVerifiedContracts, settle
 } from "./explorer";
 
@@ -75,4 +75,21 @@ export async function loadProtocol(slug: string): Promise<Intel<ProtocolIntel> |
   const parts = Object.fromEntries(intel.contracts.map((c) => [c.address, c.txCount === null && c.lastActive === null ? null : c]));
   if (!intel.measurable) return { data: intel, fetchedAt: new Date().toISOString(), network: ARC_NETWORK, unavailable: [] };
   return envelope(intel, parts);
+}
+
+/** Arcway's own passport contract on this network: proof of onchain use, and the leaderboard. */
+export async function loadPassport(): Promise<Intel<PassportStats>> {
+  if (!PASSPORT_ADDRESS) {
+    return { data: buildPassportStats({ address: null, logs: null }), fetchedAt: new Date().toISOString(), network: ARC_NETWORK, unavailable: [] };
+  }
+  const [info, counters, logs] = await Promise.all([settle(getAddress(PASSPORT_ADDRESS)), settle(getAddressCounters(PASSPORT_ADDRESS)), settle(getAddressLogs(PASSPORT_ADDRESS))]);
+  const data = buildPassportStats({ address: PASSPORT_ADDRESS, logs: logs?.items ?? null, truncated: logs?.truncated, info, counters });
+  return envelope(data, { info, counters, logs });
+}
+
+/** Live check for a submitted contract address: is it a contract on this network, and is its source verified? */
+export async function checkContract(address: string): Promise<Intel<{ address: string; isContract: boolean | null; verified: boolean | null; name: string | null; transactions: number | null }>> {
+  const [info, counters] = await Promise.all([settle(getAddress(address)), settle(getAddressCounters(address))]);
+  const tx = counters?.transactions_count ? Number(counters.transactions_count) : null;
+  return envelope({ address, isContract: info?.is_contract ?? null, verified: info?.is_verified ?? null, name: info?.name ?? null, transactions: Number.isFinite(tx) ? tx : null }, { info, counters });
 }

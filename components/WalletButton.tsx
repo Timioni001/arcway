@@ -3,7 +3,9 @@
 import { ArrowUpRight, Check, ChevronDown, Copy, LogOut, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { YOU_NAV } from "../lib/nav";
+import { PRIMARY_NAV, YOU_NAV } from "../lib/nav";
+
+const WALLET_LINKS = [...PRIMARY_NAV.filter((n) => n.href === "/passport"), ...YOU_NAV];
 import { IS_MAINNET, NETWORK_NAME, arcChain, explorer } from "../lib/config";
 import { formatUsdc, shortAddress } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
@@ -129,7 +131,7 @@ export function WalletButton() {
                 </a>
               </div>
               <nav className="wallet__you" aria-label="Your pages">
-                {YOU_NAV.map(({ href, label, icon: Icon }) => (
+                {WALLET_LINKS.map(({ href, label, icon: Icon }) => (
                   <Link key={href} href={href} className="wallet__you-link" onClick={() => setOpen(false)}><Icon aria-hidden="true" />{label}</Link>
                 ))}
               </nav>

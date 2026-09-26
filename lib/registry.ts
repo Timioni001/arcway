@@ -50,6 +50,8 @@ export type ArcApp = {
   active: boolean;
   /** Placeholder entry (not a real app). */
   sample?: boolean;
+  /** Submitted by the community and not yet reviewed by Arcway. */
+  community?: boolean;
   /** Answer to "what would I do here?". */
   firstAction: string;
   builder?: Builder;

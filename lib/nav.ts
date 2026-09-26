@@ -1,5 +1,5 @@
 import {
-  Activity, Blocks, Bookmark, Code2, IdCard, LayoutDashboard, Link2, Network, Radar, RadioTower, Search, Settings, Target, UserRound,
+  Activity, Award, Blocks, Bookmark, Code2, IdCard, LayoutDashboard, Link2, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound,
   type LucideIcon
 } from "lucide-react";
 import { getBuilder } from "./builders";
@@ -9,17 +9,46 @@ import { TRAILS } from "./trails";
 
 export type NavItem = { href: string; label: string; icon: LucideIcon; blurb: string };
 
-/** Intelligence first, existing product after. Order is the product's mental model. */
-export const PRIMARY_NAV: NavItem[] = [
-  { href: "/", label: "Overview", icon: LayoutDashboard, blurb: "The Arc ecosystem at a glance" },
-  { href: "/ecosystem", label: "Ecosystem", icon: Network, blurb: "Protocols, categories and how they connect" },
-  { href: "/pulse", label: "Pulse", icon: Activity, blurb: "Live activity across Arc" },
-  { href: "/radar", label: "Radar", icon: Radar, blurb: "What's new and what changed" },
-  { href: "/builders", label: "Builders", icon: Code2, blurb: "Teams, projects and contracts" },
-  { href: "/signals", label: "Signals", icon: RadioTower, blurb: "Verified onchain observations" },
-  { href: "/apps", label: "Apps", icon: Blocks, blurb: "Browse and try apps on Arc" },
-  { href: "/quests", label: "Quests", icon: Target, blurb: "Explore Arc and earn XP" }
+export type NavGroup = { label: string; items: NavItem[] };
+
+/** The product in four sections: understand Arc, discover what's on it, take part, and build on it. */
+export const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Understand",
+    items: [
+      { href: "/", label: "Overview", icon: LayoutDashboard, blurb: "The Arc ecosystem at a glance" },
+      { href: "/ecosystem", label: "Ecosystem", icon: Network, blurb: "Protocols, categories and how they connect" },
+      { href: "/pulse", label: "Pulse", icon: Activity, blurb: "Live activity across Arc" },
+      { href: "/radar", label: "Radar", icon: Radar, blurb: "What's new and what changed" },
+      { href: "/signals", label: "Signals", icon: RadioTower, blurb: "Verified onchain observations" }
+    ]
+  },
+  {
+    label: "Discover",
+    items: [
+      { href: "/apps", label: "Apps", icon: Blocks, blurb: "Browse and try apps on Arc" },
+      { href: "/builders", label: "Builders", icon: Code2, blurb: "Teams, projects and contracts" }
+    ]
+  },
+  {
+    label: "Participate",
+    items: [
+      { href: "/quests", label: "Quests", icon: Target, blurb: "Explore Arc and earn XP" },
+      { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your XP, level and badges" },
+      { href: "/leaderboard", label: "Leaderboard", icon: Trophy, blurb: "Top explorers this season" }
+    ]
+  },
+  {
+    label: "Build on Arc",
+    items: [
+      { href: "/submit", label: "Submit a project", icon: Rocket, blurb: "Get your Arc app listed" },
+      { href: "/widgets", label: "Badges", icon: Award, blurb: "Show your app is live on Arc" },
+      { href: "/digest", label: "Arc today", icon: Newspaper, blurb: "Daily digest and RSS" }
+    ]
+  }
 ];
+
+export const PRIMARY_NAV: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 export const SECONDARY_NAV: NavItem[] = [
   { href: "/watchlist", label: "Watchlist", icon: Bookmark, blurb: "What you follow" },
@@ -30,7 +59,6 @@ export const SECONDARY_NAV: NavItem[] = [
 /** Personal pages: reachable from the profile menu, never the visual centre. */
 export const YOU_NAV: NavItem[] = [
   { href: "/overview", label: "Your Arc", icon: UserRound, blurb: "Your progress and activity" },
-  { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your XP and badges" },
   { href: "/activity", label: "Your activity", icon: Activity, blurb: "Your transactions on Arc" },
   { href: "/pay", label: "Pay links", icon: Link2, blurb: "Request USDC with a link" }
 ];
