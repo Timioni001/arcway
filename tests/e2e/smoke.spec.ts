@@ -1,6 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const ROUTES = ["/", "/overview", "/apps", "/apps/uniswap", "/quests", "/quests/first-tx", "/builders", "/passport"];
+const ROUTES = [
+  "/", "/overview", "/apps", "/apps/uniswap", "/quests", "/quests/first-tx", "/builders", "/passport",
+  "/passport/0x7a00000000000000000000000000000000092f1a", "/terms", "/privacy"
+];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
 function watchErrors(page: Page) {
@@ -94,4 +97,61 @@ test("APIs validate input and fail safely", async ({ request }) => {
   expect(bad.status()).toBe(400);
   const claim = await request.post("/api/quests/claim", { data: { address: "0x7a00000000000000000000000000000000092f1a", questId: "nope" } });
   expect(claim.status()).toBe(400);
+});
+
+test("footer links to Terms and Privacy", async ({ page }) => {
+  await page.goto("/");
+  const legal = page.getByRole("navigation", { name: "Legal" });
+  await legal.getByRole("link", { name: "Privacy Policy" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Privacy Policy" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Legal" }).getByRole("link", { name: "Terms of Use" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Terms of Use" })).toBeVisible();
+});
+
+test("saving an app shows it under Saved and survives a reload", async ({ page }) => {
+  await page.goto("/apps");
+  await page.getByRole("button", { name: "Save Aave" }).click();
+  await expect(page.getByRole("button", { name: "Remove Aave" })).toHaveAttribute("aria-pressed", "true");
+  await page.reload();
+  await page.getByRole("button", { name: /^Saved/ }).click();
+  await expect(page.getByRole("link", { name: /Aave/ }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Uniswap/ })).toHaveCount(0);
+});
+
+test("sorting A–Z orders apps by name", async ({ page }) => {
+  await page.goto("/apps");
+  await page.getByLabel("Sort apps").selectOption("az");
+  const names = await page.locator(".app-card h3").allTextContents();
+  expect(names.length).toBeGreaterThan(3);
+  expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+});
+
+test("passport lookup validates the address", async ({ page }) => {
+  await page.goto("/passport");
+  const input = page.getByLabel("Look up a passport");
+  await input.fill("hello");
+  await page.getByRole("button", { name: "View" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "wallet address" })).toBeVisible();
+  await input.fill("0x7a00000000000000000000000000000000092f1a");
+  await page.getByRole("button", { name: "View" }).click();
+  await expect(page).toHaveURL(/\/passport\/0x7a00/i);
+  await expect(page.getByRole("link", { name: /Copy link|Post on X/ }).or(page.getByRole("button", { name: "Copy link" })).first()).toBeVisible();
+});
+
+test("an invalid passport address is a 404", async ({ page }) => {
+  const res = await page.goto("/passport/not-an-address");
+  expect(res?.status()).toBe(404);
+});
+
+test("fee calculator responds to the slider", async ({ page }) => {
+  await page.goto("/overview");
+  await expect(page.getByRole("heading", { name: "What things cost on Arc" })).toBeVisible();
+  await page.getByLabel("How many times").fill("500");
+  await expect(page.getByText("500 times")).toBeVisible();
+});
+
+test("share images render", async ({ request }) => {
+  const home = await request.get("/opengraph-image");
+  expect(home.status()).toBe(200);
+  expect(home.headers()["content-type"]).toContain("image/png");
 });

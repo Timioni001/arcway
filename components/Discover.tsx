@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, SearchX } from "lucide-react";
+import { Heart, Search, SearchX } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useId, useMemo, useState } from "react";
 import { buildersFrom } from "../lib/builders";
@@ -10,6 +10,7 @@ import { AppCard, FeaturedApp } from "./AppCard";
 import { BuilderCard } from "./Builders";
 import { QuestCard } from "./Quests";
 import { CategoryTile } from "./CategoryIcon";
+import { SaveButton, useSavedApps } from "./SaveButton";
 import { StateBlock } from "./Section";
 
 /** Search + filters + results. Search results reuse the same cards as everywhere else. */
@@ -20,14 +21,24 @@ export function Discover() {
     CATEGORIES.includes(initial as Category) ? (initial as Category) : null
   );
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<"recommended" | "newest" | "az">("recommended");
+  const [savedOnly, setSavedOnly] = useState(false);
+  const saved = useSavedApps();
+  const sortId = useId();
   const searchId = useId();
   const term = search.trim().toLowerCase();
 
-  const apps = useMemo(() => discoverApps(APPS, { category, search }), [category, search]);
+  const apps = useMemo(() => {
+    let list = discoverApps(APPS, { category, search });
+    if (savedOnly) list = list.filter((a) => saved.includes(a.id));
+    if (sort === "newest") list = [...list].sort((a, b) => b.addedAt.localeCompare(a.addedAt) || a.name.localeCompare(b.name));
+    if (sort === "az") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+    return list;
+  }, [category, search, savedOnly, saved, sort]);
   const quests = term ? questViews.filter((q) => `${q.title} ${q.description}`.toLowerCase().includes(term)) : [];
   const builders = term ? buildersFrom().filter((b) => b.name.toLowerCase().includes(term)) : [];
   const categories = CATEGORIES;
-  const featured = !term && !category ? apps.find((a) => a.featured) : undefined;
+  const featured = !term && !category && !savedOnly && sort === "recommended" ? apps.find((a) => a.featured) : undefined;
   const total = apps.length + quests.length + builders.length;
 
   return (
@@ -37,7 +48,11 @@ export function Discover() {
         <Search aria-hidden="true" />
         <input id={searchId} type="search" placeholder="Search apps, quests, builders…" value={search} onChange={(e) => setSearch(e.target.value)} autoComplete="off" />
       </div>
-      <div className="filters" role="group" aria-label="Filter by category" style={{ margin: "16px 0 32px" }}>
+      <div className="discover-bar">
+      <div className="filters" role="group" aria-label="Filter by category">
+        <button className="chip" aria-pressed={savedOnly} onClick={() => setSavedOnly((v) => !v)}>
+          <Heart aria-hidden="true" style={{ width: 14, height: 14 }} />Saved{saved.length ? <span className="mono xs">{saved.length}</span> : null}
+        </button>
         <button className="chip" aria-pressed={category === null} onClick={() => setCategory(null)}>All</button>
         {categories.map((c) => (
           <button key={c} className="chip" aria-pressed={category === c} onClick={() => setCategory(category === c ? null : c)}>
@@ -45,12 +60,21 @@ export function Discover() {
           </button>
         ))}
       </div>
+        <label className="sort" htmlFor={sortId}>
+          <span className="visually-hidden">Sort apps</span>
+          <select id={sortId} value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}>
+            <option value="recommended">Recommended</option>
+            <option value="newest">Newest</option>
+            <option value="az">A–Z</option>
+          </select>
+        </label>
+      </div>
 
       <p className="visually-hidden" role="status">{total} results</p>
 
       {total === 0 ? (
-        <StateBlock icon={SearchX} title="No results" actions={<button className="btn btn--secondary btn--sm" onClick={() => { setSearch(""); setCategory(null); }}>Clear search</button>}>
-          {category && !term ? `No ${category.toLowerCase()} apps listed yet. New apps are added regularly.` : "Try another word or category."}
+        <StateBlock icon={savedOnly && !saved.length ? Heart : SearchX} title={savedOnly && !saved.length ? "No saved apps yet" : "No results"} actions={<button className="btn btn--secondary btn--sm" onClick={() => { setSearch(""); setCategory(null); setSavedOnly(false); }}>Show all apps</button>}>
+          {savedOnly && !saved.length ? "Tap the heart on any app to save it here." : category && !term ? `No ${category.toLowerCase()} apps listed yet. New apps are added regularly.` : "Try another word or category."}
         </StateBlock>
       ) : (
         <>

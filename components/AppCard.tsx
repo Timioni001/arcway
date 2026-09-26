@@ -2,6 +2,7 @@ import { ArrowRight, ArrowUpRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { STATUS_LABEL, isVerified, type ArcApp } from "../lib/registry";
 import { AppMark } from "./CategoryIcon";
+import { SaveButton } from "./SaveButton";
 import { Forms } from "./Forms";
 
 /** Kept for existing call sites: the app's mark. */
@@ -25,10 +26,11 @@ export function AppBadges({ app }: { app: ArcApp }) {
 
 export function AppCard({ app }: { app: ArcApp }) {
   return (
-    <Link href={`/apps/${app.slug}`} className="app-card card hover-lift">
-      <div className="row between" style={{ alignItems: "flex-start" }}>
+    <div className="app-card-wrap">
+    <Link href={`/apps/${app.slug}`} className="app-card card hover-lift spotlight">
+      <div className="row" style={{ alignItems: "flex-start", paddingRight: 40 }}>
         <AppLogo app={app} />
-        <AppBadges app={app} />
+        <span style={{ marginLeft: "auto" }}><AppBadges app={app} /></span>
       </div>
       <div>
         <h3 className="h4">{app.name}</h3>
@@ -39,6 +41,8 @@ export function AppCard({ app }: { app: ArcApp }) {
         <span className="app-card__open">View <ArrowUpRight aria-hidden="true" /></span>
       </div>
     </Link>
+    <SaveButton appId={app.id} name={app.name} />
+    </div>
   );
 }
 

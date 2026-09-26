@@ -66,6 +66,7 @@ export function ClaimsProvider({ address, onRecorded, children }: { address?: st
         onRecorded();
         const quest = getQuest(questId);
         if (quest) toast(`${quest.xp} XP claimed · ${quest.title}`);
+        window.dispatchEvent(new Event("arcway:celebrate"));
       } catch (error) {
         const retryable = !(error instanceof ApiRequestError && error.code === "recording_unavailable");
         set(questId, {

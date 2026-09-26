@@ -7,11 +7,11 @@ import { LEVELS, levelFor } from "../lib/levels";
 import { Medal } from "./Medal";
 import { PassCard } from "./PassCard";
 
-/** Level ladder: every level with its XP threshold; the current one lit up. */
-export function LevelLadder() {
+/** Level ladder: every level with its XP threshold; the current one lit up. Pass `xp` to show someone else's. */
+export function LevelLadder({ xp: xpProp }: { xp?: number } = {}) {
   const { xp, connection } = useArcwayState();
   const connected = connection.status === "connected";
-  const level = levelFor(connected ? xp : 0);
+  const level = levelFor(xpProp ?? (connected ? xp : 0));
   return (
     <ol className="ladder" aria-label="Levels">
       {LEVELS.map((l, i) => {

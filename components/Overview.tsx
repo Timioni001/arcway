@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Flame, LayoutGrid, Target, Trophy, Wallet } from "lucide-react";
+import { ArrowRight, Flame, Heart, LayoutGrid, Target, Trophy, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { useBlockNumber } from "wagmi";
@@ -14,6 +14,7 @@ import { levelFor } from "../lib/levels";
 import { APPS, CATEGORIES, newestApps, type Category } from "../lib/registry";
 import { currentStreak, lastDays } from "../lib/streak";
 import { AppMark, CATEGORY_META, CategoryTile } from "./CategoryIcon";
+import { useSavedApps } from "./SaveButton";
 
 function Stat({ icon, label, value, sub, children }: { icon: ReactNode; label: string; value: ReactNode; sub: ReactNode; children?: ReactNode }) {
   return (
@@ -191,5 +192,40 @@ export function ConnectBanner() {
         {wallet.connecting ? "Confirm in wallet…" : "Connect wallet"}
       </button>
     </div>
+  );
+}
+
+export function SavedApps() {
+  const saved = useSavedApps();
+  const apps = saved.map((id) => APPS.find((a) => a.id === id)).filter((a): a is (typeof APPS)[number] => Boolean(a));
+  return (
+    <section className="card pad" aria-labelledby="saved-title">
+      <div className="row between">
+        <h2 id="saved-title" className="h4">Saved apps</h2>
+        {apps.length > 0 && <span className="mono xs secondary">{apps.length}</span>}
+      </div>
+      {apps.length === 0 ? (
+        <div className="saved-empty">
+          <span className="state__icon"><Heart aria-hidden="true" /></span>
+          <p className="small secondary">Tap the heart on any app to keep it here.</p>
+          <Link href="/apps" className="link small">Browse apps <ArrowRight aria-hidden="true" /></Link>
+        </div>
+      ) : (
+        <ul className="new-list">
+          {apps.map((a) => (
+            <li key={a.id}>
+              <Link href={`/apps/${a.slug}`} className="new-list__row">
+                <AppMark app={a} size="sm" />
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: "block", fontWeight: 600 }}>{a.name}</span>
+                  <span className="xs secondary">{a.tagline}</span>
+                </span>
+                <ArrowRight aria-hidden="true" style={{ width: 16, color: "var(--text-muted)" }} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

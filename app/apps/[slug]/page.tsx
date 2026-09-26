@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppBadges, AppLogo } from "../../../components/AppCard";
 import { OpenAppButton } from "../../../components/OpenAppButton";
+import { SaveButton } from "../../../components/SaveButton";
 import { ExternalLink } from "../../../components/Status";
 import { NETWORK_NAME, explorer } from "../../../lib/config";
 import { shortAddress, timeAgo } from "../../../lib/format";
@@ -52,10 +53,11 @@ export default async function AppDetail({ params }: Props) {
         <AppBadges app={app} />
         <span className="tag">{app.category}</span>
       </div>
-      <div style={{ marginTop: 28 }}>
+      <div className="row" style={{ marginTop: 28 }}>
         {href ? <OpenAppButton appId={app.id} href={href} name={app.name} /> : (
           <span className="btn btn--primary" aria-disabled="true">{app.sample ? "Sample listing" : "Link coming soon"}</span>
         )}
+        <SaveButton appId={app.id} name={app.name} variant="full" />
       </div>
 
       <div className="detail">

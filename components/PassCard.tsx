@@ -10,12 +10,10 @@ import { Forms } from "./Forms";
 import { LogoMark } from "./Logo";
 
 /** The passport as a physical card: tilts and catches light under the pointer. */
-export function PassCard() {
+export function PassCardView({ address, xp, done }: { address?: string; xp: number; done: boolean[] }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { xp, quests, connection } = useArcwayState();
   const shown = useCountUp(xp);
   const level = levelFor(xp);
-  const connected = connection.status === "connected";
   const tilt = useCallback((px: number, py: number, el: HTMLElement) => {
     el.style.setProperty("--ry", `${px * 7}deg`);
     el.style.setProperty("--rx", `${-py * 7}deg`);
@@ -31,16 +29,27 @@ export function PassCard() {
       </div>
       <div className="pass__bottom">
         <div>
-          <div className="pass__label">{connected ? level.name : "Your level"}</div>
-          <div className="pass__xp" style={{ marginTop: 8 }}>{String(connected ? shown : 0).padStart(3, "0")} XP</div>
-          <div className="mono" style={{ marginTop: 10, fontSize: 13, color: "#A9DFEB" }}>
-            {connected && connection.address ? shortAddress(connection.address) : "0x0000…0000"}
-          </div>
+          <div className="pass__label">{address ? level.name : "Your level"}</div>
+          <div className="pass__xp" style={{ marginTop: 8 }}>{String(shown).padStart(3, "0")} XP</div>
+          <div className="mono" style={{ marginTop: 10, fontSize: 13, color: "#A9DFEB" }}>{address ? shortAddress(address) : "0x0000…0000"}</div>
         </div>
         <div className="pass__dots" aria-hidden="true">
-          {quests.map((q) => <i key={q.id} data-on={connected && q.status === "completed"} />)}
+          {done.map((d, i) => <i key={i} data-on={d} />)}
         </div>
       </div>
     </div>
+  );
+}
+
+/** The connected wallet's passport card. */
+export function PassCard() {
+  const { xp, quests, connection } = useArcwayState();
+  const connected = connection.status === "connected";
+  return (
+    <PassCardView
+      address={connected ? connection.address : undefined}
+      xp={connected ? xp : 0}
+      done={quests.map((q) => connected && q.status === "completed")}
+    />
   );
 }

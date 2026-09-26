@@ -51,3 +51,7 @@ export const ARC_DOCS_URL = "https://docs.arc.network";
 /** Where builders ask to be listed. */
 export const SUBMIT_APP_URL =
   process.env.NEXT_PUBLIC_SUBMIT_APP_URL || "https://github.com/Timioni001/arcway/issues/new?title=Listing%3A%20";
+
+/** Where people reach the team (terms, privacy, support). */
+export const CONTACT_URL = process.env.NEXT_PUBLIC_CONTACT_URL || "https://github.com/Timioni001/arcway/issues";
+export const LEGAL_UPDATED = "September 26, 2026";
