@@ -1,8 +1,9 @@
 import { ArrowRight, ArrowUpRight, Compass, MousePointerClick, Trophy } from "lucide-react";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { categoryCounts, CATEGORIES, type ArcApp } from "../lib/registry";
 import { AppBadges, AppLogo } from "./AppCard";
-import { CATEGORY_BLURB, CategoryTile } from "./CategoryIcon";
+import { CATEGORY_META, CategoryTile } from "./CategoryIcon";
 import { Forms } from "./Forms";
 import { Reveal } from "./Reveal";
 
@@ -11,15 +12,14 @@ export function CategoryGrid({ apps }: { apps: ArcApp[] }) {
   return (
     <ul className="cats">
       {CATEGORIES.map((c, i) => (
-        <Reveal as="li" key={c} delay={(i % 3) * 60}>
-          <Link href={`/apps?category=${encodeURIComponent(c)}`} className="cat">
-            <CategoryTile category={c} />
-            <span style={{ minWidth: 0 }}>
-              <span className="cat__name">{c}</span>
-              <span className="cat__count" style={{ display: "block" }}>
-                {counts[c] ? `${counts[c]} ${counts[c] === 1 ? "app" : "apps"}` : CATEGORY_BLURB[c]}
-              </span>
+        <Reveal as="li" key={c} delay={(i % 4) * 60}>
+          <Link href={`/apps?category=${encodeURIComponent(c)}`} className="cat spotlight" style={{ "--cat": CATEGORY_META[c].color } as CSSProperties}>
+            <span className="row between">
+              <CategoryTile category={c} />
+              <span className="cat__count mono">{counts[c] || "Soon"}</span>
             </span>
+            <span className="cat__name">{c}</span>
+            <span className="cat__blurb">{CATEGORY_META[c].blurb}</span>
             <ArrowRight className="cat__arrow" aria-hidden="true" />
           </Link>
         </Reveal>

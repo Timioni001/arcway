@@ -85,7 +85,7 @@ export function WalletButton() {
           onClick={() => (multiple ? setOpen((o) => !o) : wallet.connect())}
         >
           <Wallet aria-hidden="true" />
-          {wallet.connecting ? "Confirm…" : <>Connect<span className="hide-sm"> wallet</span></>}
+          <span>{wallet.connecting ? "Confirm…" : <>Connect<span className="hide-sm"> wallet</span></>}</span>
         </button>
       )}
 

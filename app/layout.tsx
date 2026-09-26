@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { NetworkNotice } from "../components/NetworkNotice";
 import { Providers } from "../components/Providers";
 import { Footer, Header, MobileNav } from "../components/Shell";
+import { SpotlightTracker } from "../components/SpotlightTracker";
 import { THEME_INIT_SCRIPT } from "../lib/theme";
 import "./globals.css";
 import "./components.css";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main id="main">{children}</main>
           <Footer />
           <MobileNav />
+          <SpotlightTracker />
         </Providers>
       </body>
     </html>

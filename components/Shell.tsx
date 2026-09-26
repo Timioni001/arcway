@@ -1,6 +1,6 @@
 'use client';
 
-import { Compass, IdCard, Target, Users } from "lucide-react";
+import { Compass, IdCard, LayoutDashboard, Target, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ARC_DOCS_URL, BRIDGE_URL, IS_MAINNET, NETWORK_NAME, SUBMIT_APP_URL } from "../lib/config";
@@ -10,6 +10,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { WalletButton } from "./WalletButton";
 
 const LINKS = [
+  { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/apps", label: "Discover", icon: Compass },
   { href: "/quests", label: "Quests", icon: Target },
   { href: "/builders", label: "Builders", icon: Users },
@@ -49,7 +50,7 @@ export function MobileNav() {
   const isActive = useActive();
   return (
     <nav className="mobile-nav" aria-label="Main">
-      {LINKS.map(({ href, label, icon: Icon }) => (
+      {LINKS.filter((l) => l.href !== "/builders").map(({ href, label, icon: Icon }) => (
         <Link key={href} href={href} aria-current={isActive(href) ? "page" : undefined}>
           <Icon aria-hidden="true" />
           {label}
