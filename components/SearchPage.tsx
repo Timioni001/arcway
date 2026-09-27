@@ -99,7 +99,7 @@ export function SearchPage() {
             <Group title="Categories" count={results.categories.length}>
               <ul className="row" style={{ gap: 8 }}>
                 {results.categories.map((c) => (
-                  <li key={c}><Link href={`/apps?category=${encodeURIComponent(c)}`} className="chip"><CategoryTile category={c} size="xs" />{c}</Link></li>
+                  <li key={c}><Link href={`/apps?category=${encodeURIComponent(c)}`} className="chip">{c}</Link></li>
                 ))}
               </ul>
             </Group>

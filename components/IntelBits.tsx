@@ -14,11 +14,11 @@ export function SourceTag({ source, period }: { source: Source; period?: string 
   );
 }
 
-/** One-line section heading used across intelligence pages: icon, title, meta on the right. */
-export function PanelHead({ icon: Icon, title, id, children }: { icon: LucideIcon; title: string; id: string; children?: ReactNode }) {
+/** One-line section heading used across intelligence pages: title, meta on the right. */
+export function PanelHead({ title, id, children }: { icon?: LucideIcon; title: string; id: string; children?: ReactNode }) {
   return (
     <div className="panel__head">
-      <h2 id={id} className="panel__title"><Icon aria-hidden="true" />{title}</h2>
+      <h2 id={id} className="panel__title">{title}</h2>
       {children && <div className="panel__meta">{children}</div>}
     </div>
   );

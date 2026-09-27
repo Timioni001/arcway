@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, ArrowUpRight, BadgeCheck, FileCode2, Medal, Trophy, Users } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { NETWORK_NAME, explorer } from "../lib/config";
@@ -8,7 +8,6 @@ import { timeAgo } from "../lib/format";
 import { useIntel } from "../lib/hooks/useIntel";
 import { levelFor } from "../lib/levels";
 import { AddressAvatar } from "./AddressAvatar";
-import { IconOrb } from "./IconOrb";
 import { Freshness, SourceTag, compact } from "./Intel";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
@@ -21,7 +20,6 @@ export function PassportProof() {
   if (!p?.deployed || !p.address) {
     return (
       <div className="proof proof--pending">
-        <IconOrb icon={FileCode2} hue="sky" />
         <div>
           <div className="proof__title">Passport contract</div>
           <p className="small secondary">The Arcway Passport contract isn&apos;t configured for {NETWORK_NAME} on this deployment yet.</p>
@@ -29,16 +27,14 @@ export function PassportProof() {
       </div>
     );
   }
-  const stat = (icon: typeof Users, hue: "violet" | "amber" | "green" | "blue", value: string, label: string) => (
+  const stat = (value: string, label: string) => (
     <div className="proof__stat">
-      <IconOrb icon={icon} hue={hue} size="sm" />
       <span><b className="mono">{value}</b><span>{label}</span></span>
     </div>
   );
   return (
     <div className="proof">
       <div className="proof__contract">
-        <IconOrb icon={FileCode2} hue="blue" />
         <div style={{ minWidth: 0 }}>
           <div className="proof__title">Arcway Passport on {NETWORK_NAME}</div>
           <a className="mono proof__addr" href={explorer.address(p.address)} target="_blank" rel="noopener noreferrer">
@@ -52,10 +48,10 @@ export function PassportProof() {
         </div>
       </div>
       <div className="proof__stats">
-        {stat(Users, "violet", compact(p.passports), "passports issued")}
-        {stat(Trophy, "amber", compact(p.xp), "XP recorded")}
-        {stat(Medal, "green", compact(p.completions), "quests completed")}
-        {stat(FileCode2, "blue", p.transactions === null ? "—" : compact(p.transactions), "transactions")}
+        {stat(compact(p.passports), "passports issued")}
+        {stat(compact(p.xp), "XP recorded")}
+        {stat(compact(p.completions), "quests completed")}
+        {stat(p.transactions === null ? "—" : compact(p.transactions), "transactions")}
       </div>
       {p.truncated && <p className="xs secondary">Counts include the most recent 1,000 events.</p>}
     </div>
@@ -84,7 +80,7 @@ export function LeaderboardView() {
   return (
     <section className="panel" aria-labelledby="lb-title">
       <div className="panel__head">
-        <h2 id="lb-title" className="panel__title"><Trophy aria-hidden="true" />{tab === "season" ? p?.season.label ?? "This season" : "All time"}</h2>
+        <h2 id="lb-title" className="panel__title">{tab === "season" ? p?.season.label ?? "This season" : "All time"}</h2>
         <div className="panel__meta">
           <div className="seg" role="group" aria-label="Period">
             <button aria-pressed={tab === "season"} onClick={() => setTab("season")}>This season</button>

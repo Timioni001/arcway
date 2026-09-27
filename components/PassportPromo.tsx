@@ -1,12 +1,11 @@
 'use client';
 
-import { ArrowRight, Award, Target, Trophy } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useArcwayState } from "../lib/hooks/context";
 import { LEVELS } from "../lib/levels";
 import { QUESTS, TOTAL_XP } from "../lib/quests";
 import { FloatingDots } from "./FloatingDots";
-import { IconOrb } from "./IconOrb";
 import { Medal } from "./Medal";
 import { PassCard } from "./PassCard";
 import { LevelLadder } from "./PassportSection";
@@ -26,9 +25,9 @@ export function PassportPromo() {
         <h2 id="passport-title" className="ohead__title">Your record on Arc, in one card.</h2>
         <p className="ohead__lede">Every quest you complete adds XP and a badge. Your level travels with your wallet, and anyone can view it.</p>
         <ul className="ppromo__stats">
-          <li><IconOrb icon={Target} hue="amber" size="sm" /><span><b className="mono">{QUESTS.length}</b> starter quests</span></li>
-          <li><IconOrb icon={Trophy} hue="violet" size="sm" /><span><b className="mono">{TOTAL_XP}</b> XP to earn</span></li>
-          <li><IconOrb icon={Award} hue="green" size="sm" /><span><b className="mono">{LEVELS.length}</b> levels</span></li>
+          <li><span><b className="mono">{QUESTS.length}</b> starter quests</span></li>
+          <li><span><b className="mono">{TOTAL_XP}</b> XP to earn</span></li>
+          <li><span><b className="mono">{LEVELS.length}</b> levels</span></li>
         </ul>
         <LevelLadder />
         <ul className="medal-shelf ppromo__badges" aria-label="Badges">

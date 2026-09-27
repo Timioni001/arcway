@@ -9,7 +9,6 @@ import { APPS, CATEGORIES, STATUS_FILTER_LABEL, availableStatusFilters, discover
 import { AppCard, FeaturedApp } from "./AppCard";
 import { BuilderCard } from "./Builders";
 import { QuestCard } from "./Quests";
-import { CategoryTile } from "./CategoryIcon";
 import { SaveButton, useSavedApps } from "./SaveButton";
 import { StateBlock } from "./Section";
 
@@ -59,7 +58,7 @@ export function Discover() {
         <button className="chip" aria-pressed={category === null} onClick={() => setCategory(null)}>All</button>
         {categories.map((c) => (
           <button key={c} className="chip" aria-pressed={category === c} onClick={() => setCategory(category === c ? null : c)}>
-            <CategoryTile category={c} size="xs" />{c}
+            {c}
           </button>
         ))}
       </div>

@@ -218,7 +218,7 @@ export function ProtocolDirectory() {
       <div className="filters" role="group" aria-label="Filter protocols by category" style={{ marginBottom: 14 }}>
         <button className="chip" aria-pressed={category === null} onClick={() => setCategory(null)}>All</button>
         {CATEGORIES.map((c) => (
-          <button key={c} className="chip" aria-pressed={category === c} onClick={() => setCategory(category === c ? null : c)}><CategoryTile category={c} size="xs" />{c}</button>
+          <button key={c} className="chip" aria-pressed={category === c} onClick={() => setCategory(category === c ? null : c)}>{c}</button>
         ))}
       </div>
       {category && <div style={{ margin: "-4px 0 14px" }}><FollowButton kind="category" id={category} name={category} /></div>}

@@ -1,5 +1,4 @@
-import { Activity, ArrowLeftRight, ArrowRight, Award, BookOpen, Bot, Code2, Compass, Gem, Map as MapIcon, Network, PiggyBank, Radar, Rocket, Send, ShieldCheck, Target, TrendingUp, type LucideIcon } from "lucide-react";
-import { IconOrb, type OrbHue } from "../components/IconOrb";
+import { ArrowRight } from "lucide-react";
 import { PassportPromo } from "../components/PassportPromo";
 import { PassportProof } from "../components/PassportProof";
 import Link from "next/link";
@@ -27,34 +26,34 @@ function Head({ id, kicker, title, lede, action }: { id: string; kicker: string;
   );
 }
 
-type Path = { icon: LucideIcon; hue: OrbHue; title: string; body: string; href: string; cats: Category[] };
+type Path = { title: string; body: string; href: string; cats: Category[] };
 const PATHS: Path[] = [
-  { icon: Send, hue: "blue", title: "Move money", body: "Send, receive and bring dollars to Arc.", href: "/ecosystem?category=Payments#protocols", cats: ["Payments", "Bridges", "Wallets"] },
-  { icon: ArrowLeftRight, hue: "teal", title: "Trade", body: "Swap stablecoins and currencies.", href: "/ecosystem?category=Trading#protocols", cats: ["Trading", "FX"] },
-  { icon: PiggyBank, hue: "green", title: "Earn", body: "Put dollars to work in lending markets.", href: `/ecosystem?category=${encodeURIComponent("Lend & Earn")}#protocols`, cats: ["Lend & Earn"] },
-  { icon: Code2, hue: "violet", title: "Build", body: "See who's building and what they ship.", href: "/builders", cats: [] },
-  { icon: Network, hue: "amber", title: "Explore", body: "Browse the whole ecosystem at once.", href: "/ecosystem", cats: [...CATEGORIES] }
+  { title: "Move money", body: "Send, receive and bring dollars to Arc.", href: "/ecosystem?category=Payments#protocols", cats: ["Payments", "Bridges", "Wallets"] },
+  { title: "Trade", body: "Swap stablecoins and currencies.", href: "/ecosystem?category=Trading#protocols", cats: ["Trading", "FX"] },
+  { title: "Earn", body: "Put dollars to work in lending markets.", href: `/ecosystem?category=${encodeURIComponent("Lend & Earn")}#protocols`, cats: ["Lend & Earn"] },
+  { title: "Build", body: "See who's building and what they ship.", href: "/builders", cats: [] },
+  { title: "Explore", body: "Browse the whole ecosystem at once.", href: "/ecosystem", cats: [...CATEGORIES] }
 ];
 
-const PILLARS: { icon: LucideIcon; hue: OrbHue; title: string; body: string }[] = [
-  { icon: Send, hue: "sky", title: "Payments", body: "Send and receive dollars as easily as a message. Network fees are paid in USDC too." },
-  { icon: TrendingUp, hue: "teal", title: "Markets", body: "Trade stablecoins and currencies on apps built for fast, final settlement." },
-  { icon: Gem, hue: "pink", title: "Assets", body: "Tokenized assets and collectibles, issued and held on an open network." },
-  { icon: Bot, hue: "amber", title: "Agents", body: "Software that can hold and move money for you, within rules you set." }
+const PILLARS: { title: string; body: string }[] = [
+  { title: "Payments", body: "Send and receive dollars as easily as a message. Network fees are paid in USDC too." },
+  { title: "Markets", body: "Trade stablecoins and currencies on apps built for fast, final settlement." },
+  { title: "Assets", body: "Tokenized assets and collectibles, issued and held on an open network." },
+  { title: "Agents", body: "Software that can hold and move money for you, within rules you set." }
 ];
 
-const STEPS: { icon: LucideIcon; hue: OrbHue; title: string; body: string }[] = [
-  { icon: BookOpen, hue: "sky", title: "Learn what Arc is", body: "A 30-second explainer, just below. No jargon." },
-  { icon: Compass, hue: "teal", title: "Find an app and try it", body: "Pick what you want to do; we show the apps for it." },
-  { icon: Target, hue: "amber", title: "Earn your passport", body: "Quick quests add XP and badges to your record on Arc." }
+const STEPS: { title: string; body: string }[] = [
+  { title: "Learn what Arc is", body: "A 30-second explainer, just below. No jargon." },
+  { title: "Find an app and try it", body: "Pick what you want to do; we show the apps for it." },
+  { title: "Earn your passport", body: "Quick quests add XP and badges to your record on Arc." }
 ];
 
-const DEEPER: { href: string; label: string; icon: LucideIcon }[] = [
-  { href: "#map", label: "Ecosystem map", icon: MapIcon },
-  { href: "#now", label: "Arc right now", icon: Activity },
-  { href: "#new", label: "What's new", icon: Radar },
-  { href: "#pulse", label: "Live activity", icon: TrendingUp },
-  { href: "#proof", label: "Onchain proof", icon: ShieldCheck }
+const DEEPER: { href: string; label: string }[] = [
+  { href: "#map", label: "Ecosystem map" },
+  { href: "#now", label: "Arc right now" },
+  { href: "#new", label: "What's new" },
+  { href: "#pulse", label: "Live activity" },
+  { href: "#proof", label: "Onchain proof" }
 ];
 
 export default function Home() {
@@ -98,8 +97,7 @@ export default function Home() {
           <ol className="steps3">
             {STEPS.map((st, i) => (
               <Reveal as="li" key={st.title} delay={i * 70} className="step3">
-                <span className="step3__num mono" aria-hidden="true">{i + 1}</span>
-                <IconOrb icon={st.icon} hue={st.hue} />
+                <span className="step3__num" aria-hidden="true">{i + 1}</span>
                 <span className="step3__title">{st.title}</span>
                 <span className="step3__body">{st.body}</span>
               </Reveal>
@@ -120,7 +118,6 @@ export default function Home() {
           <ul className="pillars">
             {PILLARS.map((p) => (
               <li key={p.title} className="pillar">
-                <IconOrb icon={p.icon} hue={p.hue} size="sm" glass />
                 <span className="pillar__title">{p.title}</span>
                 <span className="pillar__body">{p.body}</span>
               </li>
@@ -138,7 +135,6 @@ export default function Home() {
               return (
                 <Reveal as="li" key={p.title} delay={i * 60}>
                   <Link href={p.href} className="dpath">
-                    <IconOrb icon={p.icon} hue={p.hue} />
                     <span className="dpath__title">{p.title}</span>
                     <span className="dpath__body">{p.body}</span>
                     <span className="dpath__foot">
@@ -186,7 +182,7 @@ export default function Home() {
               <p className="ohead__lede">For the curious. Everything below is read live from Arc&apos;s public explorer, and every number shows where it came from.</p>
             </div>
             <nav className="deeper__jump" aria-label="In this part">
-              {DEEPER.map((d) => <a key={d.href} href={d.href} className="chip"><d.icon aria-hidden="true" />{d.label}</a>)}
+              {DEEPER.map((d) => <a key={d.href} href={d.href} className="chip">{d.label}</a>)}
             </nav>
           </div>
         </div>
@@ -221,7 +217,6 @@ export default function Home() {
         {/* ---------------- Part 3: for builders ---------------- */}
         <section className="osec" aria-labelledby="build-title">
           <div className="buildcta">
-            <IconOrb icon={Rocket} hue="violet" size="lg" />
             <div className="buildcta__copy">
               <div className="ohead__kicker">For builders</div>
               <h2 id="build-title" className="ohead__title">Built something on Arc?</h2>
@@ -229,7 +224,7 @@ export default function Home() {
             </div>
             <div className="buildcta__actions">
               <Link href="/submit" className="btn btn--primary">Submit a project <ArrowRight aria-hidden="true" /></Link>
-              <Link href="/widgets" className="btn btn--secondary"><Award aria-hidden="true" />Get a badge</Link>
+              <Link href="/widgets" className="btn btn--secondary">Get a badge</Link>
             </div>
           </div>
         </section>
