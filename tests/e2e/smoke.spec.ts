@@ -16,7 +16,7 @@ const ROUTES = [
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
   "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
   "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave",
-  "/leaderboard", "/submit", "/widgets", "/digest"
+  "/leaderboard", "/submit", "/widgets", "/digest", "/more"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -60,10 +60,9 @@ test("category links open Discover filtered", async ({ page }) => {
 });
 
 test("dark theme toggles and persists", async ({ page, isMobile }) => {
-  await open(page, "/");
+  await open(page, isMobile ? "/more" : "/");
   const html = page.locator("html");
   const wasDark = await html.evaluate((el) => el.classList.contains("dark"));
-  if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
   await page.getByRole("button", { name: /Switch to (dark|light) theme/ }).click();
   await expect(html).toHaveClass(wasDark ? /^(?!.*\bdark\b)/ : /\bdark\b/);
   await page.reload();
@@ -322,7 +321,7 @@ test("desktop uses a left rail with the full navigation", async ({ page, isMobil
   test.skip(isMobile, "desktop layout");
   await open(page, "/pulse");
   const main = page.getByRole("navigation", { name: "Main" });
-  for (const label of ["Overview", "Ecosystem", "Pulse", "Radar", "Builders", "Signals", "Apps", "Quests"]) {
+  for (const label of ["Home", "Ecosystem", "Pulse", "Radar", "Builders", "Signals", "Apps", "Quests"]) {
     await expect(main.getByRole("link", { name: label })).toBeVisible();
   }
   await expect(main.getByRole("link", { name: "Pulse" })).toHaveAttribute("aria-current", "page");
@@ -350,33 +349,41 @@ test("tablet starts with a collapsed rail that expands on demand", async ({ page
   await expect.poll(async () => (await rail.boundingBox())!.width).toBeLessThan(100);
 });
 
-test("mobile uses a top dropdown and a five-item bottom bar", async ({ page, isMobile }) => {
+test("mobile uses five tabs and a More page instead of a dropdown", async ({ page, isMobile }) => {
   test.skip(!isMobile, "mobile layout");
   await open(page, "/");
   await expect(page.locator(".rail")).toBeHidden();
+  await expect(page.getByRole("button", { name: /Current section/ })).toHaveCount(0);
   const quick = page.getByRole("navigation", { name: "Quick" });
-  await expect(quick.getByRole("link")).toHaveCount(5);
-  await page.getByRole("button", { name: /Current section: Overview/ }).click();
-  const menu = page.getByRole("navigation", { name: "Main menu" });
-  for (const label of ["Ecosystem", "Pulse", "Radar", "Builders", "Signals", "Apps", "Quests", "Watchlist", "Settings"]) {
-    await expect(menu.getByRole("link", { name: new RegExp(`^${label}`) })).toBeVisible();
+  await expect(quick.getByRole("link")).toHaveText(["Home", "Apps", "Quests", "Passport", "More"]);
+  await expect(quick.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
+  await quick.getByRole("link", { name: "More" }).click();
+  await expect(page).toHaveURL(/\/more$/);
+  await expect(quick.getByRole("link", { name: "More" })).toHaveAttribute("aria-current", "page");
+  for (const g of ["Get started", "Explore Arc", "Live data", "For builders", "You"]) {
+    await expect(page.locator(".hub").getByRole("heading", { level: 2, name: g, exact: true })).toBeVisible();
   }
-  const box = (await menu.getByRole("link", { name: /^Signals/ }).boundingBox())!;
-  expect(box.height).toBeGreaterThanOrEqual(44);
-  await menu.getByRole("link", { name: /^Signals/ }).click();
+  const signals = page.locator(".hub").getByRole("link", { name: /^Signals/ });
+  expect((await signals.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await signals.click();
   await expect(page).toHaveURL(/\/signals$/);
-  await expect(menu).toBeHidden();
+  await expect(quick.getByRole("link", { name: "More" })).toHaveAttribute("aria-current", "page");
 });
 
-test("overview onboards: hero, five paths, Arc explained, live context", async ({ page }) => {
+test("home starts simple: hero, three steps, five paths, then live data", async ({ page }) => {
   await open(page, "/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Understand what’s happening on Arc.");
-  await expect(page.locator(".hero").getByRole("link", { name: "Explore Arc" })).toHaveAttribute("href", "/ecosystem");
-  await expect(page.locator(".hero").getByRole("link", { name: "How Arc works" })).toHaveAttribute("href", "#how-arc");
+  await expect(page.locator(".hero").getByRole("link", { name: "Explore apps" })).toHaveAttribute("href", "/apps");
+  await expect(page.locator(".hero").getByRole("link", { name: "How it works" })).toHaveAttribute("href", "#how");
+  await expect(page.getByRole("region", { name: "Three steps, no experience needed" }).locator(".step3")).toHaveCount(3);
   const paths = page.getByRole("region", { name: "What are you looking for?" }).locator(".dpath");
   await expect(paths).toHaveCount(5);
   for (const t of ["Move money", "Trade", "Earn", "Build", "Explore"]) await expect(paths.filter({ hasText: t }).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "An open network for money on the internet." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What is Arc?" })).toBeVisible();
+  // Technical, live network data sits below the basics.
+  const deeper = (await page.getByRole("region", { name: "Live data from the Arc network" }).boundingBox())!;
+  const paths3 = (await page.getByRole("region", { name: "What are you looking for?" }).boundingBox())!;
+  expect(deeper.y).toBeGreaterThan(paths3.y);
   // Live activity comes from data, with its source; the overview never leads with raw contract counts.
   await expect(page.locator(".now__item--live .now__value")).toHaveText(/\d/);
   await expect(page.locator(".emap__stats dd", { hasText: /^0$/ })).toHaveCount(0);
@@ -496,10 +503,9 @@ test("intel APIs answer with data or a clean error", async ({ request }) => {
 // ---------------------------------------------------------------- sections, proof and builder tools
 
 test("navigation is grouped into four sections", async ({ page, isMobile }) => {
-  await open(page, "/");
-  if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
-  const scope = isMobile ? page.getByRole("navigation", { name: "Main menu" }) : page.getByRole("navigation", { name: "Main" });
-  for (const g of ["Understand", "Discover", "Participate", "Build on Arc"]) {
+  await open(page, isMobile ? "/more" : "/");
+  const scope = isMobile ? page.locator(".hub") : page.getByRole("navigation", { name: "Main" });
+  for (const g of ["Get started", "Explore Arc", "Live data", "For builders"]) {
     await expect(scope.getByText(g, { exact: true }).first()).toBeVisible();
   }
   await expect(scope.getByRole("link", { name: /^Submit a project/ })).toBeVisible();

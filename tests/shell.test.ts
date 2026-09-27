@@ -5,10 +5,10 @@ import { onchainMatch } from "../lib/search";
 import { parseWatchId, watchId } from "../lib/watchlist";
 
 describe("navigation", () => {
-  it("follows the intelligence-first order", () => {
-    expect(NAV_GROUPS.map((g) => g.label)).toEqual(["Understand", "Discover", "Participate", "Build on Arc"]);
-    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Overview", "Ecosystem", "Pulse", "Radar", "Signals", "Apps", "Builders", "Quests", "Passport", "Leaderboard", "Submit a project", "Badges", "Arc today"]);
-    expect(BOTTOM_NAV).toHaveLength(5);
+  it("puts the simple destinations first, technical ones later", () => {
+    expect(NAV_GROUPS.map((g) => g.label)).toEqual(["Get started", "Explore Arc", "Live data", "For builders"]);
+    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Home", "Apps", "Quests", "Passport", "Ecosystem", "Builders", "Leaderboard", "Arc today", "Pulse", "Radar", "Signals", "Submit a project", "Badges"]);
+    expect(BOTTOM_NAV.map((n) => n.label)).toEqual(["Home", "Apps", "Quests", "Passport", "More"]);
   });
   it("matches the overview only at the root", () => {
     expect(isActive("/", "/")).toBe(true);
@@ -17,7 +17,8 @@ describe("navigation", () => {
     expect(isActive("/apps-x", "/apps")).toBe(false);
   });
   it("builds breadcrumbs with entity names", () => {
-    expect(crumbsFor("/")).toEqual([{ label: "Overview" }]);
+    expect(crumbsFor("/")).toEqual([{ label: "Home" }]);
+    expect(crumbsFor("/more")).toEqual([{ label: "More" }]);
     expect(crumbsFor("/apps/uniswap")).toEqual([{ label: "Apps", href: "/apps" }, { label: "Uniswap" }]);
     expect(crumbsFor("/builders/circle")[1].label).toBe("Circle");
     expect(crumbsFor("/terms")).toEqual([{ label: "Terms of Use" }]);

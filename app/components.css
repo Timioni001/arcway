@@ -123,28 +123,6 @@
   .mtop { display: block; position: sticky; top: 0; z-index: 50; background: var(--header-bg); border-bottom: 1px solid var(--border); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); }
   .mtop__bar { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 var(--gutter); }
   .mtop__tools { margin-left: auto; display: flex; align-items: center; gap: 2px; }
-  .mtop__switch {
-    display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 44px; padding: 0 var(--gutter);
-    background: none; border: 0; border-top: 1px solid var(--border); font: inherit; font-size: 15px; font-weight: 600; color: var(--text); cursor: pointer;
-  }
-  .mtop__switch svg { width: 18px; height: 18px; color: var(--text-secondary); transition: transform var(--t-component) var(--ease); }
-  .mtop__switch[aria-expanded="true"] svg { transform: rotate(180deg); }
-  .mmenu {
-    position: absolute; left: 0; right: 0; top: 100%; z-index: 55; max-height: calc(100dvh - 100px); overflow-y: auto; overscroll-behavior: contain;
-    padding: 8px var(--gutter) 20px; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-feature);
-    animation: menu-in var(--t-panel) var(--ease);
-  }
-  .mmenu__scrim { position: fixed; inset: 0; top: 100px; z-index: 54; background: rgba(16, 34, 74, .28); animation: fade-in var(--t-component) var(--ease); }
-  .mmenu__group { padding: 10px 0; }
-  .mmenu__group + .mmenu__group { border-top: 1px solid var(--border); }
-  .mmenu__group .label { margin: 4px 4px 6px; }
-  .mmenu__link { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 48px; padding: 6px 10px; border-radius: 10px; color: var(--text); background: none; border: 0; font: inherit; text-align: left; cursor: pointer; }
-  .mmenu__link svg { width: 20px; height: 20px; stroke-width: 1.75; color: var(--text-secondary); flex: none; }
-  .mmenu__link span { display: grid; font-size: 15px; font-weight: 500; }
-  .mmenu__link small { font-size: 12px; color: var(--text-secondary); font-weight: 400; }
-  .mmenu__link[aria-current="page"] { background: var(--nav-active-bg); }
-  .mmenu__link[aria-current="page"] svg { color: var(--nav-active-text); }
-  .mmenu__theme { border-top: 1px solid var(--border); border-radius: 0; margin-top: 4px; padding-top: 14px; }
   .bottombar {
     display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
     padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
@@ -1468,9 +1446,9 @@ a:hover .orb, .orb:hover { transform: translateY(-3px) scale(1.04); }
 .quest-steps .orb { --tint: rgba(255, 255, 255, .16); }
 @media (max-width: 640px) {
   .bchips li:nth-child(n + 5) { display: none; }
-  .hero--v3 .float-chip:nth-of-type(3) { display: none; }
-  .hero--v3 .float-chip:nth-of-type(1) { top: 4% !important; left: 0 !important; }
-  .hero--v3 .float-chip:nth-of-type(2) { top: auto !important; bottom: 6%; right: 0 !important; }
+  /* Phones: the art is decoration only, so keep it short and chip-free and get to the steps sooner. */
+  .hero--v3 .float-chip { display: none; }
+  .hero--v3 .hero__art { height: 200px; }
 }
 
 /* ---------- Onchain proof + leaderboard ---------- */
@@ -1572,3 +1550,48 @@ a:hover .orb, .orb:hover { transform: translateY(-3px) scale(1.04); }
 .footer .built-on { justify-self: start; padding-top: 4px; }
 @media (max-width: 1100px) { .footer__inner { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 767px) { .footer__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+
+/* ---------- More hub (replaces the mobile dropdown) ---------- */
+.hub { display: grid; gap: 30px; padding-top: 24px; }
+.hub-search { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 16px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary); font: inherit; font-size: 15px; cursor: pointer; box-shadow: var(--shadow-card); }
+.hub-search svg { width: 18px; height: 18px; }
+.hub-group__title { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 12px; }
+.hub-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 1000px) { .hub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .hub-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+.hub-tile { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 72px; padding: 14px 16px; border-radius: 18px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; text-align: left; cursor: pointer; transition: border-color var(--t-micro), transform var(--t-component) var(--ease); }
+.hub-tile:hover { border-color: var(--sky); transform: translateY(-2px); }
+.hub-tile__text { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.hub-tile__name { font-weight: 650; font-size: 15px; }
+.hub-tile__blurb { font-size: 13px; color: var(--text-secondary); }
+.hub-tile__go { width: 18px; height: 18px; color: var(--text-muted); flex: none; }
+
+/* ---------- Home: easy first, technical later ---------- */
+.trust-strip { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 26px; }
+.trust-strip li { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 80%, transparent); border: 1px solid var(--border); font-size: 13.5px; color: var(--text-secondary); }
+.trust-strip b { color: var(--text); font-family: var(--font-geist-mono), monospace; }
+
+.steps3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: none; }
+.step3 { position: relative; display: grid; justify-items: start; gap: 8px; align-content: start; padding: 24px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-card); }
+.step3 .orb { margin-bottom: 10px; }
+.step3__num { position: absolute; top: 18px; right: 20px; font-size: 13px; font-weight: 700; color: var(--text-muted); }
+.step3__title { font-size: 17px; font-weight: 650; }
+.step3__body { font-size: 14.5px; color: var(--text-secondary); line-height: 1.5; }
+.steps3 > li + li::before { content: ""; position: absolute; left: -17px; top: 50%; width: 18px; height: 2px; background: linear-gradient(90deg, var(--sky), transparent); }
+@media (max-width: 860px) { .steps3 { grid-template-columns: minmax(0, 1fr); gap: 12px; } .steps3 > li + li::before { display: none; } .step3 { grid-template-columns: auto minmax(0, 1fr); column-gap: 16px; align-items: center; padding: 18px; } .step3 .orb { grid-row: span 2; margin: 0; } }
+
+/* The hand-off from basics to data: a clear, calm divider */
+.deeper { margin-top: 72px; padding: 44px 0 36px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  background: radial-gradient(50% 120% at 0% 0%, var(--pale), transparent 70%), var(--surface); }
+:root.dark .deeper { background: radial-gradient(50% 120% at 0% 0%, var(--surface-blue), transparent 70%), var(--surface); }
+.deeper__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px 32px; flex-wrap: wrap; }
+.deeper__jump { display: flex; flex-wrap: wrap; gap: 8px; }
+.deeper__jump .chip svg { width: 14px; height: 14px; }
+.osec[id] { scroll-margin-top: calc(var(--nav-h) + 16px); }
+
+.buildcta { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 30px; border-radius: 24px; border: 1px solid var(--border);
+  background: radial-gradient(60% 120% at 100% 0%, rgba(180, 155, 255, .18), transparent 60%), var(--surface); box-shadow: var(--shadow-card); margin-bottom: 72px; }
+.buildcta__copy .ohead__title { margin-top: 6px; }
+.buildcta__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 900px) { .buildcta { grid-template-columns: minmax(0, 1fr); padding: 22px; } }

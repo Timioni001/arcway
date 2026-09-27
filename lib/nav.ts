@@ -1,5 +1,5 @@
 import {
-  Activity, Award, Blocks, Bookmark, Code2, IdCard, LayoutDashboard, Link2, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound,
+  Activity, Award, Blocks, Bookmark, Code2, House, IdCard, LayoutGrid, Link2, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound,
   type LucideIcon
 } from "lucide-react";
 import { getBuilder } from "./builders";
@@ -11,39 +11,42 @@ export type NavItem = { href: string; label: string; icon: LucideIcon; blurb: st
 
 export type NavGroup = { label: string; items: NavItem[] };
 
-/** The product in four sections: understand Arc, discover what's on it, take part, and build on it. */
+/**
+ * Simple first, technical later (progressive disclosure): what a newcomer needs at the top,
+ * live network data and builder tools further down.
+ */
 export const NAV_GROUPS: NavGroup[] = [
   {
-    label: "Understand",
+    label: "Get started",
     items: [
-      { href: "/", label: "Overview", icon: LayoutDashboard, blurb: "The Arc ecosystem at a glance" },
-      { href: "/ecosystem", label: "Ecosystem", icon: Network, blurb: "Protocols, categories and how they connect" },
-      { href: "/pulse", label: "Pulse", icon: Activity, blurb: "Live activity across Arc" },
-      { href: "/radar", label: "Radar", icon: Radar, blurb: "What's new and what changed" },
-      { href: "/signals", label: "Signals", icon: RadioTower, blurb: "Verified onchain observations" }
+      { href: "/", label: "Home", icon: House, blurb: "What Arc and Arcway are" },
+      { href: "/apps", label: "Apps", icon: Blocks, blurb: "Find apps to try on Arc" },
+      { href: "/quests", label: "Quests", icon: Target, blurb: "Learn Arc by doing, earn XP" },
+      { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your XP, level and badges" }
     ]
   },
   {
-    label: "Discover",
+    label: "Explore Arc",
     items: [
-      { href: "/apps", label: "Apps", icon: Blocks, blurb: "Browse and try apps on Arc" },
-      { href: "/builders", label: "Builders", icon: Code2, blurb: "Teams, projects and contracts" }
-    ]
-  },
-  {
-    label: "Participate",
-    items: [
-      { href: "/quests", label: "Quests", icon: Target, blurb: "Explore Arc and earn XP" },
-      { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your XP, level and badges" },
+      { href: "/ecosystem", label: "Ecosystem", icon: Network, blurb: "Every app, by category, on one map" },
+      { href: "/builders", label: "Builders", icon: Code2, blurb: "The teams behind the apps" },
       { href: "/leaderboard", label: "Leaderboard", icon: Trophy, blurb: "Top explorers this season" }
     ]
   },
   {
-    label: "Build on Arc",
+    label: "Live data",
+    items: [
+      { href: "/digest", label: "Arc today", icon: Newspaper, blurb: "Today's changes in one page" },
+      { href: "/pulse", label: "Pulse", icon: Activity, blurb: "Activity on Arc as it happens" },
+      { href: "/radar", label: "Radar", icon: Radar, blurb: "New contracts and what changed" },
+      { href: "/signals", label: "Signals", icon: RadioTower, blurb: "Notable changes, with evidence" }
+    ]
+  },
+  {
+    label: "For builders",
     items: [
       { href: "/submit", label: "Submit a project", icon: Rocket, blurb: "Get your Arc app listed" },
-      { href: "/widgets", label: "Badges", icon: Award, blurb: "Show your app is live on Arc" },
-      { href: "/digest", label: "Arc today", icon: Newspaper, blurb: "Daily digest and RSS" }
+      { href: "/widgets", label: "Badges", icon: Award, blurb: "Show your app is live on Arc" }
     ]
   }
 ];
@@ -63,13 +66,13 @@ export const YOU_NAV: NavItem[] = [
   { href: "/pay", label: "Pay links", icon: Link2, blurb: "Request USDC with a link" }
 ];
 
-/** Five items only on mobile; the dropdown holds everything else. */
-export const BOTTOM_NAV: { href: string; label: string }[] = [
-  { href: "/", label: "Overview" },
-  { href: "/ecosystem", label: "Explore" },
-  { href: "/pulse", label: "Pulse" },
-  { href: "/radar", label: "Radar" },
-  { href: "/watchlist", label: "Watchlist" }
+/** Mobile tabs: the four simplest destinations, and "More" for everything else (no hidden dropdown). */
+export const BOTTOM_NAV: NavItem[] = [
+  { href: "/", label: "Home", icon: House, blurb: "" },
+  { href: "/apps", label: "Apps", icon: Blocks, blurb: "" },
+  { href: "/quests", label: "Quests", icon: Target, blurb: "" },
+  { href: "/passport", label: "Passport", icon: IdCard, blurb: "" },
+  { href: "/more", label: "More", icon: LayoutGrid, blurb: "" }
 ];
 
 export function isActive(pathname: string, href: string): boolean {
@@ -78,13 +81,13 @@ export function isActive(pathname: string, href: string): boolean {
 }
 
 const ALL = [...PRIMARY_NAV, ...SECONDARY_NAV, ...YOU_NAV];
-const EXTRA: Record<string, string> = { terms: "Terms of Use", privacy: "Privacy Policy", trails: "Apps" };
+const EXTRA: Record<string, string> = { terms: "Terms of Use", privacy: "Privacy Policy", trails: "Apps", more: "More" };
 
 export type Crumb = { label: string; href?: string };
 
 /** Breadcrumb for the top bar: section, then the entity name when there is one. */
 export function crumbsFor(pathname: string): Crumb[] {
-  if (pathname === "/") return [{ label: "Overview" }];
+  if (pathname === "/") return [{ label: "Home" }];
   const [first, second] = pathname.split("/").filter(Boolean);
   const section = ALL.find((n) => n.href === `/${first}`);
   const sectionCrumb: Crumb = section ? { label: section.label, href: section.href } : { label: EXTRA[first] ?? "Arcway", href: first === "trails" ? "/apps" : undefined };

@@ -1,11 +1,11 @@
 'use client';
 
-import { Bookmark, ChevronDown, ChevronRight, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, X } from "lucide-react";
+import { Bookmark, ChevronRight, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Fragment, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { NETWORK_NAME } from "../lib/config";
-import { BOTTOM_NAV, NAV_GROUPS, PRIMARY_NAV, SECONDARY_NAV, YOU_NAV, crumbsFor, isActive, type NavItem } from "../lib/nav";
+import { BOTTOM_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isActive, type NavItem } from "../lib/nav";
 import { THEME_EVENT, toggleTheme } from "../lib/theme";
 import { getWatchlist, getWatchlistServer, subscribeWatchlist } from "../lib/watchlist";
 import { Logo, LogoMark } from "./Logo";
@@ -151,50 +151,8 @@ export function Topbar() {
   );
 }
 
-/** Mobile: compact top bar with one dropdown holding the full feature set. */
+/** Mobile: a calm top bar (logo, search, connect). Navigation lives in the bottom tabs and the More page. */
 export function MobileTop() {
-  const pathname = usePathname();
-  const dark = useDark();
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
-  const panelRef = useRef<HTMLDivElement>(null);
-  const lastTrigger = useRef<HTMLButtonElement | null>(null);
-  const current = crumbsFor(pathname)[0].label;
-
-  useEffect(() => setOpen(false), [pathname]);
-  useEffect(() => {
-    if (!open) return;
-    panelRef.current?.querySelector<HTMLElement>("a, button")?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setOpen(false); lastTrigger.current?.focus(); }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  const toggle = (e: React.MouseEvent<HTMLButtonElement>) => { lastTrigger.current = e.currentTarget; setOpen((o) => !o); };
-  const group = (title: string, items: NavItem[]) => (
-    <div className="mmenu__group">
-      <div className="label">{title}</div>
-      <ul>
-        {items.map((n) => {
-          const Icon = n.icon;
-          return (
-            <li key={n.href}>
-              {n.href === "/search" ? (
-                <button type="button" className="mmenu__link" onClick={() => { setOpen(false); openSearch(); }}><Icon aria-hidden="true" /><span>{n.label}<small>{n.blurb}</small></span></button>
-              ) : (
-                <Link href={n.href} className="mmenu__link" aria-current={isActive(pathname, n.href) ? "page" : undefined} onClick={() => setOpen(false)}>
-                  <Icon aria-hidden="true" /><span>{n.label}<small>{n.blurb}</small></span>
-                </Link>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-
   return (
     <header className="mtop">
       <div className="mtop__bar">
@@ -202,38 +160,24 @@ export function MobileTop() {
         <div className="mtop__tools">
           <SearchButton variant="icon" />
           <WalletButton />
-          <button type="button" className="icon-btn" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls={panelId} onClick={toggle}>
-            {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-          </button>
         </div>
       </div>
-      <button type="button" className="mtop__switch" aria-expanded={open} aria-controls={panelId} onClick={toggle}>
-        <span className="visually-hidden">Current section: </span>{current}<ChevronDown aria-hidden="true" />
-      </button>
-      <div ref={panelRef} id={panelId} className="mmenu" data-open={open} hidden={!open}>
-        <nav aria-label="Main menu">
-          {NAV_GROUPS.map((g) => <div key={g.label}>{group(g.label, g.items)}</div>)}
-          {group("Tools", SECONDARY_NAV)}
-          {group("You", YOU_NAV)}
-        </nav>
-        <button type="button" className="mmenu__link mmenu__theme" onClick={toggleTheme} aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}>
-          {dark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}<span>{dark ? "Light theme" : "Dark theme"}</span>
-        </button>
-      </div>
-      {open && <div className="mmenu__scrim" aria-hidden="true" onClick={() => setOpen(false)} />}
     </header>
   );
 }
 
+const TAB_HREFS = BOTTOM_NAV.filter((n) => n.href !== "/more").map((n) => n.href);
+
 export function BottomBar() {
   const pathname = usePathname();
-  const icons = Object.fromEntries([...PRIMARY_NAV, ...SECONDARY_NAV].map((n) => [n.href, n.icon]));
+  const inTabs = TAB_HREFS.some((h) => isActive(pathname, h));
   return (
     <nav className="bottombar" aria-label="Quick">
       {BOTTOM_NAV.map((n) => {
-        const Icon = icons[n.href];
+        const Icon = n.icon;
+        const active = n.href === "/more" ? !inTabs : isActive(pathname, n.href);
         return (
-          <Link key={n.href} href={n.href} aria-current={isActive(pathname, n.href) ? "page" : undefined}>
+          <Link key={n.href} href={n.href} aria-current={active ? "page" : undefined}>
             <Icon aria-hidden="true" />{n.label}
           </Link>
         );
