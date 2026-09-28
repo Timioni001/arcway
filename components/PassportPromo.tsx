@@ -8,6 +8,7 @@ import { QUESTS, TOTAL_XP } from "../lib/quests";
 import { FloatingDots } from "./FloatingDots";
 import { Medal } from "./Medal";
 import { PassCard } from "./PassCard";
+import { Ticker } from "./Ticker";
 import { LevelLadder } from "./PassportSection";
 
 /** Front-page invitation to the Arc Passport: the card, what XP is for, and the badges to collect. */
@@ -25,9 +26,9 @@ export function PassportPromo() {
         <h2 id="passport-title" className="ohead__title">Your record on Arc, in one card.</h2>
         <p className="ohead__lede">Every quest you complete adds XP and a badge. Your level travels with your wallet, and anyone can view it.</p>
         <ul className="ppromo__stats">
-          <li><span><b className="mono">{QUESTS.length}</b> starter quests</span></li>
-          <li><span><b className="mono">{TOTAL_XP}</b> XP to earn</span></li>
-          <li><span><b className="mono">{LEVELS.length}</b> levels</span></li>
+          <li><span><b className="mono"><Ticker value={QUESTS.length} /></b> starter quests</span></li>
+          <li><span><b className="mono"><Ticker value={TOTAL_XP} /></b> XP to earn</span></li>
+          <li><span><b className="mono"><Ticker value={LEVELS.length} /></b> levels</span></li>
         </ul>
         <LevelLadder />
         <ul className="medal-shelf ppromo__badges" aria-label="Badges">

@@ -1,12 +1,13 @@
 'use client';
 
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { timeAgo } from "../lib/format";
 import { useIntel, useProtocolIntel } from "../lib/hooks/useIntel";
 import type { PulseEvent } from "../lib/intel";
 import { appContracts, type ArcApp } from "../lib/registry";
 import { AppMark } from "./CategoryIcon";
+import { Ticker } from "./Ticker";
 import { Freshness, PulseList, SourceTag, compact } from "./Intel";
 
 /** "Arc right now": plain-language context. Live activity only when the explorer answers. */
@@ -17,17 +18,17 @@ export function ArcRightNow({ apps, builders, categories }: { apps: number; buil
   return (
     <div className="now">
       <div className="now__item">
-        <span className="now__value mono">{apps}</span>
+        <span className="now__value mono"><Ticker value={apps} /></span>
         <span className="now__label">Applications</span>
         <span className="now__hint">Listed on Arcway</span>
       </div>
       <div className="now__item">
-        <span className="now__value mono">{builders}</span>
+        <span className="now__value mono"><Ticker value={builders} /></span>
         <span className="now__label">Builders</span>
         <span className="now__hint">Teams behind them</span>
       </div>
       <div className="now__item">
-        <span className="now__value mono">{categories}</span>
+        <span className="now__value mono"><Ticker value={categories} /></span>
         <span className="now__label">Categories</span>
         <span className="now__hint">From payments to agents</span>
       </div>
@@ -35,7 +36,7 @@ export function ArcRightNow({ apps, builders, categories }: { apps: number; buil
         {q.isPending ? (
           <span className="skeleton" style={{ height: 36, width: 110 }} />
         ) : live ? (
-          <span className="now__value mono">{compact(live.value!)}</span>
+          <span className="now__value mono"><Ticker value={live.value!} compact /></span>
         ) : (
           <span className="now__value now__value--soon">Coming soon</span>
         )}
@@ -150,5 +151,5 @@ export function LearnArcLink({ href }: { href: string }) {
 }
 
 export function MoreLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return <Link href={href} className="link more-link">{children} <ArrowRight aria-hidden="true" /></Link>;
+  return <Link href={href} className="more-link">{children}<span className="more-link__arrow" aria-hidden="true"><ArrowUpRight /></span></Link>;
 }

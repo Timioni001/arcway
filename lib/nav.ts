@@ -75,6 +75,11 @@ export const BOTTOM_NAV: NavItem[] = [
   { href: "/more", label: "More", icon: LayoutGrid, blurb: "" }
 ];
 
+/** The group a top-level page belongs to, for the section tabs in the top bar. Detail pages get breadcrumbs instead. */
+export function sectionFor(pathname: string): NavGroup | null {
+  return NAV_GROUPS.find((g) => g.items.some((n) => n.href === pathname)) ?? null;
+}
+
 export function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);

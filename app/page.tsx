@@ -9,6 +9,7 @@ import { FloatingDots } from "../components/FloatingDots";
 import { HeroArt } from "../components/HeroArt";
 import { ArcRightNow, DiscoverApps, LearnArcLink, MoreLink, PulsePreview, WhatsNew } from "../components/Onboarding";
 import { Reveal } from "../components/Reveal";
+import { Ticker } from "../components/Ticker";
 import { builderMark, buildersFrom } from "../lib/builders";
 import { ARC_DOCS_URL } from "../lib/config";
 import { APPS, CATEGORIES, categoryCounts, discoverApps, type Category } from "../lib/registry";
@@ -81,9 +82,9 @@ export default function Home() {
               <Link href="#how" className="btn btn--secondary">How it works</Link>
             </div>
             <ul className="trust-strip enter enter-3" aria-label="At a glance">
-              <li><b>{live.length}</b> apps</li>
-              <li><b>{builders.length}</b> builders</li>
-              <li><b>{CATEGORIES.length}</b> categories</li>
+              <li><b><Ticker value={live.length} /></b> apps</li>
+              <li><b><Ticker value={builders.length} /></b> builders</li>
+              <li><b><Ticker value={CATEGORIES.length} /></b> categories</li>
               <li>Free, no sign-up</li>
             </ul>
           </div>

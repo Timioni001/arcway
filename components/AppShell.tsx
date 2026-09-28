@@ -1,11 +1,11 @@
 'use client';
 
-import { Bookmark, ChevronRight, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
+import { ArrowUpRight, Bookmark, ChevronRight, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { NETWORK_NAME } from "../lib/config";
-import { BOTTOM_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isActive, type NavItem } from "../lib/nav";
+import { BOTTOM_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isActive, sectionFor, type NavItem } from "../lib/nav";
 import { THEME_EVENT, toggleTheme } from "../lib/theme";
 import { getWatchlist, getWatchlistServer, subscribeWatchlist } from "../lib/watchlist";
 import { Logo, LogoMark } from "./Logo";
@@ -96,10 +96,15 @@ export function Rail() {
       </nav>
       <nav className="rail__nav rail__nav--secondary" aria-label="More">
         <ul>
-          {SECONDARY_NAV.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}
+          {SECONDARY_NAV.filter((n) => n.href !== "/search").map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}
         </ul>
       </nav>
       <div className="rail__foot">
+        <Link href="/quests" className="rail-promo" onClick={close}>
+          <span className="rail-promo__title">Earn your passport</span>
+          <span className="rail-promo__body">Short quests that teach Arc. Each one adds XP and a badge.</span>
+          <span className="rail-promo__cta">Start a quest<i aria-hidden="true"><ArrowUpRight /></i></span>
+        </Link>
         <button type="button" className="rail__link" data-label={dark ? "Light theme" : "Dark theme"} onClick={toggleTheme} aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}>
           {dark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}<span className="rail__label">{dark ? "Light theme" : "Dark theme"}</span>
         </button>
@@ -135,12 +140,26 @@ function WatchlistLink() {
   );
 }
 
+/** Pill tabs for the pages in the current section (wide screens, top-level pages only). */
+function SectionTabs({ pathname }: { pathname: string }) {
+  const group = sectionFor(pathname);
+  if (!group) return null;
+  return (
+    <nav className="stabs" aria-label={`${group.label} pages`}>
+      {group.items.map((n) => (
+        <Link key={n.href} href={n.href} className="stabs__tab" aria-current={n.href === pathname ? "page" : undefined}>{n.label}</Link>
+      ))}
+    </nav>
+  );
+}
+
 /** Desktop and tablet: where you are, search, watchlist, notifications, profile. No balances, no swaps. */
 export function Topbar() {
   const pathname = usePathname();
   return (
     <header className="topbar">
       <Crumbs pathname={pathname} />
+      <SectionTabs pathname={pathname} />
       <div className="topbar__tools">
         <SearchButton />
         <WatchlistLink />
