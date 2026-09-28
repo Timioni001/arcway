@@ -1371,9 +1371,9 @@ main:has(.page--home) + .footer { margin-top: 0; }
 
 /* ---------- Passport promo: bright, inviting ---------- */
 .ppromo { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; padding: 40px; border-radius: 28px; overflow: hidden;
-  background: radial-gradient(60% 80% at 0% 0%, rgba(169, 221, 244, .7), transparent 60%), radial-gradient(50% 70% at 100% 100%, rgba(180, 155, 255, .22), transparent 60%), linear-gradient(135deg, #F2FAFE, #FFFFFF);
+  background: radial-gradient(60% 80% at 0% 0%, rgba(169, 221, 244, .7), transparent 60%), radial-gradient(50% 70% at 100% 100%, rgba(79, 180, 234, .16), transparent 60%), linear-gradient(135deg, #F2FAFE, #FFFFFF);
   border: 1px solid var(--border); box-shadow: var(--shadow-feature); }
-:root.dark .ppromo { background: radial-gradient(60% 80% at 0% 0%, rgba(79, 180, 234, .22), transparent 60%), radial-gradient(50% 70% at 100% 100%, rgba(180, 155, 255, .14), transparent 60%), var(--surface); }
+:root.dark .ppromo { background: radial-gradient(60% 80% at 0% 0%, rgba(79, 180, 234, .22), transparent 60%), radial-gradient(50% 70% at 100% 100%, rgba(79, 180, 234, .12), transparent 60%), var(--surface); }
 .ppromo__card { position: relative; perspective: 1200px; }
 .ppromo__card .fdots { z-index: 2; inset: -10%; }
 .ppromo__stats { display: flex; flex-wrap: wrap; gap: 14px 24px; margin: 24px 0 26px; }
@@ -1387,7 +1387,7 @@ main:has(.page--home) + .footer { margin-top: 0; }
 .pass {
   background:
     radial-gradient(80% 100% at 100% 0%, rgba(169, 221, 244, .75), transparent 55%),
-    radial-gradient(60% 80% at 0% 100%, rgba(180, 155, 255, .35), transparent 60%),
+    radial-gradient(60% 80% at 0% 100%, rgba(117, 201, 243, .35), transparent 60%),
     linear-gradient(135deg, #4FB4EA 0%, #3298D8 40%, #246CB0 100%);
   box-shadow: 0 30px 60px -20px rgba(36, 108, 176, .55), inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 0 0 1px rgba(255, 255, 255, .18);
 }
@@ -1544,7 +1544,7 @@ main:has(.page--home) + .footer { margin-top: 0; }
 .osec[id] { scroll-margin-top: calc(var(--nav-h) + 16px); }
 
 .buildcta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; padding: 30px; border-radius: 24px; border: 1px solid var(--border);
-  background: radial-gradient(60% 120% at 100% 0%, rgba(180, 155, 255, .18), transparent 60%), var(--surface); box-shadow: var(--shadow-card); margin-bottom: 72px; }
+  background: radial-gradient(60% 120% at 100% 0%, rgba(169, 221, 244, .45), transparent 60%), var(--surface); box-shadow: var(--shadow-card); margin-bottom: 72px; }
 .buildcta__copy .ohead__title { margin-top: 6px; }
 .buildcta__actions { display: flex; gap: 10px; flex-wrap: wrap; }
 @media (max-width: 900px) { .buildcta { grid-template-columns: minmax(0, 1fr); padding: 22px; } }
@@ -1633,20 +1633,18 @@ body { background: var(--background); }
 @keyframes blur-in { from { opacity: 0; filter: blur(8px); transform: translateY(14px); } to { opacity: 1; filter: none; transform: none; } }
 @keyframes slide-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
 @keyframes draw { from { stroke-dashoffset: 40; } to { stroke-dashoffset: 0; } }
-@keyframes pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
-/* Each page's first blocks blur in, one after another. */
-main > .page > *:nth-child(-n + 4), main > .page > .container > *:nth-child(-n + 3) { animation: blur-in 640ms var(--ease) both; }
-main > .page > *:nth-child(2), main > .page > .container > *:nth-child(2) { animation-delay: 90ms; }
-main > .page > *:nth-child(3), main > .page > .container > *:nth-child(3) { animation-delay: 180ms; }
-main > .page > *:nth-child(4) { animation-delay: 240ms; }
-/* The rail groups slide in once, on first load (the rail persists between pages). */
-.rail__group { animation: slide-in 520ms var(--ease) both; }
-.rail__group:nth-child(2) { animation-delay: 60ms; }
-.rail__group:nth-child(3) { animation-delay: 120ms; }
-.rail__group:nth-child(4) { animation-delay: 180ms; }
-/* The logo draws its route, then the destination dot lands. */
-.logo__mark path { stroke-dasharray: 40; animation: draw 900ms var(--ease) 120ms both; }
-.logo__mark circle { transform-box: fill-box; transform-origin: center; animation: pop 420ms var(--ease) 820ms both; }
+@keyframes pop { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: none; } }
+/* First load only (data-intro is cleared ~1.4s after hydration): later page changes are instant. */
+:root[data-intro] main > .page > *:nth-child(-n + 4), :root[data-intro] main > .page > .container > *:nth-child(-n + 3) { animation: blur-in 560ms var(--ease) both; }
+:root[data-intro] main > .page > *:nth-child(2), :root[data-intro] main > .page > .container > *:nth-child(2) { animation-delay: 70ms; }
+:root[data-intro] main > .page > *:nth-child(3), :root[data-intro] main > .page > .container > *:nth-child(3) { animation-delay: 140ms; }
+:root[data-intro] main > .page > *:nth-child(4) { animation-delay: 200ms; }
+:root[data-intro] .rail__group { animation: slide-in 480ms var(--ease) both; }
+:root[data-intro] .rail__group:nth-child(2) { animation-delay: 50ms; }
+:root[data-intro] .rail__group:nth-child(3) { animation-delay: 100ms; }
+:root[data-intro] .rail__group:nth-child(4) { animation-delay: 150ms; }
+:root[data-intro] .logo__mark path { stroke-dasharray: 40; animation: draw 800ms var(--ease) 100ms both; }
+:root[data-intro] .logo__mark circle { transform-box: fill-box; transform-origin: center; animation: pop 280ms var(--ease) 700ms both; }
 @media (prefers-reduced-motion: reduce) {
   main > .page > *, main > .page > .container > *, .rail__group, .logo__mark path, .logo__mark circle { animation: none !important; }
 }
@@ -1666,3 +1664,89 @@ main > .page > *:nth-child(4) { animation-delay: 240ms; }
 .now .now__item--live .src__kind { background: rgba(255, 255, 255, .14); color: #fff; }
 .now .now__item--live .src[data-source] .src__kind { color: #fff; }
 @media (max-width: 767px) { .mtop { background: color-mix(in srgb, var(--background) 88%, transparent); border-bottom-color: var(--canvas-line); } .mtop .icon-btn { border-radius: 50%; background: var(--surface); border-color: var(--canvas-line); } }
+
+/* ==========================================================================
+   V5: native feel (Appllama design skill, adapted for the web)
+   One easing curve, press feedback on press-in, tabular numbers,
+   glass reserved for the bars that content scrolls under.
+   ========================================================================== */
+:root { --ease: cubic-bezier(0.23, 1, 0.32, 1); --press: 120ms; }
+
+/* Numbers that count, time or price line up. */
+.mono, .now__value, .trust-strip b, .ppromo__stats b, .proof__stat b, .metric__value, .lb__xp { font-variant-numeric: tabular-nums; }
+
+/* Press feedback lands on press-in: cards and buttons scale to .97, rows get a highlight. */
+.btn, .chip, .dpath, .dapp, .hub-tile, .bchip, .app-card, .rail-promo, .stabs__tab, .bottombar a, .icon-btn {
+  transition-property: transform, background, background-color, border-color, color, box-shadow, opacity;
+  transition-duration: var(--press), var(--t-micro), var(--t-micro), var(--t-micro), var(--t-micro), var(--t-component), var(--t-micro);
+  transition-timing-function: var(--ease);
+}
+:is(.btn, .chip, .dpath, .dapp, .hub-tile, .bchip, .app-card, .rail-promo, .stabs__tab, .icon-btn):active { transform: scale(.97); }
+:is(.rail__link, .pulse-row, .lb__row, .wrow, .notif__item):active { background: var(--rail-hover); }
+
+/* Continuous (squircle) corners where the browser supports them. */
+@supports (corner-shape: squircle) {
+  .card, .panel, .dpath, .step3, .dapp, .hub-tile, .proof, .now__item, .ppromo, .buildcta, .rail-promo, .page--home > .hero--v3, .page--home > .glance, .page--home > .deeper { corner-shape: squircle; }
+}
+
+/* Bars lift off the content once you scroll (scroll-driven, no JS; older browsers keep the flat bar). */
+@keyframes bar-lift { to { box-shadow: 0 8px 24px -14px rgba(11, 18, 32, .28); border-bottom-color: var(--canvas-line); } }
+@supports (animation-timeline: scroll()) {
+  .topbar, .mtop { animation: bar-lift linear both; animation-timeline: scroll(root); animation-range: 0 72px; }
+}
+
+/* ---------- Mobile: floating glass tab bar ---------- */
+@media (max-width: 767px) {
+  .mtop { background: color-mix(in srgb, var(--background) 72%, transparent); -webkit-backdrop-filter: saturate(1.8) blur(20px); backdrop-filter: saturate(1.8) blur(20px); border-bottom-color: transparent; }
+  .bottombar {
+    --pad: 6px;
+    left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom)); padding: var(--pad);
+    border-radius: 30px; border: 1px solid rgba(255, 255, 255, .7);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .8), rgba(255, 255, 255, .64));
+    -webkit-backdrop-filter: blur(28px) saturate(1.9); backdrop-filter: blur(28px) saturate(1.9);
+    box-shadow: 0 14px 34px -14px rgba(11, 18, 32, .32), 0 2px 6px -2px rgba(11, 18, 32, .08), inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 -1px 0 rgba(11, 18, 32, .05);
+    transform-origin: 50% 100%;
+    transition: transform 260ms var(--ease), padding 260ms var(--ease);
+    isolation: isolate;
+  }
+  /* Specular edge: a thin bright rim that fades toward the bottom, like light on curved glass. */
+  .bottombar::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 2;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 255, 255, .15) 45%, rgba(255, 255, 255, .5));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  .bottombar a { position: relative; z-index: 1; min-height: 50px; border-radius: 24px; background: none; font-size: 11px; color: var(--text-secondary); }
+  .bottombar a[aria-current="page"] { background: none; color: var(--royal); font-weight: 600; }
+  .bottombar a[aria-current="page"] svg { stroke-width: 2.1; }
+  .bottombar a:active svg { transform: scale(.88); }
+  .bottombar a svg { transition: transform var(--press) var(--ease); }
+  /* The lens: a brighter glass pill that glides to the selected tab. */
+  .bottombar__lens {
+    position: absolute; z-index: 0; top: var(--pad); bottom: var(--pad); left: var(--pad); width: calc((100% - var(--pad) * 2) / 5);
+    border-radius: 24px; transform: translateX(calc(var(--i) * 100%)); transition: transform 300ms var(--ease);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(234, 247, 252, .85));
+    box-shadow: 0 4px 12px -6px rgba(36, 108, 176, .35), inset 0 1px 0 #fff, inset 0 0 0 1px rgba(169, 221, 244, .55);
+  }
+  /* Scrolling down tucks the bar into a slimmer pill; labels fade out. */
+  .bottombar[data-compact] { transform: translateY(4px) scale(.9); --pad: 4px; }
+  .bottombar[data-compact] a { min-height: 42px; gap: 0; font-size: 0; }
+  .bottombar a { transition: min-height 260ms var(--ease), font-size 200ms var(--ease), color var(--t-micro); }
+
+  :root.dark .bottombar { border-color: rgba(169, 221, 244, .16); background: linear-gradient(180deg, rgba(18, 51, 91, .72), rgba(8, 26, 51, .6)); box-shadow: 0 14px 34px -12px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(169, 221, 244, .18); }
+  :root.dark .bottombar::before { background: linear-gradient(180deg, rgba(169, 221, 244, .45), rgba(169, 221, 244, .04) 50%, rgba(169, 221, 244, .18)); }
+  :root.dark .bottombar a[aria-current="page"] { color: #F4FAFF; }
+  :root.dark .bottombar__lens { background: linear-gradient(180deg, rgba(79, 180, 234, .38), rgba(50, 152, 216, .22)); box-shadow: inset 0 1px 0 rgba(169, 221, 244, .35), inset 0 0 0 1px rgba(79, 180, 234, .35); }
+  :root.dark .mtop { background: color-mix(in srgb, var(--background) 70%, transparent); }
+  /* Browsers without backdrop blur get a solid bar rather than unreadable see-through glass. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .bottombar { background: var(--surface); }
+    :root.dark .bottombar { background: var(--surface); }
+  }
+  /* Room for the floating bar at the end of every page. */
+  .footer { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bottombar, .bottombar__lens, .bottombar a { transition: none !important; }
+  .bottombar[data-compact] { transform: none; }
+  :is(.btn, .chip, .dpath, .dapp, .hub-tile, .bchip, .app-card, .rail-promo, .stabs__tab, .icon-btn):active { transform: none; }
+}

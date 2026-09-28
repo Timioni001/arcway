@@ -187,11 +187,33 @@ export function MobileTop() {
 
 const TAB_HREFS = BOTTOM_NAV.filter((n) => n.href !== "/more").map((n) => n.href);
 
+/** iOS-style: the tab bar tucks into a compact pill while you scroll down, and returns on the way up. */
+function useCompactOnScroll() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    let last = window.scrollY;
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (Math.abs(y - last) > 8) { setCompact(y > last && y > 160); last = y; }
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, []);
+  return compact;
+}
+
 export function BottomBar() {
   const pathname = usePathname();
+  const compact = useCompactOnScroll();
   const inTabs = TAB_HREFS.some((h) => isActive(pathname, h));
+  const index = BOTTOM_NAV.findIndex((n) => (n.href === "/more" ? !inTabs : isActive(pathname, n.href)));
   return (
-    <nav className="bottombar" aria-label="Quick">
+    <nav className="bottombar" aria-label="Quick" data-compact={compact || undefined} style={{ "--i": Math.max(index, 0) } as React.CSSProperties}>
+      <span className="bottombar__lens" aria-hidden="true" />
       {BOTTOM_NAV.map((n) => {
         const Icon = n.icon;
         const active = n.href === "/more" ? !inTabs : isActive(pathname, n.href);

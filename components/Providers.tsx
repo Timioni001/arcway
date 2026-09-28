@@ -22,7 +22,13 @@ export function Providers({ children }: { children: ReactNode }) {
       })
   );
   // Marks the page interactive (children's effects have run); used by tests and CSS.
-  useEffect(() => { document.documentElement.dataset.hydrated = "true"; }, []);
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.hydrated = "true";
+    // The opening animation plays once per visit; later page changes are instant (frequent actions stay still).
+    const id = setTimeout(() => { delete root.dataset.intro; }, 1400);
+    return () => clearTimeout(id);
+  }, []);
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>

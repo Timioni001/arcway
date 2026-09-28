@@ -573,3 +573,17 @@ test("widget builder gives copyable snippets", async ({ page }) => {
   await expect(page.locator(".codebox pre").first()).toContainText("/api/badge/aave");
   await expect(page.getByRole("img", { name: "Arcway badge for Aave" })).toBeVisible();
 });
+
+test("mobile glass tab bar: lens follows the page and the bar tucks away while scrolling down", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "mobile layout");
+  await open(page, "/apps");
+  const bar = page.getByRole("navigation", { name: "Quick" });
+  await expect(bar).toHaveAttribute("style", /--i:\s*1/);
+  await page.mouse.wheel(0, 900);
+  await expect(bar).toHaveAttribute("data-compact", "true");
+  await page.mouse.wheel(0, -400);
+  await expect(bar).not.toHaveAttribute("data-compact", /.*/);
+  await bar.getByRole("link", { name: "Quests" }).click();
+  await expect(page).toHaveURL(/\/quests$/);
+  await expect(bar).toHaveAttribute("style", /--i:\s*2/);
+});

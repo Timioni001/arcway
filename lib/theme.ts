@@ -1,7 +1,7 @@
 export const THEME_KEY = "arcway:theme";
 
 /** Runs before paint so the saved or system theme applies without a flash. */
-export const THEME_INIT_SCRIPT = `document.documentElement.classList.add("js");try{var t=localStorage.getItem("${THEME_KEY}");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");var r=localStorage.getItem("arcway:rail");if(r==="collapsed"||r==="expanded")document.documentElement.dataset.rail=r}catch(e){}`;
+export const THEME_INIT_SCRIPT = `document.documentElement.classList.add("js");document.documentElement.dataset.intro="1";try{var t=localStorage.getItem("${THEME_KEY}");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark");var r=localStorage.getItem("arcway:rail");if(r==="collapsed"||r==="expanded")document.documentElement.dataset.rail=r}catch(e){}`;
 
 export const THEME_EVENT = "arcway:theme";
 
