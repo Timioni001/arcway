@@ -1,0 +1,55 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:G;src:url({{FONTDIR}}/geist-sans/Geist-Regular.woff2);font-weight:400}
+@font-face{font-family:G;src:url({{FONTDIR}}/geist-sans/Geist-Medium.woff2);font-weight:500}
+@font-face{font-family:G;src:url({{FONTDIR}}/geist-sans/Geist-SemiBold.woff2);font-weight:600}
+@font-face{font-family:G;src:url({{FONTDIR}}/geist-sans/Geist-Bold.woff2);font-weight:700}
+@font-face{font-family:M;src:url({{FONTDIR}}/geist-mono/GeistMono-Medium.woff2);font-weight:500}
+*{margin:0;box-sizing:border-box}
+body{width:{{W}};height:{{H}};font-family:G;color:#0B1B33;background:#fff;overflow:hidden;position:relative}
+.bg{position:absolute;inset:0;background:
+ radial-gradient(42% 60% at 88% 18%,rgba(169,221,244,.55),transparent 70%),
+ radial-gradient(40% 50% at 70% 100%,rgba(79,180,234,.14),transparent 70%),#fff}
+.dots{position:absolute;inset:0;background-image:radial-gradient(rgba(36,108,176,.13) 1.2px,transparent 1.3px);background-size:28px 28px;
+ -webkit-mask-image:radial-gradient(60% 80% at 80% 45%,#000 20%,transparent 75%)}
+.wrap{position:absolute;inset:0;padding:{{PAD}}px;display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:14px;font-weight:700;font-size:34px;letter-spacing:-.03em}
+.logo svg{width:48px;height:48px}
+.pill{display:inline-flex;align-items:center;gap:10px;margin-top:auto;align-self:flex-start;padding:9px 16px 9px 12px;border-radius:99px;border:1px solid #D6E6F3;background:#fff;font-size:19px;font-weight:500;color:#33506E;box-shadow:0 6px 20px -10px rgba(23,62,120,.25)}
+.pill i{width:10px;height:10px;border-radius:50%;background:#3298D8;box-shadow:0 0 0 5px rgba(50,152,216,.18)}
+h1{font-size:{{HEAD}}px;line-height:.98;letter-spacing:-.045em;font-weight:700;margin-top:26px;max-width:{{MAXW}}}
+h1 b{background:linear-gradient(90deg,#3298D8,#246CB0);-webkit-background-clip:text;color:transparent}
+p{font-size:{{SUB}}px;line-height:1.45;color:#4A6280;margin-top:24px;max-width:{{SUBW}}}
+.chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;max-width:{{CHW}}}
+.chip{padding:11px 18px;border-radius:14px;border:1px solid #DCE9F4;background:rgba(255,255,255,.9);font-size:19px;font-weight:600;color:#17365E}
+.chip span{font-family:M;color:#3298D8;margin-right:8px;font-size:16px}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font-size:18px;color:#6A819C;font-weight:500}
+.foot b{color:#0B1B33;font-weight:600}
+.art{position:absolute;{{ARTPOS}}}
+.form{position:absolute;top:50%;left:50%;width:120px;height:400px;border-radius:60px;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,#fff) 0%,var(--c) 42%,color-mix(in srgb,var(--c) 78%,#10224A) 100%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -36px 48px rgba(16,34,74,.18),-22px 30px 50px rgba(23,62,120,.18);
+ transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(-12deg)}
+.card{position:absolute;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid #E1ECF5;box-shadow:0 18px 40px -18px rgba(23,62,120,.35);font-weight:600;font-size:18px;white-space:nowrap}
+.card small{display:block;font-weight:500;font-size:14px;color:#6A819C;margin-top:2px}
+.card .n{font-family:M;font-size:15px;color:#fff;background:linear-gradient(135deg,#4FB4EA,#246CB0);width:36px;height:36px;border-radius:11px;display:grid;place-items:center}
+</style></head><body>
+<div class="bg"></div><div class="dots"></div>
+<div class="art">
+ <div class="form" style="--c:#A9DDF4;--x:-150px;--y:48px"></div>
+ <div class="form" style="--c:#75C9F3;--x:-75px;--y:18px"></div>
+ <div class="form" style="--c:#4FB4EA;--x:0px;--y:-12px"></div>
+ <div class="form" style="--c:#3298D8;--x:75px;--y:-42px"></div>
+ <div class="form" style="--c:#246CB0;--x:150px;--y:-72px"></div>
+ <div class="card" style="{{CARD1}}"><span class="n">01</span><span>Find apps on Arc<small>Every app, by what it does</small></span></div>
+ <div class="card" style="{{CARD2}}"><span class="n">02</span><span>Learn with quests<small>Short, hands-on, no jargon</small></span></div>
+ <div class="card" style="{{CARD3}}"><span class="n">03</span><span>Earn your passport<small>XP recorded on Arc</small></span></div>
+</div>
+<div class="wrap">
+ <div class="logo"><svg viewBox="0 0 32 32" fill="none"><defs><linearGradient id="g" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#3298D8"/><stop offset="1" stop-color="#173E78"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#g)"/><path d="M8 23v-6a8 8 0 0 1 16 0" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="24" cy="22" r="2.8" fill="#A9DDF4"/></svg>arcway</div>
+ <div class="pill"><i></i>Coming soon to Arc mainnet</div>
+ <h1>Your guide to <b>Arc</b>.</h1>
+ <p>Find apps worth trying, learn how Arc works, and earn a passport as you go. Free, no sign-up.</p>
+ <div class="chips"><div class="chip"><span>01</span>Discover</div><div class="chip"><span>02</span>Learn</div><div class="chip"><span>03</span>Earn XP</div><div class="chip"><span>04</span>Live data</div></div>
+ <div class="foot"><span>Built for the <b>Arc</b> ecosystem</span><span>Independent · Not affiliated with Circle</span></div>
+</div>
+</body></html>
