@@ -1690,9 +1690,12 @@ body { background: var(--background); }
 }
 
 /* Bars lift off the content once you scroll (scroll-driven, no JS; older browsers keep the flat bar). */
-@keyframes bar-lift { to { box-shadow: 0 8px 24px -14px rgba(11, 18, 32, .28); border-bottom-color: var(--canvas-line); } }
+/* The shadow lives on a pseudo-element and only its opacity animates, so scrolling never repaints the bar. */
+.topbar::after, .mtop::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 14px; pointer-events: none; opacity: 0;
+  background: linear-gradient(180deg, rgba(11, 18, 32, .08), transparent); }
+@keyframes bar-lift { to { opacity: 1; } }
 @supports (animation-timeline: scroll()) {
-  .topbar, .mtop { animation: bar-lift linear both; animation-timeline: scroll(root); animation-range: 0 72px; }
+  .topbar::after, .mtop::after { animation: bar-lift linear both; animation-timeline: scroll(root); animation-range: 0 72px; }
 }
 
 /* ---------- Mobile: floating glass tab bar ---------- */
@@ -1750,3 +1753,25 @@ body { background: var(--background); }
   .bottombar[data-compact] { transform: none; }
   :is(.btn, .chip, .dpath, .dapp, .hub-tile, .bchip, .app-card, .rail-promo, .stabs__tab, .icon-btn):active { transform: none; }
 }
+
+/* ---------- Performance: keep taps and scrolling inside the frame budget ---------- */
+html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+/* Floating dots: no per-dot blur filter (it forced a repaint every frame). */
+.fdots i { filter: none; }
+/* Off-screen or background-tab decoration is paused. */
+[data-idle] *, [data-idle]::before, [data-idle]::after, [data-idle] i, :root[data-hidden] * { animation-play-state: paused !important; }
+/* Phones and touch screens: entrances play once, endless decorative loops do not run at all. */
+@media (pointer: coarse), (max-width: 767px) {
+  .fdots i { animation: none; }
+  .hero__art .form { animation: form-rise 900ms var(--ease) both; }
+  .hero__art .float-chip { animation: chip-in 700ms var(--ease) forwards; animation-delay: calc(700ms + var(--depth) * 12ms); }
+  .emap__pulse { animation: none; }
+  .shimmer { animation: word-in 800ms var(--ease) both; animation-delay: calc(var(--i) * 70ms + 80ms); }
+  .hero__bloom { filter: none; }
+}
+/* Faster, shorter scroll reveal. */
+.js .reveal { transform: translateY(10px); transition-duration: 380ms; }
+/* The Arc pillars sit on a flat gradient: a live backdrop blur there cost a full repaint per scroll frame for no visible gain. */
+.pillar { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255, 255, 255, .12); }
+.featured-visual__mark { -webkit-backdrop-filter: none; backdrop-filter: none; }
+@media (max-width: 767px) { .bottombar { -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8); } }

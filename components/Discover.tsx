@@ -2,7 +2,7 @@
 
 import { Bookmark, Search, SearchX } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useId, useMemo, useState } from "react";
+import { useDeferredValue, useId, useMemo, useState } from "react";
 import { buildersFrom } from "../lib/builders";
 import { useArcwayState } from "../lib/hooks/context";
 import { APPS, CATEGORIES, STATUS_FILTER_LABEL, availableStatusFilters, discoverApps, matchesStatus, type Category, type StatusFilter } from "../lib/registry";
@@ -27,20 +27,26 @@ export function Discover() {
   const saved = useSavedApps();
   const sortId = useId();
   const searchId = useId();
-  const term = search.trim().toLowerCase();
+  // The chips and the search box update on the same frame as the tap; the list follows right after.
+  const view = {
+    category: useDeferredValue(category), search: useDeferredValue(search), savedOnly: useDeferredValue(savedOnly),
+    status: useDeferredValue(status), sort: useDeferredValue(sort)
+  };
+  const term = view.search.trim().toLowerCase();
 
   const apps = useMemo(() => {
+    const { category, search, savedOnly, status, sort } = view;
     let list = discoverApps(APPS, { category, search });
     if (savedOnly) list = list.filter((a) => saved.includes(a.id));
     if (status) list = list.filter((a) => matchesStatus(a, status));
     if (sort === "newest") list = [...list].sort((a, b) => b.addedAt.localeCompare(a.addedAt) || a.name.localeCompare(b.name));
     if (sort === "az") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
     return list;
-  }, [category, search, savedOnly, saved, sort, status]);
+  }, [view.category, view.search, view.savedOnly, view.status, view.sort, saved]);
   const quests = term ? questViews.filter((q) => `${q.title} ${q.description}`.toLowerCase().includes(term)) : [];
   const builders = term ? buildersFrom().filter((b) => b.name.toLowerCase().includes(term)) : [];
   const categories = CATEGORIES;
-  const featured = !term && !category && !savedOnly && !status && sort === "recommended" ? apps.find((a) => a.featured) : undefined;
+  const featured = !term && !view.category && !view.savedOnly && !view.status && view.sort === "recommended" ? apps.find((a) => a.featured) : undefined;
   const total = apps.length + quests.length + builders.length;
 
   return (

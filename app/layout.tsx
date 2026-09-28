@@ -6,6 +6,7 @@ import { Providers } from "../components/Providers";
 import { BottomBar, MobileTop, Rail, Topbar } from "../components/AppShell";
 import { SearchPalette } from "../components/SearchPalette";
 import { Footer } from "../components/Shell";
+import { AmbientPause } from "../components/AmbientPause";
 import { SpotlightTracker } from "../components/SpotlightTracker";
 import { Celebrate } from "../components/Celebrate";
 import { THEME_INIT_SCRIPT } from "../lib/theme";
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <BottomBar />
           <SearchPalette />
           <SpotlightTracker />
+          <AmbientPause />
           <Celebrate />
         </Providers>
       </body>

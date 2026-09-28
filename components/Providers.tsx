@@ -25,9 +25,12 @@ export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.hydrated = "true";
+    // iOS Safari only shows :active press states when a touch listener exists.
+    const noop = () => {};
+    document.addEventListener("touchstart", noop, { passive: true });
     // The opening animation plays once per visit; later page changes are instant (frequent actions stay still).
     const id = setTimeout(() => { delete root.dataset.intro; }, 1400);
-    return () => clearTimeout(id);
+    return () => { clearTimeout(id); document.removeEventListener("touchstart", noop); };
   }, []);
   return (
     <WagmiProvider config={wagmiConfig}>
