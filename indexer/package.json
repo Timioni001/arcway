@@ -1,0 +1,14 @@
+{
+  "name": "arcway-indexer",
+  "private": true,
+  "description": "Envio HyperIndex indexer for the Arcway Passport on Arc",
+  "scripts": {
+    "codegen": "envio codegen",
+    "dev": "envio dev",
+    "start": "envio start"
+  },
+  "dependencies": {
+    "envio": "3.12.1"
+  },
+  "engines": { "node": ">=20" }
+}

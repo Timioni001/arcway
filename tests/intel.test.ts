@@ -132,6 +132,7 @@ describe("protocol intelligence", () => {
 import { encodeAbiParameters, encodeEventTopics } from "viem";
 import { passportAbi } from "../lib/abi";
 import { buildPassportStats, seasonOf } from "../lib/intel";
+import { toCompletion } from "../lib/server/indexer";
 import { questHash } from "../lib/quests";
 
 describe("passport stats", () => {
@@ -166,5 +167,19 @@ describe("passport stats", () => {
   });
   it("reports an undeployed contract without inventing numbers", () => {
     expect(buildPassportStats({ address: null, logs: null })).toMatchObject({ deployed: false, passports: 0, xp: 0, transactions: null });
+  });
+  it("gives the same stats from indexer rows as from explorer logs, and says which source", () => {
+    const rows = [
+      toCompletion({ user: A, questId: questHash("arrive-with-usdc"), xp: "10", timestamp: Date.parse("2026-08-30T10:00:00Z") / 1000 }),
+      toCompletion({ user: A, questId: questHash("first-tx"), xp: 25, timestamp: Date.parse("2026-09-02T10:00:00Z") / 1000 }),
+      toCompletion({ user: B, questId: questHash("arrive-with-usdc"), xp: "10", timestamp: Date.parse("2026-09-10T10:00:00Z") / 1000 })
+    ];
+    const fromLogs = buildPassportStats({ address: "0xp", logs, now });
+    const fromIndex = buildPassportStats({ address: "0xp", logs: null, completions: rows, now });
+    expect(fromLogs.source).toBe("explorer");
+    expect(fromIndex.source).toBe("indexer");
+    const { source: _a, ...l } = fromLogs;
+    const { source: _b, ...i } = fromIndex;
+    expect(i).toEqual(l);
   });
 });

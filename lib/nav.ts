@@ -1,5 +1,5 @@
 import {
-  Activity, Award, Blocks, Bookmark, Code2, House, IdCard, LayoutGrid, Link2, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound,
+  Activity, Award, Blocks, Bookmark, Code2, House, IdCard, LayoutGrid, Link2, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound, Wallet,
   type LucideIcon
 } from "lucide-react";
 import { getBuilder } from "./builders";
@@ -22,7 +22,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/", label: "Home", icon: House, blurb: "What Arc and Arcway are" },
       { href: "/apps", label: "Apps", icon: Blocks, blurb: "Find apps to try on Arc" },
       { href: "/quests", label: "Quests", icon: Target, blurb: "Learn Arc by doing, earn XP" },
-      { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your XP, level and badges" }
+      { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your XP, level and badges" },
+      { href: "/wallet", label: "Get a wallet", icon: Wallet, blurb: "Create a free Arc wallet in seconds" }
     ]
   },
   {

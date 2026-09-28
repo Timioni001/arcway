@@ -1,3 +1,4 @@
+import { INDEXER_ENABLED, getIndexedCompletions } from "./indexer";
 import { ARC_NETWORK, PASSPORT_ADDRESS, USDC_ADDRESS, explorer } from "../config";
 import {
   activeApps, buildPassportStats, buildProtocol, type PassportStats, buildPulse, buildRadar, buildSignals, buildSnapshot,
@@ -82,7 +83,14 @@ export async function loadPassport(): Promise<Intel<PassportStats>> {
   if (!PASSPORT_ADDRESS) {
     return { data: buildPassportStats({ address: null, logs: null }), fetchedAt: new Date().toISOString(), network: ARC_NETWORK, unavailable: [] };
   }
-  const [info, counters, logs] = await Promise.all([settle(getAddress(PASSPORT_ADDRESS)), settle(getAddressCounters(PASSPORT_ADDRESS)), settle(getAddressLogs(PASSPORT_ADDRESS))]);
+  const [info, counters] = await Promise.all([settle(getAddress(PASSPORT_ADDRESS)), settle(getAddressCounters(PASSPORT_ADDRESS))]);
+  // Prefer Arcway's own indexer; fall back to scanning the contract's logs on the explorer.
+  const indexed = INDEXER_ENABLED ? await settle(getIndexedCompletions()) : null;
+  if (indexed) {
+    const data = buildPassportStats({ address: PASSPORT_ADDRESS, logs: null, completions: indexed.rows, truncated: indexed.truncated, info, counters });
+    return envelope(data, { info, counters, completions: indexed });
+  }
+  const logs = await settle(getAddressLogs(PASSPORT_ADDRESS));
   const data = buildPassportStats({ address: PASSPORT_ADDRESS, logs: logs?.items ?? null, truncated: logs?.truncated, info, counters });
   return envelope(data, { info, counters, logs });
 }

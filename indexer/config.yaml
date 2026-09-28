@@ -1,0 +1,25 @@
+# Envio HyperIndex: indexes Arcway's passport contract on Arc.
+# Docs: https://docs.envio.dev · Arc support: https://envio.dev/chains/arc-testnet
+name: arcway-indexer
+description: Quest completions, explorers, daily totals for the Arcway Passport on Arc
+contracts:
+  - name: ArcwayPassport
+    abi_file_path: ./abis/ArcwayPassport.json
+    handler: ./src/EventHandlers.ts
+    events:
+      - event: QuestCompleted(address indexed user, bytes32 indexed questId, uint256 xpAwarded)
+        field_selection:
+          transaction_fields:
+            - hash
+      - event: BadgeAwarded(address indexed user, bytes32 indexed badgeId)
+        field_selection:
+          transaction_fields:
+            - hash
+chains:
+  # Arc Testnet. Add the mainnet chain id and address here once the passport is deployed there.
+  - id: 5042002
+    start_block: ${ENVIO_START_BLOCK:-0}
+    contracts:
+      - name: ArcwayPassport
+        address:
+          - ${ENVIO_PASSPORT_ADDRESS}

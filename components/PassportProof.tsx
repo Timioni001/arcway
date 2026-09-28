@@ -42,7 +42,7 @@ export function PassportProof() {
           </a>
           <div className="proof__tags">
             {p.verified ? <span className="badge badge--live"><BadgeCheck aria-hidden="true" />Source verified</span> : p.verified === false ? <span className="badge">Source not verified yet</span> : null}
-            <SourceTag source="observed" period="Contract events" />
+            <SourceTag source="observed" period={p.source === "indexer" ? "Arcway indexer" : "Contract events"} />
             <Freshness fetchedAt={q.data?.fetchedAt} fetching={q.isFetching && !q.isPending} unavailable={q.data?.unavailable} />
           </div>
         </div>

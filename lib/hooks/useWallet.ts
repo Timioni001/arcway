@@ -1,9 +1,11 @@
 'use client';
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnect, useConnection, useConnectors, useDisconnect, useSwitchChain } from "wagmi";
 import { arcChain } from "../config";
 import { humanizeError } from "../errors";
+import { savedPasskey } from "../passkey";
+import { PASSKEY_CONNECTOR_ID } from "../passkeyConnector";
 
 /**
  * Wallet actions with user-facing error messages.
@@ -17,10 +19,16 @@ export function useWallet() {
   const switchMutation = useSwitchChain();
   const [error, setError] = useState<string | null>(null);
 
+  // The passkey wallet is offered on its own, not mixed into the browser-wallet list.
+  const passkey = connectors.find((c) => c.id === PASSKEY_CONNECTOR_ID);
+  const [hasPasskey, setHasPasskey] = useState(false);
+  useEffect(() => setHasPasskey(Boolean(passkey && savedPasskey())), [passkey]);
+
   // Prefer EIP-6963 announced wallets; hide the generic fallback when a named one exists.
   const available = useMemo(() => {
-    const named = connectors.filter((c) => c.id !== "injected");
-    return named.length ? named : connectors;
+    const browser = connectors.filter((c) => c.id !== PASSKEY_CONNECTOR_ID);
+    const named = browser.filter((c) => c.id !== "injected");
+    return named.length ? named : browser;
   }, [connectors]);
 
   const hasBrowserWallet =
@@ -29,9 +37,10 @@ export function useWallet() {
   const connect = useCallback(
     async (connectorId?: string) => {
       setError(null);
-      const connector = available.find((c) => c.id === connectorId) ?? available[0];
-      if (!connector || !hasBrowserWallet) {
-        setError("No browser wallet found. Install a wallet extension, then reload this page.");
+      const usePasskey = passkey && (connectorId === PASSKEY_CONNECTOR_ID || (!connectorId && !hasBrowserWallet && savedPasskey()));
+      const connector = usePasskey ? passkey : available.find((c) => c.id === connectorId) ?? available[0];
+      if (!connector || (!usePasskey && !hasBrowserWallet)) {
+        setError("No browser wallet found. Create a free wallet on Arcway, or install a wallet app and reload.");
         return;
       }
       try {
@@ -40,7 +49,7 @@ export function useWallet() {
         setError(humanizeError(e));
       }
     },
-    [available, connectMutation, hasBrowserWallet]
+    [available, connectMutation, hasBrowserWallet, passkey]
   );
 
   const switchToArc = useCallback(async () => {
@@ -61,6 +70,9 @@ export function useWallet() {
     connection,
     connectors: available,
     hasBrowserWallet,
+    /** A passkey wallet was created or used on this device and can sign in again. */
+    hasPasskey,
+    passkeyEnabled: Boolean(passkey),
     connect,
     disconnect,
     switchToArc,

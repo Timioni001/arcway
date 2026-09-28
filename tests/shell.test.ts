@@ -7,7 +7,7 @@ import { parseWatchId, watchId } from "../lib/watchlist";
 describe("navigation", () => {
   it("puts the simple destinations first, technical ones later", () => {
     expect(NAV_GROUPS.map((g) => g.label)).toEqual(["Get started", "Explore Arc", "Live data", "For builders"]);
-    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Home", "Apps", "Quests", "Passport", "Ecosystem", "Builders", "Leaderboard", "Arc today", "Pulse", "Radar", "Signals", "Submit a project", "Badges"]);
+    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Home", "Apps", "Quests", "Passport", "Get a wallet", "Ecosystem", "Builders", "Leaderboard", "Arc today", "Pulse", "Radar", "Signals", "Submit a project", "Badges"]);
     expect(BOTTOM_NAV.map((n) => n.label)).toEqual(["Home", "Apps", "Quests", "Passport", "More"]);
   });
   it("matches the overview only at the root", () => {

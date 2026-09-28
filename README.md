@@ -70,7 +70,24 @@ Use Arc testnet while developing. Mainnet uses real USDC and transactions are ir
 - Circle App Kit / Bridge Kit where appropriate
 - Arc Mainnet
 - Optional Postgres/Supabase for curated app metadata
-- Optional indexer for activity and quest verification
+- Envio HyperIndex indexer for passport data (`indexer/`), with the Arc explorer as fallback
+- Circle Modular Wallets for passkey wallets (optional, `NEXT_PUBLIC_CIRCLE_CLIENT_KEY`)
+
+## Indexer
+
+`indexer/` is an [Envio HyperIndex](https://docs.envio.dev) project for the Arcway Passport on Arc:
+every `QuestCompleted` and `BadgeAwarded` event becomes a queryable row (completions, explorers,
+daily totals). Deploy it on Envio's hosted service and set `ARCWAY_INDEXER_URL`; the app then reads
+passport stats and the leaderboard from it, and falls back to the Arc explorer when it is unset or
+down. See `indexer/README.md`.
+
+## Passkey wallets
+
+`/wallet` lets newcomers create an Arc wallet with a passkey (Face ID, fingerprint or device PIN):
+a Circle smart account with no seed phrase, and gas sponsored through Circle's Gas Station. It
+connects through wagmi like any wallet. Set `NEXT_PUBLIC_CIRCLE_CLIENT_KEY` (Circle Console > Keys >
+Client Keys), register the site's domain as the passkey domain, and add a Gas Station policy for
+Arc. Without a key the page shows it as coming soon and points to wallet apps instead.
 
 ## Network
 

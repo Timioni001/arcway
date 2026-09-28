@@ -1,0 +1,45 @@
+# One row per wallet that has earned XP on the Arcway Passport.
+type Explorer {
+  id: ID!                  # lowercase address
+  xp: BigInt!
+  completions: Int!
+  badges: Int!
+  firstAt: Int!            # unix seconds
+  lastAt: Int!
+}
+
+# Every recorded quest completion, as emitted by QuestCompleted.
+type Completion {
+  id: ID!                  # txHash-logIndex
+  explorer: Explorer!
+  user: String! @index
+  questId: String! @index  # bytes32 quest hash, lowercase hex
+  xp: BigInt!
+  timestamp: Int! @index   # unix seconds
+  block: Int!
+  txHash: String!
+}
+
+type Badge {
+  id: ID!                  # txHash-logIndex
+  user: String! @index
+  badgeId: String!
+  timestamp: Int!
+}
+
+# UTC day buckets for charts: completions, XP and first-time explorers per day.
+type DailyStat {
+  id: ID!                  # YYYY-MM-DD
+  day: String!
+  completions: Int!
+  xp: BigInt!
+  newExplorers: Int!
+}
+
+# Running totals, one row with id "global".
+type Totals {
+  id: ID!
+  explorers: Int!
+  completions: Int!
+  xp: BigInt!
+}

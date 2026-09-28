@@ -16,7 +16,7 @@ const ROUTES = [
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
   "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
   "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave",
-  "/leaderboard", "/submit", "/widgets", "/digest", "/more"
+  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -586,4 +586,23 @@ test("mobile glass tab bar: lens follows the page and the bar tucks away while s
   await bar.getByRole("link", { name: "Quests" }).click();
   await expect(page).toHaveURL(/\/quests$/);
   await expect(bar).toHaveAttribute("style", /--i:\s*2/);
+});
+
+test("get a wallet: passkey option explains itself when not switched on, wallet apps and safety tips are there", async ({ page }) => {
+  await open(page, "/wallet");
+  await expect(page.getByRole("heading", { level: 1, name: "Your first Arc wallet" })).toBeVisible();
+  const passkey = page.getByRole("region", { name: "Create one here with a passkey" });
+  await expect(passkey.getByText("Coming soon")).toBeVisible();
+  await expect(passkey.getByRole("button", { name: "Create my wallet" })).toBeDisabled();
+  const apps = page.getByRole("region", { name: "Or use a wallet app" });
+  await expect(apps.getByRole("link", { name: /MetaMask/ })).toHaveAttribute("href", /metamask\.io/);
+  await expect(page.getByRole("region", { name: "Keep it safe" })).toContainText("Arcway never sees it");
+});
+
+test("no wallet installed: the error points to Get a wallet", async ({ page }) => {
+  await open(page, "/overview");
+  await page.locator(".next-bar").getByRole("button", { name: /Connect wallet/ }).click();
+  await expect(page.getByRole("alert").first()).toContainText("Create a free wallet");
+  await page.locator(".next-bar").getByRole("link", { name: "Get a wallet" }).click();
+  await expect(page).toHaveURL(/\/wallet$/);
 });

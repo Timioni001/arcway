@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useJourneyAction } from "../lib/hooks/actions";
 import { useClaims } from "../lib/hooks/claims";
@@ -53,6 +54,7 @@ export function NextStep({ variant = "card" }: { variant?: "card" | "panel" }) {
         </div>
       )}
       <Status tone="error">{wallet.error}</Status>
+      {wallet.error && !wallet.hasBrowserWallet && <Link href="/wallet" className="btn btn--primary btn--sm" style={{ marginTop: 10 }}>Get a wallet</Link>}
     </>
   );
 

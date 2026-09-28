@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRight, Check, ChevronDown, Copy, LogOut, Wallet } from "lucide-react";
+import { ArrowUpRight, Check, ChevronDown, Copy, Fingerprint, LogOut, Plus, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { PRIMARY_NAV, YOU_NAV } from "../lib/nav";
@@ -10,6 +10,7 @@ import { IS_MAINNET, NETWORK_NAME, arcChain, explorer } from "../lib/config";
 import { formatUsdc, shortAddress } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
 import { useWallet } from "../lib/hooks/useWallet";
+import { PASSKEY_CONNECTOR_ID } from "../lib/passkeyConnector";
 import { Status } from "./Status";
 
 export function WalletButton() {
@@ -57,7 +58,8 @@ export function WalletButton() {
 
   const address = connection.status === "connected" ? connection.address : undefined;
   const onArc = connection.chainId === arcChain.id;
-  const multiple = wallet.connectors.length > 1;
+  // Open the chooser whenever there is more than one way in (or none yet: it links to "Get a wallet").
+  const multiple = wallet.connectors.length + (wallet.hasPasskey ? 1 : 0) > 1 || (wallet.passkeyEnabled && !wallet.hasBrowserWallet);
 
   const copy = async () => {
     try {
@@ -144,13 +146,22 @@ export function WalletButton() {
           ) : (
             <div className="stack" style={{ ["--gap" as string]: "10px" }}>
               <div className="label">Choose a wallet</div>
-              {wallet.connectors.map((c) => (
+              {wallet.hasPasskey && (
+                <button className="btn btn--secondary btn--block" style={{ justifyContent: "flex-start" }} disabled={wallet.connecting} onClick={() => wallet.connect(PASSKEY_CONNECTOR_ID)}>
+                  <Fingerprint aria-hidden="true" />Passkey wallet
+                </button>
+              )}
+              {wallet.hasBrowserWallet && wallet.connectors.map((c) => (
                 <button key={c.uid} className="btn btn--secondary btn--block" style={{ justifyContent: "flex-start" }} disabled={wallet.connecting} onClick={() => wallet.connect(c.id)}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {c.icon ? <img src={c.icon} alt="" width={20} height={20} style={{ borderRadius: 5 }} /> : <Wallet aria-hidden="true" />}
                   {c.name}
                 </button>
               ))}
+              <Link href="/wallet" className="btn btn--ghost btn--block" style={{ justifyContent: "flex-start" }} onClick={() => setOpen(false)}>
+                <Plus aria-hidden="true" />New to Arc? Get a wallet
+              </Link>
+              <Status tone="error">{wallet.error}</Status>
             </div>
           )}
         </div>
@@ -158,7 +169,10 @@ export function WalletButton() {
       {!open && !address && wallet.error && (
         <div className="wallet__panel" role="alert">
           <p className="small">{wallet.error}</p>
-          <button className="btn btn--ghost btn--sm" style={{ marginTop: 8 }} onClick={wallet.clearError}>Dismiss</button>
+          <div className="row" style={{ marginTop: 8, gap: 6 }}>
+            <Link href="/wallet" className="btn btn--primary btn--sm" onClick={wallet.clearError}>Get a wallet</Link>
+            <button className="btn btn--ghost btn--sm" onClick={wallet.clearError}>Dismiss</button>
+          </div>
         </div>
       )}
     </div>

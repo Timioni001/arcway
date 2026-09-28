@@ -470,7 +470,12 @@ export type PassportStats = {
   leaderboard: PassportExplorer[];
   season: { label: string; start: string; leaderboard: PassportExplorer[] };
   truncated: boolean;
+  /** Where the completions were read from: Arcway's own indexer, or the Arc explorer's logs. */
+  source: "indexer" | "explorer";
 };
+
+/** One QuestCompleted event, already decoded (the indexer's Completion rows map straight onto this). */
+export type PassportCompletion = { user: string; quest: string; xp: number; at: string | null };
 
 const QUEST_BY_HASH = new Map(QUESTS.map((q) => [questHash(q.id).toLowerCase(), q]));
 
@@ -485,6 +490,8 @@ export function seasonOf(now: number) {
 export function buildPassportStats(input: {
   address: string | null;
   logs: BsLog[] | null;
+  /** Pre-decoded completions (from the indexer). When given, `logs` is ignored. */
+  completions?: PassportCompletion[] | null;
   truncated?: boolean;
   info?: BsAddress | null;
   counters?: { transactions_count?: string } | null;
@@ -495,13 +502,14 @@ export function buildPassportStats(input: {
   const empty: PassportStats = {
     deployed: Boolean(input.address), address: input.address, verified: input.info?.is_verified ?? null,
     transactions: toInt(input.counters?.transactions_count), passports: 0, xp: 0, completions: 0, byQuest: [],
-    leaderboard: [], season: { ...season, leaderboard: [] }, truncated: Boolean(input.truncated)
+    leaderboard: [], season: { ...season, leaderboard: [] }, truncated: Boolean(input.truncated),
+    source: input.completions ? "indexer" : "explorer"
   };
-  if (!input.address || !input.logs) return empty;
+  if (!input.address || !(input.completions ?? input.logs)) return empty;
 
-  type Row = { user: string; quest: string; xp: number; at: string | null };
-  const rows: Row[] = [];
-  for (const log of input.logs) {
+  type Row = PassportCompletion;
+  const rows: Row[] = input.completions ? input.completions.map((c) => ({ ...c, user: c.user.toLowerCase(), quest: c.quest.toLowerCase() })) : [];
+  for (const log of input.completions ? [] : input.logs ?? []) {
     try {
       const ev = decodeEventLog({ abi: passportAbi, data: log.data as Hex, topics: log.topics.filter(Boolean) as [Hex, ...Hex[]] });
       if (ev.eventName !== "QuestCompleted") continue;

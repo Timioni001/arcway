@@ -57,3 +57,13 @@ export const SUBMIT_APP_URL =
 /** Where people reach the team (terms, privacy, support). */
 export const CONTACT_URL = process.env.NEXT_PUBLIC_CONTACT_URL || "https://github.com/Timioni001/arcway/issues";
 export const LEGAL_UPDATED = "September 26, 2026";
+
+/**
+ * Passkey wallets via Circle Modular Wallets (smart accounts with Face ID / fingerprint, fees sponsored).
+ * Needs a Client Key from the Circle Console and the site's domain registered there as the passkey domain.
+ * NEXT_PUBLIC_CIRCLE_CHAIN is Circle's path name for the network ("arcTestnet" on testnet).
+ */
+export const CIRCLE_CLIENT_KEY = process.env.NEXT_PUBLIC_CIRCLE_CLIENT_KEY || "";
+export const CIRCLE_CLIENT_URL = process.env.NEXT_PUBLIC_CIRCLE_CLIENT_URL || "https://modular-sdk.circle.com/v1/rpc/w3s/buidl";
+export const CIRCLE_CHAIN = process.env.NEXT_PUBLIC_CIRCLE_CHAIN || (IS_MAINNET ? "" : "arcTestnet");
+export const PASSKEY_WALLETS = Boolean(CIRCLE_CLIENT_KEY && CIRCLE_CHAIN);

@@ -12,6 +12,7 @@
     "check": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
+    "@circle-fin/modular-wallets-core": "1.0.16",
     "@tanstack/react-query": "^5.103.2",
     "geist": "^1.7.2",
     "lucide-react": "^1.48.0",
@@ -30,5 +31,10 @@
     "@types/react-dom": "^19",
     "typescript": "^5.9.3",
     "vitest": "^5.0.1"
+  },
+  "overrides": {
+    "@circle-fin/modular-wallets-core": {
+      "viem": "$viem"
+    }
   }
 }

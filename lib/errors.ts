@@ -32,7 +32,7 @@ export function humanizeError(error: unknown): string {
     return "Your wallet already has a request open. Check your wallet window.";
   }
   if (has((e) => e.name === "ConnectorNotFoundError" || e.name === "ProviderNotFoundError")) {
-    return "No browser wallet found. Install a wallet extension, then reload this page.";
+    return "No browser wallet found. Create a free wallet on Arcway, or install a wallet app and reload.";
   }
   if (has((e) => e.code === 4902) || text.includes("unrecognized chain")) {
     return `Your wallet doesn't know ${arcChain.name} yet. Approve adding it when your wallet asks.`;
