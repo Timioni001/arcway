@@ -16,7 +16,7 @@ const ROUTES = [
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
   "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
   "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave",
-  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet"
+  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet", "/campaigns", "/launch"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -617,3 +617,35 @@ for (const route of ROUTES) {
     expect(errors).toEqual([]);
   });
 }
+
+test("campaigns: empty state explains itself and points projects to launching", async ({ page }) => {
+  await open(page, "/campaigns");
+  await expect(page.getByRole("heading", { level: 1, name: "Live campaigns on Arc" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No live campaigns yet" })).toBeVisible();
+  await expect(page.getByRole("list", { name: "Ways a pool is shared" }).getByRole("listitem")).toHaveCount(3);
+  await page.locator(".cpg-empty").getByRole("link", { name: "Launch a campaign" }).click();
+  await expect(page).toHaveURL(/\/launch$/);
+});
+
+test("launch a campaign: the form checks the rules and previews the reward", async ({ page }) => {
+  await open(page, "/launch");
+  await page.getByLabel("Project", { exact: true }).fill("Tipjar");
+  await page.getByLabel("Title").fill("First tip week");
+  await page.getByLabel("What people get to do").fill("Send one tip on Arc and share the pool.");
+  await page.getByLabel("Task 1 contract addresses").fill("0x00000000000000000000000000000000000000AB");
+  await page.getByLabel("Pool (USDC)").fill("500");
+  await page.getByLabel("Number of rewards").fill("100");
+  const preview = page.getByRole("complementary", { name: "Summary" });
+  await expect(preview).toContainText("500 USDC");
+  await expect(preview).toContainText("5 USDC each for the first 100 people");
+  // An uneven first-come pool is caught before any wallet step.
+  await page.getByLabel("Pool (USDC)").fill("100");
+  await page.getByLabel("Number of rewards").fill("3");
+  await expect(preview).toContainText("—");
+  // Switching to a prize draw re-labels the winners field and updates the preview.
+  await page.locator(".lc-mode", { hasText: "Prize draw" }).click();
+  await page.getByLabel("Pool (USDC)").fill("300");
+  await page.getByLabel("Winners to draw").fill("3");
+  await expect(preview).toContainText("3 winners drawn, 100 USDC each");
+  await expect(page.getByText(/escrow isn.t deployed/)).toBeVisible();
+});

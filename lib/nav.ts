@@ -1,8 +1,9 @@
 import {
-  Activity, Award, Blocks, Bookmark, Code2, House, IdCard, LayoutGrid, Link2, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound, Wallet,
+  Activity, Award, Blocks, Gift, Megaphone, Bookmark, Code2, House, IdCard, LayoutGrid, Link2, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound, Wallet,
   type LucideIcon
 } from "lucide-react";
 import { getBuilder } from "./builders";
+import { getCampaignMeta } from "./campaigns";
 import { getQuest } from "./quests";
 import { getApp } from "./registry";
 import { TRAILS } from "./trails";
@@ -31,7 +32,8 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/ecosystem", label: "Ecosystem", icon: Network, blurb: "Every app, by category, on one map" },
       { href: "/builders", label: "Builders", icon: Code2, blurb: "The teams behind the apps" },
-      { href: "/leaderboard", label: "Leaderboard", icon: Trophy, blurb: "Top explorers this season" }
+      { href: "/leaderboard", label: "Leaderboard", icon: Trophy, blurb: "Top explorers this season" },
+      { href: "/campaigns", label: "Campaigns", icon: Gift, blurb: "Complete tasks, share a USDC prize pool" }
     ]
   },
   {
@@ -47,6 +49,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "For builders",
     items: [
       { href: "/submit", label: "Submit a project", icon: Rocket, blurb: "Get your Arc app listed" },
+      { href: "/launch", label: "Launch a campaign", icon: Megaphone, blurb: "Reward people for trying your app" },
       { href: "/widgets", label: "Badges", icon: Award, blurb: "Show your app is live on Arc" }
     ]
   }
@@ -103,6 +106,7 @@ export function crumbsFor(pathname: string): Crumb[] {
     first === "builders" ? getBuilder(second)?.name :
     first === "quests" ? getQuest(second)?.title :
     first === "trails" ? TRAILS.find((t) => t.id === second)?.title :
+    first === "campaigns" ? getCampaignMeta(second)?.title :
     first === "passport" || first === "pay" ? `${second.slice(0, 6)}…${second.slice(-4)}` :
     undefined;
   return [sectionCrumb, { label: name ?? "Details" }];

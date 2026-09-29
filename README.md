@@ -81,6 +81,23 @@ daily totals). Deploy it on Envio's hosted service and set `ARCWAY_INDEXER_URL`;
 passport stats and the leaderboard from it, and falls back to the Arc explorer when it is unset or
 down. See `indexer/README.md`.
 
+## Campaigns
+
+Projects can launch live campaigns with a USDC prize pool (`/launch`), and people join for free
+(`/campaigns`). The pool is locked in `contracts/src/ArcwayCampaigns.sol`:
+
+- **First come**: a fixed reward paid on entry until the pool runs out.
+- **Prize draw**: N winners drawn after the end; **Shared pool**: split equally between entrants.
+- Entry needs a signature from Arcway's verifier after it checks the tasks on Arc (use the app,
+  hold USDC, finish an Arcway quest). Draw results are computed from the on-chain entries and the
+  hash of the first Arc block after the end, published as a Merkle root, and claimed with a proof.
+- Neither Arcway nor the verifier can withdraw a pool. Only the project can take leftovers back:
+  before it starts, if nobody joined, if results are 3 days late, or after the claim window.
+
+Launching creates the campaign on chain; the project then sends it for listing (a pre-filled issue
+with the description hash stored on chain). Deploy with `contracts/script/DeployCampaigns.s.sol` and
+set `NEXT_PUBLIC_CAMPAIGNS_CONTRACT`.
+
 ## Passkey wallets
 
 `/wallet` lets newcomers create an Arc wallet with a passkey (Face ID, fingerprint or device PIN):

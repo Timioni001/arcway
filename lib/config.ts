@@ -39,6 +39,7 @@ export const explorer = {
   home: explorerBase,
   page: (path: string) => `${explorerBase}${path}`,
   tx: (hash: string) => `${explorerBase}/tx/${hash}`,
+  block: (n: string | number) => `${explorerBase}/block/${n}`,
   address: (address: string) => `${explorerBase}/address/${address}`,
   /** Blockscout v2 REST base, e.g. https://testnet.arcscan.app/api/v2 */
   apiV2: explorerBase ? `${explorerBase}/api/v2` : undefined
@@ -67,3 +68,6 @@ export const CIRCLE_CLIENT_KEY = process.env.NEXT_PUBLIC_CIRCLE_CLIENT_KEY || ""
 export const CIRCLE_CLIENT_URL = process.env.NEXT_PUBLIC_CIRCLE_CLIENT_URL || "https://modular-sdk.circle.com/v1/rpc/w3s/buidl";
 export const CIRCLE_CHAIN = process.env.NEXT_PUBLIC_CIRCLE_CHAIN || (IS_MAINNET ? "" : "arcTestnet");
 export const PASSKEY_WALLETS = Boolean(CIRCLE_CLIENT_KEY && CIRCLE_CHAIN);
+
+/** ArcwayCampaigns escrow ON THE SAME NETWORK. Until it is set, campaigns can be previewed but not launched. */
+export const CAMPAIGNS_ADDRESS = optionalAddress(process.env.NEXT_PUBLIC_CAMPAIGNS_CONTRACT);
