@@ -11,8 +11,8 @@ import { FollowButton } from "../../../components/SaveButton";
 import { ExternalLink } from "../../../components/Status";
 import { builderId } from "../../../lib/builders";
 import { NETWORK_NAME } from "../../../lib/config";
-import { timeAgo } from "../../../lib/format";
 import { APPS, appContracts, appLink, getApp, isVerified } from "../../../lib/registry";
+import { RelativeDate } from "../../../components/RelativeDate";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -111,7 +111,7 @@ export default async function ProtocolPage({ params }: Props) {
               <div><dt>Verified by Arcway</dt><dd><Fact ok={verified}>{verified ? "Yes" : "Not yet"}</Fact></dd></div>
               <div><dt>Counts for quests</dt><dd><Fact ok={verified}>{verified ? "Yes" : "Not yet"}</Fact></dd></div>
               {verified && app.verification && <div><dt>Checked against</dt><dd><ExternalLink href={app.verification.sourceUrl}>Team&apos;s source</ExternalLink></dd></div>}
-              {verified && app.verification && <div><dt>Last checked</dt><dd>{timeAgo(app.verification.checkedAt)}</dd></div>}
+              {verified && app.verification && <div><dt>Last checked</dt><dd><RelativeDate iso={app.verification.checkedAt} /></dd></div>}
             </dl>
           </section>
           {app.builder && (

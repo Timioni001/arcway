@@ -8,13 +8,15 @@ import { AppMark } from "./CategoryIcon";
 import { ChangeRows } from "./HomeIntel";
 import { Freshness, IntelGate, PanelHead, SignalList } from "./Intel";
 import { APPS } from "../lib/registry";
+import { useClientDate } from "../lib/hooks/useClientDate";
 
 /** Arc today in one page: what changed, the notable signals, and new listings. Shareable, subscribable. */
 export function DigestView() {
   const radar = useIntel("radar");
   const signals = useIntel("signals");
   const [copied, setCopied] = useState(false);
-  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
+  const now = useClientDate();
+  const today = now ? now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" }) : "Today";
   const share = async () => {
     try { await navigator.clipboard.writeText(window.location.href); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* ignore */ }
   };

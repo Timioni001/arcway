@@ -606,3 +606,14 @@ test("no wallet installed: the error points to Get a wallet", async ({ page }) =
   await page.locator(".next-bar").getByRole("link", { name: "Get a wallet" }).click();
   await expect(page).toHaveURL(/\/wallet$/);
 });
+
+// Static pages are built once; a visitor days later must still hydrate without mismatches.
+for (const route of ROUTES) {
+  test(`${route} hydrates cleanly on a later day than the build`, async ({ page }) => {
+    await page.clock.install({ time: Date.now() + 3 * 24 * 60 * 60 * 1000 });
+    const errors = watchErrors(page);
+    await open(page, route);
+    await page.waitForTimeout(500);
+    expect(errors).toEqual([]);
+  });
+}

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { useBlockNumber } from "wagmi";
 import { NETWORK_NAME, arcChain } from "../lib/config";
-import { timeAgo } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
 import { useActivity } from "../lib/hooks/useActivity";
 import { useCountUp } from "../lib/hooks/useCountUp";
@@ -15,6 +14,8 @@ import { APPS, CATEGORIES, newestApps, type Category } from "../lib/registry";
 import { currentStreak, lastDays } from "../lib/streak";
 import { AppMark, CATEGORY_META, CategoryTile } from "./CategoryIcon";
 import { useSavedApps } from "./SaveButton";
+import { useClientDate } from "../lib/hooks/useClientDate";
+import { RelativeDate } from "./RelativeDate";
 
 function Stat({ icon, label, value, sub, children }: { icon: ReactNode; label: string; value: ReactNode; sub: ReactNode; children?: ReactNode }) {
   return (
@@ -59,11 +60,16 @@ export function OverviewStats() {
 export function ActivityStrip() {
   const { connection } = useArcwayState();
   const activity = useActivity();
-  const days = useMemo(() => lastDays((activity.data?.items ?? []).map((t) => t.timestamp), 14), [activity.data]);
+  // Dates only after hydration (see useClientDate); until then the 14 cells render without labels.
+  const now = useClientDate();
+  const days = useMemo(
+    () => (now ? lastDays((activity.data?.items ?? []).map((t) => t.timestamp), 14, now) : Array.from({ length: 14 }, (_, i) => ({ day: `pending-${i}`, count: 0 }))),
+    [activity.data, now]
+  );
   const connected = connection.status === "connected";
   const step = (n: number) => (n === 0 ? 0 : n === 1 ? 1 : n <= 3 ? 2 : 3);
   const active = days.filter((d) => d.count > 0).length;
-  const fmt = (k: string) => new Date(`${k}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const fmt = (k: string) => (k.startsWith("pending") ? "…" : new Date(`${k}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" }));
 
   return (
     <section className="card pad" aria-labelledby="strip-title">
@@ -166,7 +172,7 @@ export function NewApps() {
               <AppMark app={a} size="sm" />
               <span style={{ minWidth: 0 }}>
                 <span style={{ display: "block", fontWeight: 600 }}>{a.name}</span>
-                <span className="xs secondary">{a.category} · added {timeAgo(a.addedAt)}</span>
+                <span className="xs secondary">{a.category} · added <RelativeDate iso={a.addedAt} /></span>
               </span>
               <span className="cat-dot" style={{ background: CATEGORY_META[a.category].color }} aria-hidden="true" />
             </Link>
