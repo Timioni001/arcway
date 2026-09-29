@@ -3,9 +3,9 @@
 import { ArrowUpRight, Check, ChevronDown, Copy, Fingerprint, LogOut, Plus, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
-import { PRIMARY_NAV, YOU_NAV } from "../lib/nav";
+import { FOLDED_VIEWS, YOU_NAV } from "../lib/nav";
 
-const WALLET_LINKS = [...PRIMARY_NAV.filter((n) => n.href === "/passport"), ...YOU_NAV];
+const WALLET_LINKS = [...FOLDED_VIEWS.filter((n) => n.href === "/passport"), ...YOU_NAV.filter((n) => n.href !== "/wallet")];
 import { IS_MAINNET, NETWORK_NAME, arcChain, explorer } from "../lib/config";
 import { formatUsdc, shortAddress } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";

@@ -4,10 +4,11 @@ import {
   activeApps, buildPassportStats, buildProtocol, type PassportStats, buildPulse, buildRadar, buildSignals, buildSnapshot,
   type Intel, type ProtocolIntel, type PulseEvent, type Radar, type Signal, type Snapshot
 } from "../intel";
+import { buildAssetDetail, buildAssets, type Asset, type AssetDetail } from "../assets";
 import { APPS, appContracts, getApp, type ArcApp } from "../registry";
 import {
   getAddress, getAddressCounters, getAddressLogs, getAddressTxs, getContractCounters, getHotContracts, getLatestTxs,
-  getStats, getTokenCounters, getTokenTransfers, getTxChart, getVerifiedContracts, settle
+  getStats, getToken, getTokenCounters, getTokenTransfers, getTokens, getTxChart, getVerifiedContracts, settle
 } from "./explorer";
 
 /** Thrown when every source for a view failed; routes turn it into a 502. */
@@ -76,6 +77,24 @@ export async function loadProtocol(slug: string): Promise<Intel<ProtocolIntel> |
   const parts = Object.fromEntries(intel.contracts.map((c) => [c.address, c.txCount === null && c.lastActive === null ? null : c]));
   if (!intel.measurable) return { data: intel, fetchedAt: new Date().toISOString(), network: ARC_NETWORK, unavailable: [] };
   return envelope(intel, parts);
+}
+
+/** Tokens on Arc, ranked by holders. */
+export async function loadAssets(): Promise<Intel<Asset[]>> {
+  const tokens = await settle(getTokens());
+  return envelope(buildAssets(tokens ?? []), { tokens });
+}
+
+/** One token: explorer metadata, counters, recent transfers and the listed apps seen in them. */
+export async function loadAsset(address: string): Promise<Intel<AssetDetail> | undefined> {
+  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) return undefined;
+  const [token, counters, transfers] = await Promise.all([settle(getToken(address)), settle(getTokenCounters(address)), settle(getTokenTransfers(address))]);
+  if (!token) {
+    if (counters || transfers) return undefined;
+    throw new IntelUnavailable("Arc data is unavailable right now.");
+  }
+  const data = buildAssetDetail({ token, counters, transfers, network: ARC_NETWORK });
+  return data ? envelope(data, { token, counters, transfers }) : undefined;
 }
 
 /** Arcway's own passport contract on this network: proof of onchain use, and the leaderboard. */

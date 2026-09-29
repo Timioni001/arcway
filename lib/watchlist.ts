@@ -1,16 +1,16 @@
 import { readJson, writeJson } from "./storage";
 
 /**
- * What someone follows, kept in this browser: protocols, builders and categories.
+ * What someone follows, kept in this browser: protocols, builders, categories and assets.
  * Ids are typed ("app:uniswap", "builder:circle", "category:Payments") so one list covers all.
  * Replaces the older saved-apps list and migrates it on first read.
  */
-export type WatchKind = "app" | "builder" | "category";
+export type WatchKind = "app" | "builder" | "category" | "asset";
 export const watchId = (kind: WatchKind, key: string) => `${kind}:${key}`;
 export function parseWatchId(id: string): { kind: WatchKind; key: string } | null {
   const i = id.indexOf(":");
   const kind = id.slice(0, i) as WatchKind;
-  return i > 0 && (kind === "app" || kind === "builder" || kind === "category") ? { kind, key: id.slice(i + 1) } : null;
+  return i > 0 && (kind === "app" || kind === "builder" || kind === "category" || kind === "asset") ? { kind, key: id.slice(i + 1) } : null;
 }
 
 const KEY = "arcway:watchlist";

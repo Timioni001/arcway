@@ -123,6 +123,8 @@ export const getHotContracts = (scale: "1d" | "7d" = "1d") =>
 export const getVerifiedContracts = () => get<{ items?: BsVerifiedContract[] }>("/smart-contracts", 120).then((b) => b.items ?? []);
 export const getLatestTxs = () => get<BsTx[] | { items?: BsTx[] }>("/main-page/transactions", 10).then((b) => (Array.isArray(b) ? b : b.items ?? []));
 export const getTokenTransfers = (token: string) => get<{ items?: BsTokenTransfer[] }>(`/tokens/${token}/transfers`, 15).then((b) => b.items ?? []);
+export const getTokens = () => get<{ items?: import("../assets").BsToken[] }>("/tokens?type=ERC-20", 300).then((b) => b.items ?? []);
+export const getToken = (token: string) => get<import("../assets").BsToken>(`/tokens/${token}`, 300);
 export const getTokenCounters = (token: string) => get<BsTokenCounters>(`/tokens/${token}/counters`, 120);
 export const getAddress = (address: string) => get<BsAddress>(`/addresses/${address}`, 300);
 export const getAddressCounters = (address: string) => get<BsAddressCounters>(`/addresses/${address}/counters`, 120);

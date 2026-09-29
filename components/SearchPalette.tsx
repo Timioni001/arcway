@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftRight, Copy, CornerDownLeft, FileCode2, History, IdCard, Link2, Moon, Plus, Route, Search, Target, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, Coins, Copy, RadioTower, CornerDownLeft, FileCode2, History, IdCard, Link2, Moon, Plus, Route, Search, Target, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { builderMark } from "../lib/builders";
@@ -9,10 +9,13 @@ import { searchAll, suggestedCategories } from "../lib/search";
 import { addArcToWallet } from "../lib/addToWallet";
 import { NETWORK_NAME } from "../lib/config";
 import { useArcwayState } from "../lib/hooks/context";
+import { useIntel } from "../lib/hooks/useIntel";
+import type { Asset } from "../lib/assets";
+import type { Signal } from "../lib/intel";
 import { useToast } from "../lib/hooks/toast";
 import { APPS, discoverApps } from "../lib/registry";
 import { toggleTheme } from "../lib/theme";
-import { PRIMARY_NAV, SECONDARY_NAV, YOU_NAV } from "../lib/nav";
+import { ALL_PAGES } from "../lib/nav";
 import { explorer } from "../lib/config";
 import { AppLogo } from "./AppCard";
 import { AppMark, CategoryTile } from "./CategoryIcon";
@@ -21,11 +24,11 @@ type Item = { id: string; group: string; title: string; sub: string; href?: stri
 
 const tile = (Icon: LucideIcon, shade: 1 | 2 | 3) => <span className="tile" data-shade={shade}><Icon aria-hidden="true" /></span>;
 
-const PAGES: Item[] = [...PRIMARY_NAV, ...SECONDARY_NAV.filter((n) => n.href !== "/search"), ...YOU_NAV].map((n, i) => ({
+const PAGES: Item[] = ALL_PAGES.filter((n) => n.href !== "/search").map((n, i) => ({
   id: `p-${n.href}`, group: "Pages", title: n.label, sub: n.blurb, href: n.href, icon: tile(n.icon, ((i % 3) + 1) as 1 | 2 | 3)
 }));
 
-function results(term: string, actions: Item[], recent: string[]): Item[] {
+function results(term: string, actions: Item[], recent: string[], live: { assets: Asset[]; signals: Signal[] }): Item[] {
   const t = term.trim().toLowerCase();
   if (!t) {
     const rec = recent.map<Item>((r) => ({ id: `r-${r}`, group: "Recent searches", title: r, sub: "Search again", icon: tile(History, 1), fill: r }));
@@ -35,9 +38,11 @@ function results(term: string, actions: Item[], recent: string[]): Item[] {
     return [...rec, ...cats, ...actions, ...PAGES];
   }
   const r = searchAll(term);
+  const assetHit = r.onchain?.kind === "address" ? live.assets.find((a) => a.address.toLowerCase() === r.onchain!.value.toLowerCase()) : undefined;
   const onchain: Item[] = !r.onchain ? [] : r.onchain.kind === "tx"
     ? [{ id: "o-tx", group: "Onchain", title: "View transaction", sub: r.onchain.value, run: () => { window.open(explorer.tx((r.onchain as { value: string }).value), "_blank", "noopener"); }, icon: tile(ArrowLeftRight, 2) }]
     : [
+        ...(assetHit ? [{ id: "o-asset", group: "Onchain", title: `${assetHit.symbol} token`, sub: "Open asset", href: `/assets/${assetHit.address}`, icon: tile(Coins, 1) }] : []),
         ...(r.onchain.app ? [{ id: "o-app", group: "Onchain", title: `${r.onchain.app.name} contract`, sub: "Open protocol", href: `/apps/${r.onchain.app.slug}`, icon: <AppLogo app={r.onchain.app} /> }] : []),
         { id: "o-addr", group: "Onchain", title: "View address on explorer", sub: r.onchain.value, run: () => { window.open(explorer.address((r.onchain as { value: string }).value), "_blank", "noopener"); }, icon: tile(FileCode2, 2) },
         { id: "o-pass", group: "Onchain", title: "Open passport", sub: "XP and activity for this wallet", href: `/passport/${r.onchain.value}`, icon: tile(IdCard, 3) }
@@ -55,12 +60,18 @@ function results(term: string, actions: Item[], recent: string[]): Item[] {
     id: `b-${b.id}`, group: "Builders", title: b.name, sub: `${b.apps.length} app${b.apps.length === 1 ? "" : "s"}`, href: `/builders/${b.id}`, icon: <AppMark app={builderMark(b)} />
   }));
   const pages = PAGES.filter((p) => p.title.toLowerCase().includes(t));
+  const assets = r.onchain ? [] : live.assets.filter((a) => `${a.symbol} ${a.name}`.toLowerCase().includes(t)).slice(0, 5).map<Item>((a) => ({
+    id: `as-${a.address}`, group: "Assets", title: a.symbol, sub: `${a.name}${a.holders !== null ? ` · ${a.holders.toLocaleString("en-US")} holders` : ""}`, href: `/assets/${a.address}`, icon: tile(Coins, 1)
+  }));
+  const signals = r.onchain ? [] : live.signals.filter((s) => `${s.title} ${s.detail} ${s.entity?.label ?? ""}`.toLowerCase().includes(t)).slice(0, 4).map<Item>((s) => ({
+    id: `sg-${s.id}`, group: "Signals", title: s.title, sub: s.period, href: "/signals", icon: tile(RadioTower, 3)
+  }));
   const trails = r.trails.map<Item>((tr) => ({
     id: `t-${tr.id}`, group: "Trails", title: tr.title, sub: tr.goal, href: `/trails/${tr.id}`, icon: tile(Route, 1)
   }));
   const acts = actions.filter((a) => `${a.title} ${a.sub} ${a.keywords ?? ""}`.toLowerCase().includes(t));
-  const all: Item = { id: "s-all", group: "Search", title: `See all results for “${term.trim()}”`, sub: "Grouped by apps, categories, quests and builders", href: `/search?q=${encodeURIComponent(term.trim())}`, icon: tile(Search, 3) };
-  return [...onchain, ...acts, ...apps, ...cats, ...trails, ...quests, ...builders, ...pages, all];
+  const all: Item = { id: "s-all", group: "Search", title: `See all results for “${term.trim()}”`, sub: "Apps, builders, assets, quests and more", href: `/search?q=${encodeURIComponent(term.trim())}`, icon: tile(Search, 3) };
+  return [...onchain, ...acts, ...apps, ...builders, ...assets, ...signals, ...cats, ...trails, ...quests, ...pages, all];
 }
 
 const OPEN_EVENT = "arcway:search";
@@ -116,7 +127,10 @@ export function SearchPalette() {
     return list;
   }, [connection.address, toast]);
   const recent = useSyncExternalStore(subscribeRecent, getRecent, getRecentServer);
-  const items = useMemo(() => results(term, actions, recent), [term, actions, recent]);
+  const assetsQ = useIntel("assets", open);
+  const signalsQ = useIntel("signals", open);
+  const live = useMemo(() => ({ assets: assetsQ.data?.data ?? [], signals: signalsQ.data?.data ?? [] }), [assetsQ.data, signalsQ.data]);
+  const items = useMemo(() => results(term, actions, recent, live), [term, actions, recent, live]);
 
   const close = useCallback(() => {
     setOpen(false);

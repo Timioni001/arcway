@@ -6,7 +6,7 @@ Minimal on-chain reputation registry: XP, quest completions and badges written b
 an authorised verifier. Two-step ownership, per-quest XP cap, zero-address checks.
 
 `script/Deploy.s.sol` deploys it and, if `VERIFIER_ADDRESS` is set, authorises the
-verifier in the same run. Mainnet steps: `../docs/DEPLOY.md`.
+verifier in the same run. Mainnet steps: `../docs/DEPLOYMENT.md`.
 
 ### Local test
 

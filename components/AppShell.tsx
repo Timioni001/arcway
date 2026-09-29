@@ -1,11 +1,11 @@
 'use client';
 
-import { ArrowUpRight, Bookmark, ChevronRight, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
+import { Bookmark, ChevronRight, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { NETWORK_NAME } from "../lib/config";
-import { BOTTOM_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isActive, sectionFor, type NavItem } from "../lib/nav";
+import { BOTTOM_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isBottomActive, isNavActive, viewsFor, type NavItem } from "../lib/nav";
 import { THEME_EVENT, toggleTheme } from "../lib/theme";
 import { getWatchlist, getWatchlistServer, subscribeWatchlist } from "../lib/watchlist";
 import { Logo, LogoMark } from "./Logo";
@@ -31,7 +31,7 @@ export function useWatchCount() {
 }
 
 function RailLink({ item, pathname, onNavigate }: { item: NavItem; pathname: string; onNavigate?: () => void }) {
-  const active = isActive(pathname, item.href);
+  const active = isNavActive(pathname, item.href);
   const Icon = item.icon;
   if (item.href === "/search") {
     return (
@@ -88,23 +88,18 @@ export function Rail() {
       </div>
       <nav className="rail__nav" aria-label="Main">
         {NAV_GROUPS.map((g) => (
-          <div key={g.label} className="rail__group">
-            <div className="rail__heading" aria-hidden="true"><span className="rail__label">{g.label}</span></div>
-            <ul aria-label={g.label}>{g.items.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}</ul>
+          <div key={g.label || "top"} className="rail__group">
+            {g.label && <div className="rail__heading" aria-hidden="true"><span className="rail__label">{g.label}</span></div>}
+            <ul aria-label={g.label || "Overview"}>{g.items.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}</ul>
           </div>
         ))}
       </nav>
       <nav className="rail__nav rail__nav--secondary" aria-label="More">
         <ul>
-          {SECONDARY_NAV.filter((n) => n.href !== "/search").map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}
+          {SECONDARY_NAV.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}
         </ul>
       </nav>
       <div className="rail__foot">
-        <Link href="/quests" className="rail-promo" onClick={close}>
-          <span className="rail-promo__title">Earn your passport</span>
-          <span className="rail-promo__body">Short quests that teach Arc. Each one adds XP and a badge.</span>
-          <span className="rail-promo__cta">Start a quest<i aria-hidden="true"><ArrowUpRight /></i></span>
-        </Link>
         <button type="button" className="rail__link" data-label={dark ? "Light theme" : "Dark theme"} onClick={toggleTheme} aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}>
           {dark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}<span className="rail__label">{dark ? "Light theme" : "Dark theme"}</span>
         </button>
@@ -140,16 +135,19 @@ function WatchlistLink() {
   );
 }
 
-/** Pill tabs for the pages in the current section (wide screens, top-level pages only). */
-function SectionTabs({ pathname }: { pathname: string }) {
-  const group = sectionFor(pathname);
-  if (!group) return null;
+/** Views folded into the current section (Quests → Campaigns, Leaderboard, Passport). All widths, top-level pages only. */
+export function SectionViews() {
+  const pathname = usePathname();
+  const views = viewsFor(pathname);
+  if (!views) return null;
   return (
-    <nav className="stabs" aria-label={`${group.label} pages`}>
-      {group.items.map((n) => (
-        <Link key={n.href} href={n.href} className="stabs__tab" aria-current={n.href === pathname ? "page" : undefined}>{n.label}</Link>
-      ))}
-    </nav>
+    <div className="container sviews-wrap">
+      <nav className="sviews" aria-label="Views in this section">
+        {views.map((n) => (
+          <Link key={n.href} href={n.href} className="sviews__tab" aria-current={n.href === pathname ? "page" : undefined}>{n.label}</Link>
+        ))}
+      </nav>
+    </div>
   );
 }
 
@@ -159,7 +157,6 @@ export function Topbar() {
   return (
     <header className="topbar">
       <Crumbs pathname={pathname} />
-      <SectionTabs pathname={pathname} />
       <div className="topbar__tools">
         <SearchButton />
         <WatchlistLink />
@@ -170,7 +167,7 @@ export function Topbar() {
   );
 }
 
-/** Mobile: a calm top bar (logo, search, connect). Navigation lives in the bottom tabs and the More page. */
+/** Mobile: logo, search, connect, menu. The menu page lists the full information architecture. */
 export function MobileTop() {
   return (
     <header className="mtop">
@@ -179,13 +176,12 @@ export function MobileTop() {
         <div className="mtop__tools">
           <SearchButton variant="icon" />
           <WalletButton />
+          <Link href="/more" className="icon-btn" aria-label="Menu"><Menu aria-hidden="true" /></Link>
         </div>
       </div>
     </header>
   );
 }
-
-const TAB_HREFS = BOTTOM_NAV.filter((n) => n.href !== "/more").map((n) => n.href);
 
 /** iOS-style: the tab bar tucks into a compact pill while you scroll down, and returns on the way up. */
 function useCompactOnScroll() {
@@ -209,14 +205,13 @@ function useCompactOnScroll() {
 export function BottomBar() {
   const pathname = usePathname();
   const compact = useCompactOnScroll();
-  const inTabs = TAB_HREFS.some((h) => isActive(pathname, h));
-  const index = BOTTOM_NAV.findIndex((n) => (n.href === "/more" ? !inTabs : isActive(pathname, n.href)));
+  const index = BOTTOM_NAV.findIndex((n) => isBottomActive(pathname, n.href));
   return (
-    <nav className="bottombar" aria-label="Quick" data-compact={compact || undefined} style={{ "--i": Math.max(index, 0) } as React.CSSProperties}>
+    <nav className="bottombar" aria-label="Quick" data-compact={compact || undefined} data-lens={index >= 0 || undefined} style={{ "--i": Math.max(index, 0) } as React.CSSProperties}>
       <span className="bottombar__lens" aria-hidden="true" />
       {BOTTOM_NAV.map((n) => {
         const Icon = n.icon;
-        const active = n.href === "/more" ? !inTabs : isActive(pathname, n.href);
+        const active = isBottomActive(pathname, n.href);
         return (
           <Link key={n.href} href={n.href} aria-current={active ? "page" : undefined}>
             <Icon aria-hidden="true" />{n.label}

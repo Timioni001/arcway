@@ -1,9 +1,63 @@
-# Arcway UX: flows and states
+# Arcway interface system
+
+## Principles
+
+- White-dominant light interface; blue is the one accent.
+- Dark mode uses deep blue, not flat black or grey.
+- Typography: Geist and Geist Mono. Icons: Lucide, used sparingly.
+- Protocol marks use each project's own brand assets where available.
+- Cards support hierarchy; they do not decorate empty space.
+- Motion communicates state or hierarchy. Decorative effects never compete with data.
+- No excessive gradients, glowing containers or floating copy.
+
+Tokens live in `app/globals.css` (colours, spacing, radii, motion) and component styles in
+`app/components.css`, one block per component.
+
+## Copy
+
+Short, factual, specific, easy to scan. Prefer "Arc right now", "What's new", "Explore apps",
+"Recent activity", "Activity spike", "New contract", "View transaction" over descriptive card copy.
+Avoid marketing filler, repeated explanations, generic crypto language, claims without evidence, long
+paragraphs inside cards, and technical terms before they are useful.
+
+## Shell
+
+- **Sidebar** (desktop): Overview, then Discover, Intelligence and Participate groups, then Search
+  and Settings. Collapses to icons; tablet widths start collapsed.
+- **Top bar** (desktop): breadcrumb, search, watchlist, notifications, wallet.
+- **Section views**: a tab row above the page for views folded into a section.
+- **Mobile**: top bar (logo, search, connect, menu) and a floating glass tab bar with a lens that
+  follows the active tab. It tucks into a compact pill while scrolling down and falls back to a
+  solid bar where `backdrop-filter` is unsupported.
+
+## Motion
+
+- One intro on first load (`data-intro`, cleared after 1.4s); later navigations do not replay it.
+- Press feedback `scale(.97)`; easing `cubic-bezier(0.23, 1, 0.32, 1)`.
+- Offscreen loops pause (`AmbientPause`); phones get no decorative loops.
+- `prefers-reduced-motion` turns animation off.
+
+## Trust in the interface
+
+- Every metric shows a provenance tag (Observed, Derived, Project-provided, Community) and its period.
+- Live panels show freshness ("Updated 12s ago · ArcScan") and name any source that failed.
+- Loading shows skeletons; failure shows "Arc data is unavailable right now" with a retry, never a
+  guessed value.
+- Dates render as an exact UTC date on the server and become relative only after hydration.
+
+## Accessibility
+
+- Every interactive target is at least 44px on touch layouts.
+- Status is never colour alone; badges carry text.
+- The layout guard (`tests/e2e/layout.spec.ts`) fails on horizontal scroll or overlapping blocks on
+  phone and desktop widths for every route.
+
+## Flows and states
 
 The product question is **"I just arrived on Arc. What should I do next?"**
 Every screen state below exists to answer that with one clear action.
 
-## The next-step engine
+### The next-step engine
 
 `lib/journey.ts` → `nextStep()` returns exactly one step. Order:
 
@@ -29,7 +83,7 @@ Rules baked in:
   claim step comes before any wallet action.
 - **Mainnet is called out.** On mainnet a notice says transactions use real USDC.
 
-## Quest states
+### Quest states
 
 `lib/quests.ts` → `questViews()`:
 
@@ -40,7 +94,7 @@ Rules baked in:
 
 Eligibility comes from the server (`/api/progress`), never from the browser.
 
-## Claim lifecycle
+### Claim lifecycle
 
 `lib/hooks/claims.tsx`: `idle → verifying → confirming (tx link) → recorded`
 or `error` with a plain-language message. Double clicks are ignored, and a retry
@@ -56,14 +110,14 @@ Server errors map to user copy:
 | `rate_limited` | Try again in N seconds |
 | `arc_unavailable` / `submit_failed` | Temporary; nothing lost; retry |
 
-## Wallet errors
+### Wallet errors
 
 `lib/errors.ts` → `humanizeError()` walks viem/wagmi cause chains and returns one
 actionable sentence: cancelled in wallet, request already open, no wallet
 installed, chain unknown to wallet, wallet can't switch, insufficient USDC for
 fees, Arc unreachable.
 
-## Discovery
+### Discovery
 
 - Search by intent ("pay", "swap", "yield") plus category filters with counts;
   empty categories are hidden.
@@ -73,14 +127,14 @@ fees, Arc unreachable.
 - Opening an app remembers the visit (localStorage, safe when blocked) and
   progress refetches when the tab regains focus, so returning feels live.
 
-## Loading, empty and failure states
+### Loading, empty and failure states
 
 Every data surface has all three: balance (`…` / `unavailable`), passport
 (`Retry`), activity (loading / "No transactions yet" / retry), discovery
 ("No apps match" + clear filters). RPC calls fail fast (1 retry, 8s timeout)
 so outages become a retry step, not an endless spinner.
 
-## Accessibility
+### Accessibility
 
 Skip link, labelled sections, `aria-live` status and `role="alert"` errors,
 `aria-busy` on pending buttons, `aria-pressed` filters, visible focus rings,

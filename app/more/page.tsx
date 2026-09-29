@@ -1,14 +1,14 @@
-import { LayoutGrid } from "lucide-react";
+import { Menu } from "lucide-react";
 import type { Metadata } from "next";
 import { MoreHub } from "../../components/MoreHub";
 import { PageHead } from "../../components/PageHead";
 
-export const metadata: Metadata = { title: "Everything on Arcway", description: "Every part of Arcway, from getting started to live network data and builder tools." };
+export const metadata: Metadata = { title: "Menu", description: "Every part of Arcway: discover, intelligence and participation." };
 
 export default function MorePage() {
   return (
     <div className="container page">
-      <PageHead icon={LayoutGrid} kicker="More" title="Everything on Arcway" lead="Start at the top with the basics. Live network data and builder tools are further down." />
+      <PageHead icon={Menu} kicker="Menu" title="Everything on Arcway" lead="Discover what exists, see what changed, take part." />
       <MoreHub />
     </div>
   );

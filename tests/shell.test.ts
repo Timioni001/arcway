@@ -1,14 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { RINGS, layoutEcosystem, neighbours } from "../lib/ecosystem";
-import { BOTTOM_NAV, NAV_GROUPS, PRIMARY_NAV, crumbsFor, isActive } from "../lib/nav";
+import { BOTTOM_NAV, NAV_GROUPS, PRIMARY_NAV, crumbsFor, isActive, isBottomActive, isNavActive, sectionHref, viewsFor } from "../lib/nav";
 import { onchainMatch } from "../lib/search";
 import { parseWatchId, watchId } from "../lib/watchlist";
 
 describe("navigation", () => {
-  it("puts the simple destinations first, technical ones later", () => {
-    expect(NAV_GROUPS.map((g) => g.label)).toEqual(["Get started", "Explore Arc", "Live data", "For builders"]);
-    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Home", "Apps", "Quests", "Passport", "Get a wallet", "Ecosystem", "Builders", "Leaderboard", "Campaigns", "Arc today", "Pulse", "Radar", "Signals", "Submit a project", "Launch a campaign", "Badges"]);
-    expect(BOTTOM_NAV.map((n) => n.label)).toEqual(["Home", "Apps", "Quests", "Passport", "More"]);
+  it("is organised by job, with a small sidebar", () => {
+    expect(NAV_GROUPS.map((g) => g.label)).toEqual(["", "Discover", "Intelligence", "Participate"]);
+    expect(PRIMARY_NAV.map((n) => n.label)).toEqual(["Overview", "Ecosystem", "Apps", "Builders", "Assets", "Pulse", "Radar", "Signals", "Quests", "Watchlist"]);
+    expect(BOTTOM_NAV.map((n) => n.label)).toEqual(["Overview", "Explore", "Pulse", "Radar", "Watchlist"]);
+  });
+  it("folds features into their section", () => {
+    expect(sectionHref("/campaigns/abc")).toBe("/quests");
+    expect(sectionHref("/digest")).toBe("/radar");
+    expect(sectionHref("/submit")).toBe("/builders");
+    expect(sectionHref("/trails/get-started")).toBe("/apps");
+    expect(isNavActive("/leaderboard", "/quests")).toBe(true);
+    expect(isNavActive("/leaderboard", "/radar")).toBe(false);
+    expect(viewsFor("/passport")?.map((v) => v.href)).toEqual(["/quests", "/campaigns", "/leaderboard", "/passport"]);
+    expect(viewsFor("/passport/0x1")).toBeNull();
+    expect(viewsFor("/pulse")).toBeNull();
+    expect(isBottomActive("/assets/0x36", "/ecosystem")).toBe(true);
+    expect(isBottomActive("/trails/x", "/ecosystem")).toBe(true);
+    expect(isBottomActive("/quests", "/ecosystem")).toBe(false);
   });
   it("matches the overview only at the root", () => {
     expect(isActive("/", "/")).toBe(true);
@@ -17,8 +31,9 @@ describe("navigation", () => {
     expect(isActive("/apps-x", "/apps")).toBe(false);
   });
   it("builds breadcrumbs with entity names", () => {
-    expect(crumbsFor("/")).toEqual([{ label: "Home" }]);
-    expect(crumbsFor("/more")).toEqual([{ label: "More" }]);
+    expect(crumbsFor("/")).toEqual([{ label: "Overview" }]);
+    expect(crumbsFor("/more")).toEqual([{ label: "Menu" }]);
+    expect(crumbsFor("/campaigns")).toEqual([{ label: "Campaigns" }]);
     expect(crumbsFor("/apps/uniswap")).toEqual([{ label: "Apps", href: "/apps" }, { label: "Uniswap" }]);
     expect(crumbsFor("/builders/circle")[1].label).toBe("Circle");
     expect(crumbsFor("/terms")).toEqual([{ label: "Terms of Use" }]);

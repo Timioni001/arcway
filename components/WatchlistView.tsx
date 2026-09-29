@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Blocks, Bookmark, Code2, LayoutGrid } from "lucide-react";
+import { Bell, Blocks, Bookmark, Code2, Coins, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { builderMark, buildersFrom, getBuilder } from "../lib/builders";
@@ -9,6 +9,7 @@ import { APPS, CATEGORIES, categoryCounts, getApp, type Category } from "../lib/
 import { parseWatchId } from "../lib/watchlist";
 import { AppMark, CATEGORY_META, CategoryTile } from "./CategoryIcon";
 import { IntelGate, PanelHead, SignalList, SourceTag } from "./Intel";
+import { WatchedAssets } from "./Assets";
 import { ProtocolActivity } from "./IntelPages";
 import { FollowButton, useWatchlist } from "./SaveButton";
 
@@ -19,6 +20,7 @@ export function WatchlistView() {
   const apps = parsed.filter((p) => p.kind === "app").map((p) => getApp(p.key)).filter((a) => a && !a.sample) as NonNullable<ReturnType<typeof getApp>>[];
   const builders = parsed.filter((p) => p.kind === "builder").map((p) => getBuilder(p.key)).filter(Boolean) as NonNullable<ReturnType<typeof getBuilder>>[];
   const categories = parsed.filter((p) => p.kind === "category" && CATEGORIES.includes(p.key as Category)).map((p) => p.key as Category);
+  const assets = parsed.filter((p) => p.kind === "asset").map((p) => p.key);
   const counts = categoryCounts(APPS.filter((a) => !a.sample));
 
   // Signals touching anything followed: its apps, its builders' apps, or apps in its categories.
@@ -38,7 +40,7 @@ export function WatchlistView() {
           <Bookmark aria-hidden="true" style={{ color: "var(--blue)" }} />
           <div>
             <div style={{ fontWeight: 600 }}>Nothing followed yet</div>
-            <p className="small secondary">Follow protocols, builders or categories to keep them here, with their activity and signals in one place.</p>
+            <p className="small secondary">Follow apps, builders, assets or categories to keep them here, with their activity and signals in one place.</p>
           </div>
         </div>
         <section className="panel" aria-labelledby="suggest-title">
@@ -87,6 +89,12 @@ export function WatchlistView() {
                 </li>
               ))}
             </ul>
+          </section>
+        )}
+        {assets.length > 0 && (
+          <section className="panel" aria-labelledby="w-assets">
+            <PanelHead icon={Coins} title="Assets" id="w-assets"><span className="mono xs secondary">{assets.length}</span></PanelHead>
+            <WatchedAssets addresses={assets} />
           </section>
         )}
         {categories.length > 0 && (

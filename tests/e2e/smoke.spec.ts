@@ -16,7 +16,8 @@ const ROUTES = [
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
   "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
   "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave",
-  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet", "/campaigns", "/launch"
+  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet", "/campaigns", "/launch",
+  "/assets", "/assets/0x3600000000000000000000000000000000000000"
 ];
 
 /** Collect uncaught errors and console errors (network failures to Arc are expected offline). */
@@ -321,11 +322,9 @@ test("desktop uses a left rail with the full navigation", async ({ page, isMobil
   test.skip(isMobile, "desktop layout");
   await open(page, "/pulse");
   const main = page.getByRole("navigation", { name: "Main" });
-  for (const label of ["Home", "Ecosystem", "Pulse", "Radar", "Builders", "Signals", "Apps", "Quests"]) {
-    await expect(main.getByRole("link", { name: label })).toBeVisible();
-  }
+  await expect(main.getByRole("link")).toHaveText(["Overview", "Ecosystem", "Apps", "Builders", "Assets", "Pulse", "Radar", "Signals", "Quests", "Watchlist"]);
   await expect(main.getByRole("link", { name: "Pulse" })).toHaveAttribute("aria-current", "page");
-  await expect(page.getByRole("navigation", { name: "More" }).getByRole("link", { name: "Watchlist" })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "More" }).getByRole("link", { name: "Settings" })).toBeVisible();
   const rail = page.locator(".rail");
   expect((await rail.boundingBox())!.x).toBeLessThan(5);
   // Collapse, and the choice survives a reload.
@@ -349,49 +348,74 @@ test("tablet starts with a collapsed rail that expands on demand", async ({ page
   await expect.poll(async () => (await rail.boundingBox())!.width).toBeLessThan(100);
 });
 
-test("mobile uses five tabs and a More page instead of a dropdown", async ({ page, isMobile }) => {
+test("mobile: five job tabs, and a Menu with the full information architecture", async ({ page, isMobile }) => {
   test.skip(!isMobile, "mobile layout");
   await open(page, "/");
   await expect(page.locator(".rail")).toBeHidden();
-  await expect(page.getByRole("button", { name: /Current section/ })).toHaveCount(0);
   const quick = page.getByRole("navigation", { name: "Quick" });
-  await expect(quick.getByRole("link")).toHaveText(["Home", "Apps", "Quests", "Passport", "More"]);
-  await expect(quick.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
-  await quick.getByRole("link", { name: "More" }).click();
+  await expect(quick.getByRole("link")).toHaveText(["Overview", "Explore", "Pulse", "Radar", "Watchlist"]);
+  await expect(quick.getByRole("link", { name: "Overview" })).toHaveAttribute("aria-current", "page");
+  await page.locator(".mtop").getByRole("link", { name: "Menu" }).click();
   await expect(page).toHaveURL(/\/more$/);
-  await expect(quick.getByRole("link", { name: "More" })).toHaveAttribute("aria-current", "page");
-  for (const g of ["Get started", "Explore Arc", "Live data", "For builders", "You"]) {
+  for (const g of ["Start", "Discover", "Intelligence", "Participate", "You and settings"]) {
     await expect(page.locator(".hub").getByRole("heading", { level: 2, name: g, exact: true })).toBeVisible();
   }
-  const signals = page.locator(".hub").getByRole("link", { name: /^Signals/ });
-  expect((await signals.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-  await signals.click();
-  await expect(page).toHaveURL(/\/signals$/);
-  await expect(quick.getByRole("link", { name: "More" })).toHaveAttribute("aria-current", "page");
+  // Views folded into a section are still one tap away from the menu.
+  await expect(page.locator(".hub").getByRole("link", { name: /^Campaigns/ })).toBeVisible();
+  const builders = page.locator(".hub").getByRole("link", { name: /^Builders/ });
+  expect((await builders.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await builders.click();
+  await expect(page).toHaveURL(/\/builders$/);
+  await expect(quick.getByRole("link", { name: "Explore" })).toHaveAttribute("aria-current", "page");
 });
 
-test("home starts simple: hero, three steps, five paths, then live data", async ({ page }) => {
+test("overview follows the documented order and works without a wallet", async ({ page }) => {
   await open(page, "/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Understand what’s happening on Arc.");
   await expect(page.locator(".hero").getByRole("link", { name: "Explore apps" })).toHaveAttribute("href", "/apps");
-  await expect(page.locator(".hero").getByRole("link", { name: "How it works" })).toHaveAttribute("href", "#how");
-  await expect(page.getByRole("region", { name: "Three steps, no experience needed" }).locator(".step3")).toHaveCount(3);
+  const order = ["What are you looking for?", "What is Arc?", "Network today", "How it fits together", "What's new", "Explore apps", "Who's building", "Recent activity", "Quests"];
+  let last = -1;
+  for (const name of order) {
+    const box = (await page.getByRole("region", { name, exact: true }).boundingBox())!;
+    expect(box.y, name).toBeGreaterThan(last);
+    last = box.y;
+  }
   const paths = page.getByRole("region", { name: "What are you looking for?" }).locator(".dpath");
   await expect(paths).toHaveCount(5);
-  for (const t of ["Move money", "Trade", "Earn", "Build", "Explore"]) await expect(paths.filter({ hasText: t }).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "What is Arc?" })).toBeVisible();
-  // Technical, live network data sits below the basics.
-  const deeper = (await page.getByRole("region", { name: "Live data from the Arc network" }).boundingBox())!;
-  const paths3 = (await page.getByRole("region", { name: "What are you looking for?" }).boundingBox())!;
-  expect(deeper.y).toBeGreaterThan(paths3.y);
   // Live activity comes from data, with its source; the overview never leads with raw contract counts.
   await expect(page.locator(".now__item--live .now__value")).toHaveText(/\d/);
   await expect(page.locator(".emap__stats dd", { hasText: /^0$/ })).toHaveCount(0);
   // The pulse preview hides failed and raw contract calls.
   await expect(page.locator(".pulse-preview .pulse-row").first()).toBeVisible();
   await expect(page.locator(".pulse-preview .pulse-row[data-kind='call'], .pulse-preview .pulse-row[data-failed]")).toHaveCount(0);
-  // Connect is available but secondary: not a hero action.
+  // No decorative floating copy, and connecting is never a hero action.
+  await expect(page.locator(".float-chip")).toHaveCount(0);
   await expect(page.locator(".hero").getByRole("button", { name: /Connect/ })).toHaveCount(0);
+});
+
+test("features live inside their section as views", async ({ page }) => {
+  await open(page, "/campaigns");
+  const views = page.getByRole("navigation", { name: "Views in this section" });
+  await expect(views.getByRole("link")).toHaveText(["Quests", "Campaigns", "Leaderboard", "Passport"]);
+  await expect(views.getByRole("link", { name: "Campaigns" })).toHaveAttribute("aria-current", "page");
+  await open(page, "/digest");
+  await expect(page.getByRole("navigation", { name: "Views in this section" }).getByRole("link")).toHaveText(["Changes", "Arc today"]);
+  await open(page, "/builders");
+  await expect(page.getByRole("navigation", { name: "Views in this section" }).getByRole("link", { name: "Submit a project" })).toHaveAttribute("href", "/submit");
+});
+
+test("assets: list ranked by holders, entity page with activity, markets and related apps", async ({ page }) => {
+  await open(page, "/assets");
+  const rows = page.locator(".atable__row:not(.atable__row--head)");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.first()).toContainText("USDC");
+  await expect(rows.first()).toContainText("182,345");
+  await rows.first().getByRole("link").click();
+  await expect(page).toHaveURL(/\/assets\/0x36/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("USDC (USDC)");
+  await expect(page.getByRole("region", { name: "Recent activity" }).locator(".pulse-row")).toHaveCount(10);
+  await expect(page.getByRole("region", { name: "Markets" })).toContainText("Coming soon");
+  await expect(page.getByRole("region", { name: "Related apps" }).getByRole("link", { name: "Uniswap" })).toBeVisible();
 });
 
 test("radar keeps the full network snapshot with sources", async ({ page }) => {
@@ -502,18 +526,18 @@ test("intel APIs answer with data or a clean error", async ({ request }) => {
 
 // ---------------------------------------------------------------- sections, proof and builder tools
 
-test("navigation is grouped into four sections", async ({ page, isMobile }) => {
+test("navigation is grouped by job: discover, intelligence, participate", async ({ page, isMobile }) => {
   await open(page, isMobile ? "/more" : "/");
   const scope = isMobile ? page.locator(".hub") : page.getByRole("navigation", { name: "Main" });
-  for (const g of ["Get started", "Explore Arc", "Live data", "For builders"]) {
+  for (const g of ["Discover", "Intelligence", "Participate"]) {
     await expect(scope.getByText(g, { exact: true }).first()).toBeVisible();
   }
-  await expect(scope.getByRole("link", { name: /^Submit a project/ })).toBeVisible();
+  await expect(scope.getByRole("link", { name: /^Assets/ })).toBeVisible();
 });
 
-test("the overview proves Arcway runs on Arc", async ({ page }) => {
-  await open(page, "/");
-  const proof = page.getByRole("region", { name: "Recorded on Arc, checkable by anyone" });
+test("the leaderboard proves Arcway runs on Arc", async ({ page }) => {
+  await open(page, "/leaderboard");
+  const proof = page.locator(".proof").first();
   await expect(proof.getByRole("link", { name: /0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107/ })).toHaveAttribute("href", /\/address\/0xa8a4/);
   await expect(proof.getByText("passports issued")).toBeVisible();
   await expect(proof.locator(".proof__stat b").first()).toHaveText("2");
@@ -583,8 +607,8 @@ test("mobile glass tab bar: lens follows the page and the bar tucks away while s
   await expect(bar).toHaveAttribute("data-compact", "true");
   await page.mouse.wheel(0, -400);
   await expect(bar).not.toHaveAttribute("data-compact", /.*/);
-  await bar.getByRole("link", { name: "Quests" }).click();
-  await expect(page).toHaveURL(/\/quests$/);
+  await bar.getByRole("link", { name: "Pulse" }).click();
+  await expect(page).toHaveURL(/\/pulse$/);
   await expect(bar).toHaveAttribute("style", /--i:\s*2/);
 });
 

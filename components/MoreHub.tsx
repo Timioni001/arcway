@@ -3,7 +3,7 @@
 import { ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { NAV_GROUPS, SECONDARY_NAV, YOU_NAV, type NavItem } from "../lib/nav";
+import { NAV_GROUPS, SECONDARY_NAV, SECTION_VIEWS, YOU_NAV, type NavItem } from "../lib/nav";
 import { THEME_EVENT, toggleTheme } from "../lib/theme";
 import { openSearch } from "./SearchPalette";
 
@@ -18,7 +18,10 @@ function Tile({ item }: { item: NavItem }) {
   );
 }
 
-/** Everything on Arcway, grouped from simplest to most technical. Replaces the old dropdown menu. */
+/** A section's own page plus the views folded into it (Quests → Campaigns, Leaderboard, Passport). */
+const withViews = (items: NavItem[]) => items.flatMap((n) => [n, ...(SECTION_VIEWS[n.href] ?? []).filter((v) => v.blurb)]);
+
+/** The mobile menu: the complete information architecture, grouped by job. */
 export function MoreHub() {
   const [dark, setDark] = useState<boolean | null>(null);
   useEffect(() => {
@@ -33,13 +36,13 @@ export function MoreHub() {
         <Search aria-hidden="true" /><span>Search apps, builders, addresses…</span>
       </button>
       {NAV_GROUPS.map((g, i) => (
-        <section key={g.label} className="hub-group" aria-labelledby={`hub-${i}`}>
-          <h2 id={`hub-${i}`} className="hub-group__title">{g.label}</h2>
-          <ul className="hub-grid">{g.items.map((n) => <Tile key={n.href} item={n} />)}</ul>
+        <section key={g.label || "overview"} className="hub-group" aria-labelledby={`hub-${i}`}>
+          <h2 id={`hub-${i}`} className="hub-group__title">{g.label || "Start"}</h2>
+          <ul className="hub-grid">{withViews(g.items).map((n) => <Tile key={n.href} item={n} />)}</ul>
         </section>
       ))}
       <section className="hub-group" aria-labelledby="hub-you">
-        <h2 id="hub-you" className="hub-group__title">You</h2>
+        <h2 id="hub-you" className="hub-group__title">You and settings</h2>
         <ul className="hub-grid">
           {[...YOU_NAV, ...SECONDARY_NAV.filter((n) => n.href !== "/search")].map((n) => <Tile key={n.href} item={n} />)}
           <li>

@@ -1,4 +1,27 @@
-# Deploy Arcway on Vercel
+# Deployment
+
+Infrastructure: Vercel (Next.js, deploys `main` on every push), Arc RPC and explorer (public),
+optional Envio hosted indexer, and two Foundry-deployed contracts.
+
+## Environment
+
+| Variable | Scope | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_ARC_NETWORK` | public | `testnet` or `mainnet`; one network per deployment |
+| `NEXT_PUBLIC_ARC_RPC_URL` | public | Optional RPC override |
+| `NEXT_PUBLIC_ARC_USDC` | public | USDC address on that network |
+| `NEXT_PUBLIC_PASSPORT_CONTRACT` | public | ArcwayPassport address |
+| `NEXT_PUBLIC_CAMPAIGNS_CONTRACT` | public | ArcwayCampaigns address; campaigns stay in preview until set |
+| `NEXT_PUBLIC_CIRCLE_CLIENT_KEY` | public | Passkey wallets; off until set |
+| `NEXT_PUBLIC_CIRCLE_CLIENT_URL`, `NEXT_PUBLIC_CIRCLE_CHAIN` | public | Optional Circle overrides |
+| `NEXT_PUBLIC_BRIDGE_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CONTACT_URL` | public | Optional links |
+| `VERIFIER_PRIVATE_KEY` | server, sensitive | Signs passport records, campaign entries and results |
+| `EXPLORER_API_KEY` | server | Optional, if the explorer rate-limits |
+| `ARCWAY_INDEXER_URL` | server | Optional Envio GraphQL endpoint |
+
+`.env.example` has the same list with comments.
+
+## Deploy Arcway on Vercel
 
 No local Next.js needed. Vercel builds the app from GitHub.
 
@@ -44,6 +67,24 @@ environment variable needs a manual **Redeploy**.
 ## Custom domain (optional)
 
 **Settings → Domains → Add**, then follow the DNS instructions Vercel shows.
+
+---
+
+## Campaigns contract
+
+```bash
+cd contracts
+VERIFIER_ADDRESS=0xYourVerifier forge script script/DeployCampaigns.s.sol:DeployCampaigns \
+  --rpc-url $ARC_RPC_URL --private-key $PRIVATE_KEY --broadcast
+```
+
+Set `NEXT_PUBLIC_CAMPAIGNS_CONTRACT` to the printed address and redeploy. `VERIFIER_ADDRESS` must be
+the address of `VERIFIER_PRIVATE_KEY`, so the same key can sign entries and publish results.
+
+## Indexer (optional)
+
+See `indexer/README.md`. Deploy to Envio's hosted service, then set `ARCWAY_INDEXER_URL` to its
+GraphQL endpoint. Without it, passport stats come from the explorer.
 
 ---
 

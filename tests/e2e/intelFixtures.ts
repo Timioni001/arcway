@@ -4,6 +4,7 @@ import { passportAbi } from "../../lib/abi";
 import { questHash } from "../../lib/quests";
 import { buildPassportStats, buildProtocol, buildPulse, buildRadar, buildSignals, buildSnapshot, normalizeChart, type Intel } from "../../lib/intel";
 import { APPS } from "../../lib/registry";
+import { buildAssetDetail, buildAssets } from "../../lib/assets";
 
 /**
  * Test-only data in Blockscout's response shapes, run through the real derivations,
@@ -85,7 +86,20 @@ const passportLogs = [
   data: encodeAbiParameters([{ type: "uint256" }], [BigInt(l.xp)])
 }));
 
+export const ASSET = "0x3600000000000000000000000000000000000000";
+const tokens = [
+  { address_hash: ASSET, name: "USDC", symbol: "USDC", decimals: "6", type: "ERC-20", holders_count: "182345", total_supply: "912000000000000" },
+  { address_hash: "0x89b50855aa3be2f677cd6303cec089b5f319d72a", name: "EURC", symbol: "EURC", decimals: "6", type: "ERC-20", holders_count: "40210", total_supply: "51000000000000" },
+  { address_hash: hex(77), name: "Test Token", symbol: "TT", decimals: "18", type: "ERC-20", holders_count: "12", total_supply: (10n ** 24n).toString() }
+];
+const assetDetail = buildAssetDetail({
+  token: tokens[0], counters: { transfers_count: "4410021", token_holders_count: "182345" },
+  transfers: transfers.map((t, i) => (i === 1 ? { ...t, to: { hash: UNI, is_contract: true } } : t)), network: "mainnet"
+});
+
 export const EXTRA: Record<string, unknown> = {
+  assets: env(buildAssets(tokens)),
+  [`asset/${ASSET}`]: env(assetDetail),
   passport: env(buildPassportStats({ address: "0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107", logs: passportLogs, info: { hash: "0xa8a4", is_verified: true }, counters: { transactions_count: "3" }, now })),
   check: env({ address: "0x7a00000000000000000000000000000000092f1a", isContract: true, verified: true, name: "Tipjar", transactions: 42 })
 };

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET } from "../lib/config";
-import { NAV_GROUPS, YOU_NAV } from "../lib/nav";
+import { NAV_GROUPS, SECTION_VIEWS, YOU_NAV } from "../lib/nav";
 import { Logo } from "./Logo";
 import { FooterProof } from "./PassportProof";
 
@@ -22,17 +22,16 @@ export function Footer() {
               <img className="for-dark" src="/brand/arc/arc-logo-light.svg" alt="Arc" width={146} height={50} />
             </div>
           </div>
-          {NAV_GROUPS.map((g, i) => (
+          {NAV_GROUPS.filter((g) => g.label).map((g, i) => (
             <nav key={g.label} aria-labelledby={`f-${i}`}>
               <h2 id={`f-${i}`}>{g.label}</h2>
-              <ul>{g.items.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}</ul>
+              <ul>{[...g.items, ...g.items.flatMap((l) => (SECTION_VIEWS[l.href] ?? []).filter((v) => v.blurb))].map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}</ul>
             </nav>
           ))}
           <nav aria-labelledby="f-res">
             <h2 id="f-res">You &amp; resources</h2>
             <ul>
               {YOU_NAV.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
-              <li><Link href="/watchlist">Watchlist</Link></li>
               <li><a href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Arc docs</a></li>
               <li><a href={BRIDGE_URL} target="_blank" rel="noopener noreferrer">{IS_MAINNET ? "Get USDC" : "Get test USDC"}</a></li>
               <li><a href="/digest/feed.xml">RSS feed</a></li>

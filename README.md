@@ -114,11 +114,12 @@ Arc Mainnet:
 - Gas: USDC
 - EVM-compatible
 
-See `docs/ARCHITECTURE.md` for the complete design and deployment plan.
+See `docs/` for the full set: ARCHITECTURE, PRODUCT, INFORMATION_ARCHITECTURE, UI_UX, DATA,
+CONTRACTS, FEATURES, DEPLOYMENT and STATUS.
 
 ## Deploy
 
-See `docs/DEPLOY.md` for step-by-step Vercel instructions (no local setup needed).
+See `docs/DEPLOYMENT.md` for step-by-step Vercel instructions (no local setup needed).
 
 ## Development
 
@@ -143,19 +144,19 @@ told recording opens soon.
 - `lib/registry.ts` – curated app registry and discovery logic.
 - `lib/server/verify.ts` – server-side quest verification.
 - `app/api/*` – progress, activity and claim endpoints.
-- `docs/UX.md` – every user-facing state and why it exists.
-- `docs/UI_BRIEF.md` – visual system brief; `app/globals.css` holds its tokens.
+- `lib/nav.ts` – information architecture: sections, views inside sections, mobile tabs.
+- `docs/UI_UX.md` – interface system and every user-facing state; `app/globals.css` holds its tokens.
 - `app/components.css` – component styles, one block per component.
 
 ## UI
 
-Follows the V2 brief in `docs/UI_BRIEF.md`: white-first, one ice→navy blue
-spectrum, light and dark themes (toggle in the header, follows the system by
-default). Tokens live in `app/globals.css`; component styles in
+Follows `docs/UI_UX.md`: white-dominant, one blue accent, deep-blue dark mode
+(theme toggle in the sidebar and Settings; follows the system by default). Tokens live in `app/globals.css`; component styles in
 `app/components.css`.
 
-Routes: `/`, `/apps`, `/apps/[slug]`, `/quests`, `/quests/[id]`, `/builders`,
-`/passport`.
+Navigation (see `docs/INFORMATION_ARCHITECTURE.md`): Overview; Discover (Ecosystem, Apps,
+Builders, Assets); Intelligence (Pulse, Radar, Signals); Participate (Quests, Watchlist); Search;
+Settings.
 
 Accessibility note: white text on the signature blue `#3D91BE` is only 3.5:1,
 so buttons and links use royal `#2464A5` (6.1:1). `#3D91BE` stays the brand

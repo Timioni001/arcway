@@ -183,3 +183,30 @@ describe("passport stats", () => {
     expect(i).toEqual(l);
   });
 });
+
+import { buildAssetDetail, buildAssets, toAsset } from "../lib/assets";
+
+describe("assets", () => {
+  const usdc = { address_hash: "0x3600000000000000000000000000000000000000", name: "USDC", symbol: "USDC", decimals: "6", holders_count: "10", total_supply: "2500000" };
+  it("reads both Blockscout token shapes and never invents values", () => {
+    expect(toAsset(usdc)).toMatchObject({ symbol: "USDC", holders: 10, supply: 2.5, decimals: 6 });
+    expect(toAsset({ address: "0x89b50855aa3be2f677cd6303cec089b5f319d72a", holders: "3", symbol: "EURC" })).toMatchObject({ holders: 3, supply: null, decimals: null });
+    expect(toAsset({ address_hash: "nope" })).toBeNull();
+  });
+  it("ranks by holders and drops duplicates", () => {
+    const list = buildAssets([{ ...usdc, holders_count: "1" }, { address_hash: "0x89b50855aa3be2f677cd6303cec089b5f319d72a", symbol: "EURC", holders_count: "5" }, usdc]);
+    expect(list.map((a) => a.symbol)).toEqual(["EURC", "USDC"]);
+  });
+  it("derives related apps only from observed transfers", () => {
+    const d = buildAssetDetail({
+      token: usdc,
+      counters: { transfers_count: "7" },
+      transfers: [{ transaction_hash: "0x1", timestamp: null, from: { hash: "0x0000000000000000000000000000000000000001" }, to: { hash: "0x0000000000000000000000000000000000000002" }, total: { decimals: "6", value: "1500000" } }],
+      apps: []
+    })!;
+    expect(d.transfers).toBe(7);
+    expect(d.recent[0].amount).toBe(1.5);
+    expect(d.relatedApps).toEqual([]);
+    expect(d.sampleSize).toBe(1);
+  });
+});

@@ -3,7 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
 import { NetworkNotice } from "../components/NetworkNotice";
 import { Providers } from "../components/Providers";
-import { BottomBar, MobileTop, Rail, Topbar } from "../components/AppShell";
+import { BottomBar, MobileTop, Rail, SectionViews, Topbar } from "../components/AppShell";
 import { SearchPalette } from "../components/SearchPalette";
 import { Footer } from "../components/Shell";
 import { AmbientPause } from "../components/AmbientPause";
@@ -50,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Topbar />
               <MobileTop />
               <NetworkNotice />
+              <SectionViews />
               <main id="main">{children}</main>
               <Footer />
             </div>
