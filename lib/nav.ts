@@ -1,5 +1,5 @@
 import {
-  Activity, Award, Blocks, Bookmark, Code2, Coins, Compass, Gift, House, IdCard, Link2, Megaphone, Network, Newspaper, Radar, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound, Wallet,
+  Activity, Award, Blocks, Bookmark, Code2, Coins, Compass, Gift, House, IdCard, LayoutGrid, Link2, Megaphone, Network, Newspaper, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound, Wallet,
   type LucideIcon
 } from "lucide-react";
 import { getBuilder } from "./builders";
@@ -13,70 +13,68 @@ export type NavItem = { href: string; label: string; icon: LucideIcon; blurb: st
 export type NavGroup = { label: string; items: NavItem[] };
 
 /**
- * Jobs, not features: Overview, then Discover (what exists), Intelligence (what changed),
- * Participate (what you do). Features without their own job live inside a section (SECTION_VIEWS).
+ * People first: four public jobs (Home, Explore, Quests, Passport) and More for everything deeper.
+ * Network intelligence keeps its routes (/pulse, /radar, /signals) but uses plain names:
+ * Activity, What's New and Insights. Features without their own job live inside a section.
  */
 export const NAV_GROUPS: NavGroup[] = [
-  { label: "", items: [{ href: "/", label: "Overview", icon: House, blurb: "Arc at a glance" }] },
   {
-    label: "Discover",
+    label: "",
     items: [
-      { href: "/ecosystem", label: "Ecosystem", icon: Network, blurb: "Every app, by category, on one map" },
-      { href: "/apps", label: "Apps", icon: Blocks, blurb: "Find and inspect apps on Arc" },
-      { href: "/builders", label: "Builders", icon: Code2, blurb: "The teams behind the apps" },
-      { href: "/assets", label: "Assets", icon: Coins, blurb: "Tokens on Arc and their activity" }
-    ]
-  },
-  {
-    label: "Intelligence",
-    items: [
-      { href: "/pulse", label: "Pulse", icon: Activity, blurb: "Recent network activity" },
-      { href: "/radar", label: "Radar", icon: Radar, blurb: "New contracts and what changed" },
-      { href: "/signals", label: "Signals", icon: RadioTower, blurb: "Notable changes, with evidence" }
-    ]
-  },
-  {
-    label: "Participate",
-    items: [
-      { href: "/quests", label: "Quests", icon: Target, blurb: "Learn Arc by doing, earn XP" },
-      { href: "/watchlist", label: "Watchlist", icon: Bookmark, blurb: "Apps, builders and assets you follow" }
+      { href: "/", label: "Home", icon: House, blurb: "Start here" },
+      { href: "/apps", label: "Explore", icon: Compass, blurb: "Apps, categories, assets and builders on Arc" },
+      { href: "/quests", label: "Quests", icon: Target, blurb: "Short tasks that earn XP and badges" },
+      { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your level, badges and style" }
     ]
   }
+];
+
+/** Deeper and secondary areas. A group in the desktop sidebar, a page (/more) on mobile. */
+export const MORE_NAV: NavItem[] = [
+  { href: "/pulse", label: "Activity", icon: Activity, blurb: "See what is happening on Arc" },
+  { href: "/radar", label: "What's New", icon: Newspaper, blurb: "See what changed on Arc" },
+  { href: "/signals", label: "Insights", icon: RadioTower, blurb: "Notable patterns, with evidence" },
+  { href: "/builders", label: "Builders", icon: Code2, blurb: "The teams behind the apps" },
+  { href: "/watchlist", label: "Watchlist", icon: Bookmark, blurb: "Apps, builders and assets you follow" },
+  { href: "/submit", label: "For Builders", icon: Rocket, blurb: "List your app, run a campaign, add a badge" },
+  { href: "/settings", label: "Settings", icon: Settings, blurb: "Theme, network and data" }
 ];
 
 export const PRIMARY_NAV: NavItem[] = NAV_GROUPS.flatMap((g) => g.items);
 
 export const SECONDARY_NAV: NavItem[] = [
-  { href: "/search", label: "Search", icon: Search, blurb: "Search everything" },
-  { href: "/settings", label: "Settings", icon: Settings, blurb: "Theme, network and data" }
+  { href: "/search", label: "Search", icon: Search, blurb: "Search everything" }
 ];
 
 /**
  * Views that live inside a section instead of the sidebar. The section's own page comes first.
- * Shown as tabs on the section's pages and listed in the mobile menu.
+ * Shown as tabs on the section's pages and listed on the More page.
  */
 export const SECTION_VIEWS: Record<string, NavItem[]> = {
-  "/builders": [
-    { href: "/builders", label: "Directory", icon: Code2, blurb: "" },
-    { href: "/submit", label: "Submit a project", icon: Rocket, blurb: "Get your Arc app listed" },
-    { href: "/launch", label: "Launch a campaign", icon: Megaphone, blurb: "Reward people for trying your app" },
-    { href: "/widgets", label: "Badges", icon: Award, blurb: "Show your app is live on Arc" }
-  ],
-  "/radar": [
-    { href: "/radar", label: "Changes", icon: Radar, blurb: "" },
-    { href: "/digest", label: "Arc today", icon: Newspaper, blurb: "Today's changes in one page" }
+  "/apps": [
+    { href: "/apps", label: "Apps", icon: Blocks, blurb: "" },
+    { href: "/ecosystem", label: "Categories", icon: Network, blurb: "Every app by category, on one map" },
+    { href: "/assets", label: "Assets", icon: Coins, blurb: "Tokens on Arc and their activity" },
+    { href: "/builders", label: "Builders", icon: Code2, blurb: "" },
+    { href: "/radar", label: "What's New", icon: Newspaper, blurb: "" },
+    { href: "/pulse", label: "Activity", icon: Activity, blurb: "" }
   ],
   "/quests": [
     { href: "/quests", label: "Quests", icon: Target, blurb: "" },
     { href: "/campaigns", label: "Campaigns", icon: Gift, blurb: "Complete tasks, share a USDC prize pool" },
-    { href: "/leaderboard", label: "Leaderboard", icon: Trophy, blurb: "Top explorers this season" },
-    { href: "/passport", label: "Passport", icon: IdCard, blurb: "Your XP, level and badges" }
+    { href: "/leaderboard", label: "Leaderboard", icon: Trophy, blurb: "Top explorers this season" }
+  ],
+  "/submit": [
+    { href: "/submit", label: "Submit a project", icon: Rocket, blurb: "" },
+    { href: "/launch", label: "Launch a campaign", icon: Megaphone, blurb: "Reward people for trying your app" },
+    { href: "/widgets", label: "Badges", icon: Award, blurb: "Show your app is live on Arc" }
   ]
 };
 
 /** The nav item that owns a path: its own entry, or the section a folded-in view belongs to. */
 const PARENT: Record<string, string> = {
   "/trails": "/apps",
+  "/digest": "/apps",
   ...Object.fromEntries(Object.entries(SECTION_VIEWS).flatMap(([parent, views]) => views.map((v) => [v.href, parent])))
 };
 
@@ -88,19 +86,17 @@ export const YOU_NAV: NavItem[] = [
   { href: "/wallet", label: "Get a wallet", icon: Wallet, blurb: "Create a free Arc wallet with a passkey" }
 ];
 
-/** Every destination with a description: the mobile menu, search and footer draw from this. */
+/** Every destination with a description: the More page, search and footer draw from this. */
 export const FOLDED_VIEWS: NavItem[] = Object.values(SECTION_VIEWS).flat().filter((v) => v.blurb);
-export const ALL_PAGES: NavItem[] = [...PRIMARY_NAV, ...FOLDED_VIEWS, ...SECONDARY_NAV, ...YOU_NAV];
+export const ALL_PAGES: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV, ...FOLDED_VIEWS, ...SECONDARY_NAV, ...YOU_NAV];
 
-/** Mobile tabs. Explore covers every Discover page; the Menu button in the top bar has everything else. */
-export const EXPLORE_HREFS = ["/ecosystem", "/apps", "/builders", "/assets", "/trails"];
-
+/** Mobile tabs match the public model; More holds the rest. */
 export const BOTTOM_NAV: NavItem[] = [
-  { href: "/", label: "Overview", icon: House, blurb: "" },
-  { href: "/ecosystem", label: "Explore", icon: Compass, blurb: "" },
-  { href: "/pulse", label: "Pulse", icon: Activity, blurb: "" },
-  { href: "/radar", label: "Radar", icon: Radar, blurb: "" },
-  { href: "/watchlist", label: "Watchlist", icon: Bookmark, blurb: "" }
+  { href: "/", label: "Home", icon: House, blurb: "" },
+  { href: "/apps", label: "Explore", icon: Compass, blurb: "" },
+  { href: "/quests", label: "Quests", icon: Target, blurb: "" },
+  { href: "/passport", label: "Passport", icon: IdCard, blurb: "" },
+  { href: "/more", label: "More", icon: LayoutGrid, blurb: "" }
 ];
 
 /** The section owning a path, after resolving folded-in views (/campaigns → /quests). */
@@ -122,7 +118,7 @@ export function isNavActive(pathname: string, href: string): boolean {
 }
 
 export function isBottomActive(pathname: string, href: string): boolean {
-  if (href === "/ecosystem") return EXPLORE_HREFS.some((h) => isNavActive(pathname, h));
+  if (href === "/more") return !BOTTOM_NAV.some((n) => n.href !== "/more" && isNavActive(pathname, n.href));
   return isNavActive(pathname, href);
 }
 
@@ -132,13 +128,13 @@ export function isActive(pathname: string, href: string): boolean {
 }
 
 const ALL = ALL_PAGES;
-const EXTRA: Record<string, string> = { terms: "Terms of Use", privacy: "Privacy Policy", trails: "Apps", more: "Menu" };
+const EXTRA: Record<string, string> = { terms: "Terms of Use", privacy: "Privacy Policy", trails: "Apps", more: "More", digest: "What's New" };
 
 export type Crumb = { label: string; href?: string };
 
 /** Breadcrumb for the top bar: section, then the entity name when there is one. */
 export function crumbsFor(pathname: string): Crumb[] {
-  if (pathname === "/") return [{ label: "Overview" }];
+  if (pathname === "/") return [{ label: "Home" }];
   const [first, second] = pathname.split("/").filter(Boolean);
   const section = ALL.find((n) => n.href === `/${first}`);
   const sectionCrumb: Crumb = section ? { label: section.label, href: section.href } : { label: EXTRA[first] ?? "Arcway", href: first === "trails" ? "/apps" : undefined };

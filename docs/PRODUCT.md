@@ -1,45 +1,61 @@
 # Arcway product
 
-## Purpose
+## Direction
 
-Arcway is an intelligence and discovery layer for the Arc ecosystem. It helps people:
+Arcway is for a normal internet user who does not know Web3 terms. The public experience follows one loop:
 
-- discover applications and builders
-- understand network activity
-- inspect protocols, contracts, assets and transactions
-- monitor changes and signals
-- take part through quests, campaigns and watchlists
+```text
+DISCOVER → TRY → EARN → BUILD YOUR PASSPORT → RETURN
+```
+
+Network intelligence (Activity, What's New, Insights) stays available, but it is not what a newcomer
+sees first. It appears once someone has a reason to care about it.
 
 ## Boundary
 
+Arcway is a discovery, participation and identity layer for Arc. It helps people:
+
+- discover what exists on Arc
+- find simple ways to take part
+- complete quests and earn rewards
+- build a personal Arcway Passport
+- inspect activity and ecosystem data when they want more depth
+
 ```text
-Arc → Arc Portal: use Arc → Arcway: understand and inspect Arc
+ARC
+  ↓
+ARC PORTAL   use Arc: wallet, funding, swaps, sending, earning, agents
+  ↓
+ARCWAY       discover Arc · take part · build your passport · understand Arc
 ```
 
-Arcway does not replace Arc Portal for wallet creation, funding, swapping, sending, earning or agent
-execution. Where a user needs to act, Arcway links to the app or portal that does it.
+Arcway does not replace Arc Portal. Where someone needs to act, Arcway links to the app or portal that
+does it. Wallet features (connection, passkey onboarding where configured, sponsored transactions
+where configured) are supporting infrastructure, not a wallet product. Every transaction is explicit
+and signed by the user.
 
-Wallet features are supporting infrastructure only:
+## Growth loop
 
-- wallet connection (wagmi)
-- passkey onboarding where configured (Circle Modular Wallets, `/wallet`)
-- sponsored transactions where configured
+```text
+Home → see a quest → complete a simple action → earn XP, a badge or a reward
+     → passport updates → customise it → discover another quest → explore more of Arc
+```
 
-Every transaction is explicit and signed by the user. Arcway never holds user funds; campaign pools
-sit in the campaign contract, separate from Arcway's own funds.
+Rewards are part of onboarding and of the reason to return, not a side feature.
 
 ## Users and jobs
 
 | User | Job | Where |
 |---|---|---|
-| Newcomer | Understand what Arc is and what to try | Overview, Apps, Quests |
-| Explorer | Find apps, builders and assets | Discover |
-| Analyst | See what changed and what is active, with evidence | Pulse, Radar, Signals |
-| Participant | Follow things and earn XP or rewards | Watchlist, Quests, Campaigns |
-| Builder | Get listed, show activity, reward users | Builders views: Submit, Launch a campaign, Badges |
+| Newcomer | See what Arc offers and start somewhere | Home, Quests |
+| Explorer | Find apps, categories, assets and builders | Explore |
+| Participant | Earn XP, badges and season rewards; make a passport their own | Quests, Passport |
+| Repeat visitor, researcher | See what is happening and what changed | More: Activity, What's New, Insights |
+| Builder | Get listed, run a campaign, show a badge | More: For Builders |
 
 ## Principles
 
-- Works without a wallet. Connecting is only needed to record progress or join a campaign.
+- Do not ask a new user to become a blockchain analyst before they can enjoy Arcway.
+- Works without a wallet until someone wants to record progress.
 - Never guess. A number without a source shows "coming soon" or "unavailable".
-- Observation, not advice. Radar and Signals describe what happened; they never recommend.
+- Observation, not advice. Insights appear only with evidence.

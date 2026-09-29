@@ -1,11 +1,11 @@
 'use client';
 
-import { Bookmark, ChevronRight, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
+import { Bookmark, ChevronDown, ChevronRight, LayoutGrid, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { NETWORK_NAME } from "../lib/config";
-import { BOTTOM_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isBottomActive, isNavActive, viewsFor, type NavItem } from "../lib/nav";
+import { BOTTOM_NAV, MORE_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isBottomActive, isNavActive, viewsFor, type NavItem } from "../lib/nav";
 import { THEME_EVENT, toggleTheme } from "../lib/theme";
 import { getWatchlist, getWatchlistServer, subscribeWatchlist } from "../lib/watchlist";
 import { Logo, LogoMark } from "./Logo";
@@ -14,6 +14,7 @@ import { SearchButton, openSearch } from "./SearchPalette";
 import { WalletButton } from "./WalletButton";
 
 const RAIL_KEY = "arcway:rail";
+const MORE_KEY = "arcway:rail-more";
 
 function useDark() {
   const [dark, setDark] = useState<boolean | null>(null);
@@ -30,8 +31,8 @@ export function useWatchCount() {
   return useSyncExternalStore(subscribeWatchlist, getWatchlist, getWatchlistServer).length;
 }
 
-function RailLink({ item, pathname, onNavigate }: { item: NavItem; pathname: string; onNavigate?: () => void }) {
-  const active = isNavActive(pathname, item.href);
+function RailLink({ item, pathname, onNavigate, exact }: { item: NavItem; pathname: string; onNavigate?: () => void; exact?: boolean }) {
+  const active = exact ? pathname === item.href || pathname.startsWith(`${item.href}/`) : isNavActive(pathname, item.href);
   const Icon = item.icon;
   if (item.href === "/search") {
     return (
@@ -44,6 +45,31 @@ function RailLink({ item, pathname, onNavigate }: { item: NavItem; pathname: str
     <Link href={item.href} className="rail__link" data-label={item.label} aria-current={active ? "page" : undefined} onClick={onNavigate}>
       <Icon aria-hidden="true" /><span className="rail__label">{item.label}</span>
     </Link>
+  );
+}
+
+/** "More" expands in place: deeper areas (Activity, What's New, Insights) and secondary tools. */
+function RailMore({ pathname, onNavigate }: { pathname: string; onNavigate: () => void }) {
+  const inMore = MORE_NAV.some((n) => pathname === n.href || pathname.startsWith(`${n.href}/`));
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    let stored = false;
+    try { stored = localStorage.getItem(MORE_KEY) === "open"; } catch { /* not persisted */ }
+    setOpen(stored || inMore);
+  }, [inMore]);
+  const toggle = () => setOpen((o) => {
+    try { localStorage.setItem(MORE_KEY, o ? "closed" : "open"); } catch { /* not persisted */ }
+    return !o;
+  });
+  return (
+    <nav className="rail__nav rail__more" aria-label="More">
+      <button type="button" className="rail__link rail__more-toggle" data-label="More" aria-expanded={open} aria-controls="rail-more-list" onClick={toggle}>
+        <LayoutGrid aria-hidden="true" /><span className="rail__label">More</span><ChevronDown className="rail__chev rail__label" aria-hidden="true" />
+      </button>
+      <ul id="rail-more-list" hidden={!open}>
+        {MORE_NAV.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={onNavigate} exact /></li>)}
+      </ul>
+    </nav>
   );
 }
 
@@ -94,7 +120,8 @@ export function Rail() {
           </div>
         ))}
       </nav>
-      <nav className="rail__nav rail__nav--secondary" aria-label="More">
+      <RailMore pathname={pathname} onNavigate={close} />
+      <nav className="rail__nav rail__nav--secondary" aria-label="Utilities">
         <ul>
           {SECONDARY_NAV.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}
         </ul>
@@ -167,7 +194,7 @@ export function Topbar() {
   );
 }
 
-/** Mobile: logo, search, connect, menu. The menu page lists the full information architecture. */
+/** Mobile: logo, search, connect. Navigation lives in the bottom tabs; More lists everything else. */
 export function MobileTop() {
   return (
     <header className="mtop">
@@ -176,7 +203,6 @@ export function MobileTop() {
         <div className="mtop__tools">
           <SearchButton variant="icon" />
           <WalletButton />
-          <Link href="/more" className="icon-btn" aria-label="Menu"><Menu aria-hidden="true" /></Link>
         </div>
       </div>
     </header>

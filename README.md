@@ -145,6 +145,7 @@ told recording opens soon.
 - `lib/server/verify.ts` – server-side quest verification.
 - `app/api/*` – progress, activity and claim endpoints.
 - `lib/nav.ts` – information architecture: sections, views inside sections, mobile tabs.
+- `lib/passportStyle.ts` – passport styles and the participation that unlocks them.
 - `docs/UI_UX.md` – interface system and every user-facing state; `app/globals.css` holds its tokens.
 - `app/components.css` – component styles, one block per component.
 
@@ -154,9 +155,8 @@ Follows `docs/UI_UX.md`: white-dominant, one blue accent, deep-blue dark mode
 (theme toggle in the sidebar and Settings; follows the system by default). Tokens live in `app/globals.css`; component styles in
 `app/components.css`.
 
-Navigation (see `docs/INFORMATION_ARCHITECTURE.md`): Overview; Discover (Ecosystem, Apps,
-Builders, Assets); Intelligence (Pulse, Radar, Signals); Participate (Quests, Watchlist); Search;
-Settings.
+Navigation (see `docs/INFORMATION_ARCHITECTURE.md`): Home, Explore, Quests, Passport, and More
+(Activity, What's New, Insights, Builders, Watchlist, For Builders, Settings). Search is global.
 
 Accessibility note: white text on the signature blue `#3D91BE` is only 3.5:1,
 so buttons and links use royal `#2464A5` (6.1:1). `#3D91BE` stays the brand

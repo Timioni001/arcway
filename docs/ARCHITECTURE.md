@@ -3,17 +3,28 @@
 This document defines structure only. Product purpose is in [PRODUCT.md](PRODUCT.md), navigation in
 [INFORMATION_ARCHITECTURE.md](INFORMATION_ARCHITECTURE.md), and what is live today in [STATUS.md](STATUS.md).
 
-## Product layers
+## Product hierarchy
 
 ```text
-LEVEL 1  OVERVIEW      What is happening?
-LEVEL 2  DISCOVER      What exists on Arc?
-LEVEL 3  INTELLIGENCE  What changed and what is active?
-LEVEL 4  ENTITY        What is this app, builder, asset or contract?
-LEVEL 5  TECHNICAL     What transaction, event, call or address produced it?
+                  ARCWAY
+                     │
+          ┌──────────┴──────────┐
+       PUBLIC                 DEEP (More)
+   Home · Explore           Activity
+   Quests · Passport        What's New
+          │                 Insights
+          └──────────┬──────────┘
+                  ENTITIES
+        Apps · Builders · Assets
+         Contracts · Transactions
+                     │
+                   DATA
+                     │
+                    ARC
 ```
 
-Each level adds detail. Technical data (addresses, hashes, raw calls) appears only at levels 4 and 5.
+People enter through discovery and participation. Technical data (addresses, hashes, raw calls,
+network metrics) appears only on the deeper pages and entity pages.
 
 ## System
 
@@ -65,8 +76,11 @@ SERVE   app/api/intel/*                                  { data, fetchedAt, netw
 Two contracts, both participation infrastructure rather than the intelligence layer. See
 [CONTRACTS.md](CONTRACTS.md).
 
-- **ArcwayPassport**: XP, badges and verified quest completion.
+- **ArcwayPassport**: XP, badges and verified quest completion (proof of activity).
 - **ArcwayCampaigns**: project-funded USDC prize pools with entry, results, claims and refunds.
+
+The visual passport (name, theme, frame, title) is an application layer on top of that proof, kept
+offchain so it can change freely.
 
 ## Architecture rules
 
@@ -75,26 +89,14 @@ Two contracts, both participation infrastructure rather than the intelligence la
 3. Do not duplicate the same data in multiple independent systems.
 4. Do not expose technical data before the user needs it.
 5. Every metric has a source and a period.
-6. Arcway is an intelligence and discovery product, not a replacement for Arc Portal.
+6. Arcway is a discovery, participation and identity product, not a replacement for Arc Portal.
+8. Public pages lead with people's jobs; protocol terms appear only after the user has a reason to care.
 7. Every new feature answers: which user job does it serve, which entity does it belong to, which
    existing view should contain it, and what new data does it require?
 
-## Summary
+## Core principle
 
 ```text
-                    ARCWAY
-                       │
-             ┌─────────┴─────────┐
-          DISCOVER          INTELLIGENCE
-     Apps · Builders       Pulse · Radar
-     Assets · Ecosystem       Signals
-             └─────────┬─────────┘
-                    ENTITIES
-       App · Builder · Asset · Contract
-          Transaction · Signal · Integration
-                       │
-                     DATA
-       Arc RPC · Explorer · Envio · Metadata
-                       │
-                      ARC
+COME IN → SEE SOMETHING INTERESTING → START A QUEST → EARN SOMETHING
+        → MAKE YOUR PASSPORT YOUR OWN → DISCOVER MORE → OPTIONALLY GO DEEPER
 ```

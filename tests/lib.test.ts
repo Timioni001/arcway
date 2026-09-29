@@ -308,3 +308,30 @@ describe("builders and search", () => {
     expect(addressHues("0x111111222222")).not.toEqual(addressHues("0x999999888888"));
   });
 });
+
+import { DEFAULT_STYLE, STYLE_ITEMS, cleanName, isUnlocked, resolveStyle, unlockText, unlockedCount } from "../lib/passportStyle";
+
+describe("passport styles", () => {
+  const none = { quests: 0, apps: 0, questIds: [] as string[] };
+  const some = { quests: 3, apps: 5, questIds: ["arrive-with-usdc", "first-tx", "explore-app"] };
+  it("starts with only the defaults unlocked", () => {
+    expect(STYLE_ITEMS.filter((i) => isUnlocked(i, none)).every((i) => i.unlock === null)).toBe(true);
+    expect(unlockedCount(none)).toEqual({ unlocked: 0, total: STYLE_ITEMS.filter((i) => i.unlock).length });
+  });
+  it("unlocks by participation and says how", () => {
+    const halo = STYLE_ITEMS.find((i) => i.id === "halo")!;
+    expect(isUnlocked(halo, some)).toBe(true);
+    expect(unlockText(halo)).toBe("Complete 3 quests");
+    expect(unlockText(STYLE_ITEMS.find((i) => i.id === "app-hopper")!)).toBe("Explore 5 Arc apps");
+    expect(isUnlocked(STYLE_ITEMS.find((i) => i.id === "aurora")!, some)).toBe(false);
+  });
+  it("never shows a locked style, even if one was stored", () => {
+    expect(resolveStyle({ theme: "aurora", frame: "halo", title: "arc-explorer", name: " Ada " }, none)).toEqual({ ...DEFAULT_STYLE, name: "Ada" });
+    expect(resolveStyle({ theme: "midnight", frame: "halo", title: "app-hopper" }, some)).toMatchObject({ theme: "midnight", frame: "halo", title: "app-hopper" });
+    expect(resolveStyle({ theme: "nope" }, some).theme).toBe("arc");
+  });
+  it("keeps display names short and plain", () => {
+    expect(cleanName("<b>Ada</b>  Lovelace!!")).toBe("bAdab Lovelace");
+    expect(cleanName("x".repeat(40))).toHaveLength(24);
+  });
+});

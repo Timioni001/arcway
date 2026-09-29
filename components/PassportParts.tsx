@@ -6,6 +6,8 @@ import { useArcwayState } from "../lib/hooks/context";
 import { useCountUp } from "../lib/hooks/useCountUp";
 import { levelFor } from "../lib/levels";
 import { visitedApps } from "../lib/visited";
+import { usePassportStyle } from "../lib/hooks/usePassportStyle";
+import { getItem } from "../lib/passportStyle";
 import { Medal } from "./Medal";
 import { AddressAvatar } from "./AddressAvatar";
 
@@ -14,15 +16,17 @@ export function ProfileCard() {
   const shown = useCountUp(xp);
   const level = levelFor(xp);
   const address = connection.address;
+  const { style } = usePassportStyle();
+  const title = style.title !== "none" ? getItem("title", style.title)?.name : undefined;
 
   return (
     <section className="card pad-lg" aria-labelledby="profile">
       <h2 id="profile" className="label">Profile</h2>
       <div className="profile" style={{ marginTop: 20 }}>
-        <AddressAvatar address={address} size="lg" />
+        <span className="avatar-frame" data-frame={style.frame}><AddressAvatar address={address} size="lg" /></span>
         <div>
-          <div className="mono h4">{address ? shortAddress(address) : "Not connected"}</div>
-          <div className="small secondary" style={{ marginTop: 2 }}>{level.name}</div>
+          <div className={style.name ? "h4" : "mono h4"}>{style.name || (address ? shortAddress(address) : "Not connected")}</div>
+          <div className="small secondary" style={{ marginTop: 2 }}>{level.name}{title && <> · {title}</>}{style.name && address && <span className="mono"> · {shortAddress(address)}</span>}</div>
         </div>
       </div>
       <div className="row between" style={{ marginTop: 28, alignItems: "baseline" }}>

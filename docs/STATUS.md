@@ -15,12 +15,15 @@ changes with every release.
 
 | Area | Status | Notes |
 |---|---|---|
-| Overview, Ecosystem, Apps, Builders | LIVE | |
+| Home, Explore, Categories, Builders | LIVE | |
 | Assets list and asset pages | LIVE | Reads the explorer token list |
 | Asset markets (prices) | COMING SOON | No authoritative price source for Arc yet |
-| Pulse, Radar, Arc today, Signals | LIVE | Explorer-backed, with provenance |
+| Activity, What's New, today's summary, Insights | LIVE | Explorer-backed, with provenance; under More |
 | Search, Watchlist, Settings | LIVE | Watchlist is stored per browser |
-| Quests and Passport | LIVE | Passport contract `0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107` |
+| Quests (Beginner tier) and Passport | LIVE | Passport contract `0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107` |
+| Passport styles (name, themes, frames, titles) | LIVE | Offchain, saved per browser |
+| Quest tiers Explorer, Regular, Advanced | COMING SOON | Need new quests with onchain checks |
+| Collectibles | COMING SOON | |
 | Leaderboard and onchain proof | LIVE | |
 | Submit a project, Badges, RSS | LIVE | Listings reviewed through GitHub issues |
 | Envio indexer | BUILT | Deploy `indexer/` and set `ARCWAY_INDEXER_URL`; explorer fallback until then |
@@ -30,6 +33,8 @@ changes with every release.
 
 ## Planned
 
+- Seasonal and community quests
+- Passport styles that follow you across devices (signed profile)
 - Alerts on watchlist items
 - Contract and transaction entity pages inside Arcway (explorer links today)
 - Integration detection between apps

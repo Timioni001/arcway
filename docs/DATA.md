@@ -36,13 +36,13 @@ Envelope:
 | Endpoint | Derivation | Refresh |
 |---|---|---|
 | `/api/intel/snapshot` | `buildSnapshot`: network metrics with periods | 60s |
-| `/api/intel/pulse` | `buildPulse`: latest transactions and USDC transfers, classified | 15s |
-| `/api/intel/radar` | `buildRadar`: new, verified and most-used contracts, activity shifts | 2 min |
-| `/api/intel/signals` | `buildSignals`: observations with period and evidence | 60s |
+| `/api/intel/pulse` | `buildPulse`: latest transactions and USDC transfers, classified (Activity) | 15s |
+| `/api/intel/radar` | `buildRadar`: new, verified and most-used contracts, activity shifts (What's New) | 2 min |
+| `/api/intel/signals` | `buildSignals`: observations with period and evidence (Insights) | 60s |
 | `/api/intel/protocol/[slug]` | `buildProtocol`: a listed app's published contracts | 60s |
 | `/api/intel/assets` | `buildAssets`: ERC-20 tokens ranked by holders | 5 min |
 | `/api/intel/asset/[address]` | `buildAssetDetail`: token counters, transfers, related apps | 60s |
-| `/api/intel/passport` | `buildPassportStats`: passports, XP, leaderboard | 60s |
+| `/api/intel/passport` | `buildPassportStats`: passports, XP, completions per quest (popular quests, badge holders), leaderboard | 60s |
 | `/api/campaigns/[id]/*` | Eligibility, entry signature, Merkle proof, draw results | per request |
 
 ## Provenance

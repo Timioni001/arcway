@@ -279,6 +279,6 @@ export function SignalCard({ s, now }: { s: Signal; now: number }) {
 export function SignalList({ signals, limit }: { signals: Signal[]; limit?: number }) {
   const now = useNow(30_000);
   const list = limit ? signals.slice(0, limit) : signals;
-  if (!list.length) return <p className="small secondary intel-note">Nothing notable right now. Signals appear only when Arc data shows a real change.</p>;
+  if (!list.length) return <p className="small secondary intel-note">Nothing notable right now. Insights appear only when Arc data shows a real change.</p>;
   return <ul className="signal-list">{list.map((s) => <SignalCard key={s.id} s={s} now={now} />)}</ul>;
 }

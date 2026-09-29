@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET } from "../lib/config";
-import { NAV_GROUPS, SECTION_VIEWS, YOU_NAV } from "../lib/nav";
+import { MORE_NAV, PRIMARY_NAV, SECTION_VIEWS, YOU_NAV, type NavItem } from "../lib/nav";
+
+const views = (href: string) => (SECTION_VIEWS[href] ?? []).filter((v) => v.blurb);
+const FOOTER: { title: string; items: NavItem[] }[] = [
+  { title: "Arcway", items: [...PRIMARY_NAV, ...views("/apps")] },
+  { title: "Go deeper", items: MORE_NAV.filter((n) => ["/pulse", "/radar", "/signals", "/builders"].includes(n.href)) },
+  { title: "Earn and build", items: [...views("/quests"), ...MORE_NAV.filter((n) => n.href === "/submit"), ...views("/submit")] }
+];
 import { Logo } from "./Logo";
 import { FooterProof } from "./PassportProof";
 
@@ -11,7 +18,7 @@ export function Footer() {
         <div className="footer__inner">
           <div className="footer__brand" style={{ display: "grid", gap: 14, maxWidth: 320 }}>
             <Logo />
-            <p className="small secondary">Arc ecosystem intelligence. Explore applications, activity, builders and signals across Arc.</p>
+            <p className="small secondary">Explore Arc, complete quests and build your passport. Deeper activity data when you want it.</p>
             <FooterProof />
           <div className="built-on">
               <span className="label">Built on</span>
@@ -22,16 +29,17 @@ export function Footer() {
               <img className="for-dark" src="/brand/arc/arc-logo-light.svg" alt="Arc" width={146} height={50} />
             </div>
           </div>
-          {NAV_GROUPS.filter((g) => g.label).map((g, i) => (
-            <nav key={g.label} aria-labelledby={`f-${i}`}>
-              <h2 id={`f-${i}`}>{g.label}</h2>
-              <ul>{[...g.items, ...g.items.flatMap((l) => (SECTION_VIEWS[l.href] ?? []).filter((v) => v.blurb))].map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}</ul>
+          {FOOTER.map((g, i) => (
+            <nav key={g.title} aria-labelledby={`f-${i}`}>
+              <h2 id={`f-${i}`}>{g.title}</h2>
+              <ul>{g.items.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}</ul>
             </nav>
           ))}
           <nav aria-labelledby="f-res">
             <h2 id="f-res">You &amp; resources</h2>
             <ul>
               {YOU_NAV.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
+              <li><Link href="/watchlist">Watchlist</Link></li>
               <li><a href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Arc docs</a></li>
               <li><a href={BRIDGE_URL} target="_blank" rel="noopener noreferrer">{IS_MAINNET ? "Get USDC" : "Get test USDC"}</a></li>
               <li><a href="/digest/feed.xml">RSS feed</a></li>

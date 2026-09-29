@@ -134,7 +134,7 @@ export function PulsePreview() {
       {q.isPending ? (
         <div className="intel-skel">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: 18, width: `${86 - i * 10}%` }} />)}</div>
       ) : q.isError || !events.length ? (
-        <p className="small secondary">Live activity data coming soon. <Link className="link" href="/pulse">Open Pulse</Link></p>
+        <p className="small secondary">Live activity data coming soon. <Link className="link" href="/pulse">Open Activity</Link></p>
       ) : (
         <PulseList events={events} limit={5} />
       )}

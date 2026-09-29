@@ -47,6 +47,16 @@ Trust model:
 - The project funds the pool; funds stay in the contract, separate from Arcway's operating funds.
 - The verifier can admit entrants and publish a root that anyone can check. It cannot withdraw pools.
 
+## Onchain proof, offchain presentation
+
+| Onchain (ArcwayPassport) | Offchain (application) |
+|---|---|
+| XP, quest completion, badges | Display name, card theme, avatar frame, title, layout |
+
+Styles unlock from onchain quest completions (and apps opened from Arcway in the browser), but choosing
+one never needs a transaction. The contract stays a small proof primitive, not a social identity
+protocol. Campaigns stay separate from the passport.
+
 ## Verifier key
 
 One server-only key (`VERIFIER_PRIVATE_KEY`) signs passport records, campaign entries and results.

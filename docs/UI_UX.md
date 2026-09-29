@@ -15,20 +15,28 @@ Tokens live in `app/globals.css` (colours, spacing, radii, motion) and component
 
 ## Copy
 
-Short, factual, specific, easy to scan. Prefer "Arc right now", "What's new", "Explore apps",
+Plain words first: Activity, What's New and Insights rather than Pulse, Radar and Signals; "Try an
+app" rather than "Interact with protocol X". Short, factual, specific, easy to scan. Prefer "Arc right now", "What's new", "Explore apps",
 "Recent activity", "Activity spike", "New contract", "View transaction" over descriptive card copy.
 Avoid marketing filler, repeated explanations, generic crypto language, claims without evidence, long
 paragraphs inside cards, and technical terms before they are useful.
 
 ## Shell
 
-- **Sidebar** (desktop): Overview, then Discover, Intelligence and Participate groups, then Search
-  and Settings. Collapses to icons; tablet widths start collapsed.
+- **Sidebar** (desktop): Home, Explore, Quests, Passport; then More, which expands in place (open by
+  default on its own pages); then Search. Collapses to icons; tablet widths start collapsed.
 - **Top bar** (desktop): breadcrumb, search, watchlist, notifications, wallet.
 - **Section views**: a tab row above the page for views folded into a section.
-- **Mobile**: top bar (logo, search, connect, menu) and a floating glass tab bar with a lens that
+- **Mobile**: top bar (logo, search, connect) and a floating glass tab bar (Home, Explore, Quests,
+  Passport, More) with a lens that
   follows the active tab. It tucks into a compact pill while scrolling down and falls back to a
   solid bar where `backdrop-filter` is unsupported.
+
+## Rewards and passport
+
+Rewards look like a collection, not a spreadsheet: artwork, name, what it is for, how it was earned.
+Passport styles (themes, frames, titles) are visual and personal, and each locked option says in one
+line how to unlock it.
 
 ## Motion
 

@@ -6,8 +6,21 @@ export type QuestRequirement =
   | { kind: "app-interaction" }
   | { kind: "complete-quests"; questIds: string[] };
 
+/** What kind of thing the quest asks for, in plain words. */
+export type QuestType = "Learn" | "Explore" | "Try an app" | "Onchain action" | "Collect" | "Seasonal" | "Community";
+
+/** Progression: each tier introduces a little more of Arc. */
+export const QUEST_TIERS = ["Beginner", "Explorer", "Regular", "Advanced"] as const;
+export type QuestTier = (typeof QUEST_TIERS)[number];
+
+export const DIFFICULTY_LABEL: Record<Quest["difficulty"], string> = { easy: "Beginner", medium: "Intermediate", hard: "Advanced" };
+
 export type Quest = {
   id: string;
+  type: QuestType;
+  tier: QuestTier;
+  /** The badge this quest awards, recorded on Arc with the XP. */
+  badge: { name: string; description: string };
   title: string;
   description: string;
   /** Concrete instruction shown while the quest is not yet done. */
@@ -25,6 +38,9 @@ export type Quest = {
 export const QUESTS: Quest[] = [
   {
     id: "arrive-with-usdc",
+    type: "Learn",
+    tier: "Beginner",
+    badge: { name: "Arrival", description: "Brought dollars to Arc for the first time." },
     title: "Arrive on Arc",
     description: "Hold at least 1 USDC on Arc.",
     howTo: "Get a little USDC on Arc.",
@@ -36,6 +52,9 @@ export const QUESTS: Quest[] = [
   },
   {
     id: "first-tx",
+    type: "Onchain action",
+    tier: "Beginner",
+    badge: { name: "First Step", description: "Made a first transaction on Arc." },
     title: "First transaction",
     description: "Make your first transaction on Arc.",
     howTo: "Any payment or swap from your wallet counts.",
@@ -47,6 +66,9 @@ export const QUESTS: Quest[] = [
   },
   {
     id: "explore-app",
+    type: "Try an app",
+    tier: "Beginner",
+    badge: { name: "App Explorer", description: "Used a verified app on Arc." },
     title: "Explore an app",
     description: "Complete one action in a verified app.",
     howTo: "Open a verified app and complete its first action.",
@@ -58,6 +80,9 @@ export const QUESTS: Quest[] = [
   },
   {
     id: "arc-explorer",
+    type: "Collect",
+    tier: "Beginner",
+    badge: { name: "Arc Explorer", description: "Finished every starter quest." },
     title: "Arc Explorer",
     description: "Finish the three starter quests.",
     howTo: "Claim the three starter quests first.",

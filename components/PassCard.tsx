@@ -6,11 +6,13 @@ import { useArcwayState } from "../lib/hooks/context";
 import { useCountUp } from "../lib/hooks/useCountUp";
 import { usePointerVars } from "../lib/hooks/usePointerVars";
 import { levelFor } from "../lib/levels";
+import { usePassportStyle } from "../lib/hooks/usePassportStyle";
+import { getItem, type PassportStyle } from "../lib/passportStyle";
 import { Forms } from "./Forms";
 import { LogoMark } from "./Logo";
 
 /** The passport as a physical card: tilts and catches light under the pointer. */
-export function PassCardView({ address, xp, done }: { address?: string; xp: number; done: boolean[] }) {
+export function PassCardView({ address, xp, done, look }: { address?: string; xp: number; done: boolean[]; look?: PassportStyle }) {
   const ref = useRef<HTMLDivElement>(null);
   const shown = useCountUp(xp);
   const level = levelFor(xp);
@@ -21,7 +23,7 @@ export function PassCardView({ address, xp, done }: { address?: string; xp: numb
   usePointerVars(ref, tilt);
 
   return (
-    <div className="pass" ref={ref} role="img" aria-label={`Arcway passport: ${level.name}, ${xp} XP`}>
+    <div className="pass" ref={ref} data-theme={look?.theme ?? "arc"} role="img" aria-label={`Arcway passport${look?.name ? ` of ${look.name}` : ""}: ${level.name}, ${xp} XP`}>
       <Forms />
       <div className="pass__top">
         <span className="pass__brand"><LogoMark className="logo__mark" id="aw-mark-pass" /> arcway</span>
@@ -29,7 +31,8 @@ export function PassCardView({ address, xp, done }: { address?: string; xp: numb
       </div>
       <div className="pass__bottom">
         <div>
-          <div className="pass__label">{address ? level.name : "Your level"}</div>
+          {look?.name && <div className="pass__name">{look.name}</div>}
+          <div className="pass__label">{address ? level.name : "Your level"}{look && look.title !== "none" && <> · {getItem("title", look.title)?.name}</>}</div>
           <div className="pass__xp" style={{ marginTop: 8 }}>{String(shown).padStart(3, "0")} XP</div>
           <div className="mono" style={{ marginTop: 10, fontSize: 13, color: "#A9DDF4" }}>{address ? shortAddress(address) : "0x0000…0000"}</div>
         </div>
@@ -44,9 +47,11 @@ export function PassCardView({ address, xp, done }: { address?: string; xp: numb
 /** The connected wallet's passport card. */
 export function PassCard() {
   const { xp, quests, connection } = useArcwayState();
+  const { style } = usePassportStyle();
   const connected = connection.status === "connected";
   return (
     <PassCardView
+      look={connected ? style : undefined}
       address={connected ? connection.address : undefined}
       xp={connected ? xp : 0}
       done={quests.map((q) => connected && q.status === "completed")}

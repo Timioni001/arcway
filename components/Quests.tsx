@@ -4,7 +4,7 @@ import { ArrowRight, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { useClaims } from "../lib/hooks/claims";
 import { useArcwayState } from "../lib/hooks/context";
-import { QUESTS, questProgress, type QuestStatus, type QuestView } from "../lib/quests";
+import { DIFFICULTY_LABEL, QUESTS, QUEST_TIERS, questProgress, type QuestStatus, type QuestView } from "../lib/quests";
 import { TransactionStatus } from "./TransactionStatus";
 
 export const STATUS_TEXT: Record<QuestStatus, string> = {
@@ -38,17 +38,19 @@ export function QuestCard({ quest }: { quest: QuestView }) {
   return (
     <article className="quest-card card" data-status={connected ? quest.status : undefined} aria-labelledby={`q-${quest.id}`}>
       <div className="row between">
-        <span className="label">Quest {questNumber(quest.id)}</span>
-        {connected ? <QuestBadge quest={quest} /> : <span className="mono xs secondary">{quest.minutes} min</span>}
+        <span className="tag">{quest.type}</span>
+        {connected && <QuestBadge quest={quest} />}
       </div>
       <div>
         <h3 id={`q-${quest.id}`} className="h4">{quest.title}</h3>
         <p className="small secondary" style={{ marginTop: 6 }}>{quest.description}</p>
       </div>
-      <div className="quest-card__reward">
-        <span className="quest-card__xp mono">+{quest.xp} XP</span>
-        {connected && <span className="mono xs secondary">{pct}%</span>}
-      </div>
+      <dl className="quest-card__facts">
+        <div><dt>Reward</dt><dd><span className="quest-card__xp mono">+{quest.xp} XP</span><span className="xs secondary">{quest.badge.name} badge</span></dd></div>
+        <div><dt>Difficulty</dt><dd>{DIFFICULTY_LABEL[quest.difficulty]}</dd></div>
+        <div><dt>Time</dt><dd>{quest.minutes} min</dd></div>
+      </dl>
+      {connected && <span className="mono xs secondary">{pct}% done</span>}
       {connected && (
         <div className="progress" role="progressbar" aria-label={`${quest.title} progress`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
           <i style={{ width: `${pct}%` }} />
@@ -62,7 +64,7 @@ export function QuestCard({ quest }: { quest: QuestView }) {
           </button>
         ) : (
           <Link href={`/quests/${quest.id}`} className="app-card__open">
-            {connected && quest.status === "completed" ? "View quest" : "Start quest"} <ArrowRight aria-hidden="true" />
+            {connected && quest.status === "completed" ? "View quest" : "Start"} <ArrowRight aria-hidden="true" />
           </Link>
         )}
       </div>
@@ -76,5 +78,26 @@ export function QuestGrid() {
     <ul className="cards cards--4">
       {quests.map((q) => <li key={q.id}><QuestCard quest={q} /></li>)}
     </ul>
+  );
+}
+
+/** Progression: Beginner first; each later tier introduces a little more of Arc. */
+export function QuestTiers() {
+  const { quests, connection } = useArcwayState();
+  const connected = connection.status === "connected";
+  return (
+    <ol className="tiers">
+      {QUEST_TIERS.map((tier, i) => {
+        const inTier = quests.filter((q) => q.tier === tier);
+        const done = connected ? inTier.filter((q) => q.status === "completed").length : 0;
+        return (
+          <li key={tier} className="tier" data-live={inTier.length > 0}>
+            <span className="tier__step mono" aria-hidden="true">{i + 1}</span>
+            <span className="tier__name">{tier}</span>
+            <span className="xs secondary">{inTier.length ? `${done}/${inTier.length} quests done` : "Coming soon"}</span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

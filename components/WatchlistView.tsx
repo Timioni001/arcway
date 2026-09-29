@@ -40,7 +40,7 @@ export function WatchlistView() {
           <Bookmark aria-hidden="true" style={{ color: "var(--blue)" }} />
           <div>
             <div style={{ fontWeight: 600 }}>Nothing followed yet</div>
-            <p className="small secondary">Follow apps, builders, assets or categories to keep them here, with their activity and signals in one place.</p>
+            <p className="small secondary">Follow apps, builders, assets or categories to keep them here, with their activity and insights in one place.</p>
           </div>
         </div>
         <section className="panel" aria-labelledby="suggest-title">
@@ -113,9 +113,9 @@ export function WatchlistView() {
         )}
       </div>
       <section className="panel" aria-labelledby="w-signals">
-        <PanelHead icon={Bell} title="Signals for what you follow" id="w-signals"><SourceTag source="observed" period="Live" /></PanelHead>
+        <PanelHead icon={Bell} title="Insights for what you follow" id="w-signals"><SourceTag source="observed" period="Live" /></PanelHead>
         <IntelGate query={signals} rows={4}>
-          {relevant.length ? <SignalList signals={relevant} /> : <p className="small secondary intel-note">No signals for what you follow right now. They appear here when Arc data shows a change.</p>}
+          {relevant.length ? <SignalList signals={relevant} /> : <p className="small secondary intel-note">No insights for what you follow right now. They appear here when Arc data shows a change.</p>}
         </IntelGate>
       </section>
     </div>

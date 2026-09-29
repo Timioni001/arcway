@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftRight, Coins, Copy, RadioTower, CornerDownLeft, FileCode2, History, IdCard, Link2, Moon, Plus, Route, Search, Target, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, Award, Coins, Copy, RadioTower, CornerDownLeft, FileCode2, History, IdCard, Link2, Moon, Plus, Route, Search, Target, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { builderMark } from "../lib/builders";
@@ -15,6 +15,7 @@ import type { Signal } from "../lib/intel";
 import { useToast } from "../lib/hooks/toast";
 import { APPS, discoverApps } from "../lib/registry";
 import { toggleTheme } from "../lib/theme";
+import { QUESTS } from "../lib/quests";
 import { ALL_PAGES } from "../lib/nav";
 import { explorer } from "../lib/config";
 import { AppLogo } from "./AppCard";
@@ -63,15 +64,18 @@ function results(term: string, actions: Item[], recent: string[], live: { assets
   const assets = r.onchain ? [] : live.assets.filter((a) => `${a.symbol} ${a.name}`.toLowerCase().includes(t)).slice(0, 5).map<Item>((a) => ({
     id: `as-${a.address}`, group: "Assets", title: a.symbol, sub: `${a.name}${a.holders !== null ? ` · ${a.holders.toLocaleString("en-US")} holders` : ""}`, href: `/assets/${a.address}`, icon: tile(Coins, 1)
   }));
+  const badges = r.onchain ? [] : QUESTS.filter((q) => `${q.badge.name} ${q.badge.description}`.toLowerCase().includes(t)).map<Item>((q) => ({
+    id: `bd-${q.id}`, group: "Badges", title: q.badge.name, sub: `Earned by the ${q.title} quest`, href: "/passport#rewards", icon: tile(Award, 2)
+  }));
   const signals = r.onchain ? [] : live.signals.filter((s) => `${s.title} ${s.detail} ${s.entity?.label ?? ""}`.toLowerCase().includes(t)).slice(0, 4).map<Item>((s) => ({
-    id: `sg-${s.id}`, group: "Signals", title: s.title, sub: s.period, href: "/signals", icon: tile(RadioTower, 3)
+    id: `sg-${s.id}`, group: "Insights", title: s.title, sub: s.period, href: "/signals", icon: tile(RadioTower, 3)
   }));
   const trails = r.trails.map<Item>((tr) => ({
     id: `t-${tr.id}`, group: "Trails", title: tr.title, sub: tr.goal, href: `/trails/${tr.id}`, icon: tile(Route, 1)
   }));
   const acts = actions.filter((a) => `${a.title} ${a.sub} ${a.keywords ?? ""}`.toLowerCase().includes(t));
   const all: Item = { id: "s-all", group: "Search", title: `See all results for “${term.trim()}”`, sub: "Apps, builders, assets, quests and more", href: `/search?q=${encodeURIComponent(term.trim())}`, icon: tile(Search, 3) };
-  return [...onchain, ...acts, ...apps, ...builders, ...assets, ...signals, ...cats, ...trails, ...quests, ...pages, all];
+  return [...onchain, ...acts, ...apps, ...quests, ...builders, ...assets, ...badges, ...signals, ...cats, ...trails, ...pages, all];
 }
 
 const OPEN_EVENT = "arcway:search";

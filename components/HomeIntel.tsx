@@ -28,7 +28,7 @@ export function PulsePanel({ limit = 7 }: { limit?: number }) {
   const q = useIntel("pulse");
   return (
     <>
-      <PanelHead icon={Activity} title="Arc Pulse" id="pulse-title">
+      <PanelHead icon={Activity} title="Activity" id="pulse-title">
         <Freshness fetchedAt={q.data?.fetchedAt} fetching={q.isFetching && !q.isPending} unavailable={q.data?.unavailable} />
       </PanelHead>
       <IntelGate query={q} rows={6}>
@@ -77,7 +77,7 @@ export function RadarPanel() {
   const r = q.data?.data;
   return (
     <>
-      <PanelHead icon={Radar} title="Arc Radar" id="radar-title">
+      <PanelHead icon={Radar} title="What's New" id="radar-title">
         <Freshness fetchedAt={q.data?.fetchedAt} fetching={q.isFetching && !q.isPending} unavailable={q.data?.unavailable} />
       </PanelHead>
       <IntelGate query={q} rows={6}>
@@ -94,7 +94,7 @@ export function RadarPanel() {
           </div>
         )}
       </IntelGate>
-      <Link href="/radar" className="link small panel__more">Open Radar <ArrowRight aria-hidden="true" /></Link>
+      <Link href="/radar" className="link small panel__more">See what's new <ArrowRight aria-hidden="true" /></Link>
     </>
   );
 }
@@ -103,7 +103,7 @@ export function SignalsPanel({ limit = 4 }: { limit?: number }) {
   const q = useIntel("signals");
   return (
     <>
-      <PanelHead icon={RadioTower} title="Signals" id="signals-title">
+      <PanelHead icon={RadioTower} title="Insights" id="signals-title">
         <Freshness fetchedAt={q.data?.fetchedAt} fetching={q.isFetching && !q.isPending} unavailable={q.data?.unavailable} />
       </PanelHead>
       <IntelGate query={q} rows={4}>

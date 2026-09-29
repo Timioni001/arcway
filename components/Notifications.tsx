@@ -41,15 +41,15 @@ export function Notifications() {
         {unread > 0 && <span className="icon-btn__dot" aria-hidden="true" />}
       </button>
       {open && (
-        <div className="notif__panel" id={panelId} role="dialog" aria-label="Latest signals">
+        <div className="notif__panel" id={panelId} role="dialog" aria-label="Latest insights">
           <div className="notif__head">
-            <span className="h4" style={{ fontSize: 15 }}>Latest signals</span>
+            <span className="h4" style={{ fontSize: 15 }}>Latest insights</span>
             <Link href="/signals" className="link small" onClick={() => setOpen(false)}>View all</Link>
           </div>
           {signals.isPending ? (
             <div style={{ padding: 16 }}><div className="skeleton" style={{ height: 14, width: "70%" }} /><div className="skeleton" style={{ height: 14, width: "50%", marginTop: 10 }} /></div>
           ) : signals.isError ? (
-            <p className="small secondary" style={{ padding: 16 }}>Signals are unavailable right now.</p>
+            <p className="small secondary" style={{ padding: 16 }}>Insights are unavailable right now.</p>
           ) : items.length === 0 ? (
             <p className="small secondary" style={{ padding: 16 }}><RadioTower aria-hidden="true" style={{ width: 16, verticalAlign: -3, marginRight: 6 }} />Nothing notable yet. Signals appear when Arc data shows a real change.</p>
           ) : (
