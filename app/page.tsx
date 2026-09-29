@@ -1,6 +1,9 @@
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Blocks, Code2, Coins, Globe, IdCard, Wallet, type LucideIcon } from "lucide-react";
+import { CategoryTile } from "../components/CategoryIcon";
+import { Reveal } from "../components/Reveal";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
+import { HeroJourney } from "../components/HeroJourney";
 import { HomeNews, HomePassport, PopularQuests } from "../components/HomePublic";
 import { MoreLink } from "../components/Onboarding";
 import { PassCard } from "../components/PassCard";
@@ -22,12 +25,13 @@ function Head({ id, kicker, title, lede, action }: { id: string; kicker: string;
   );
 }
 
-const HEADLINE = ["Explore", "Arc.", "Complete", "quests.", "Build", "your", "Passport."];
+/** One job per line; the last one, the reason to come back, in blue. */
+const HEADLINE = [["Explore", "Arc."], ["Complete", "quests."], ["Build", "your", "Passport."]];
 
-const HOW: { title: string; body: string }[] = [
-  { title: "Money on the internet", body: "Arc is an open network where apps move US dollars (USDC) as easily as sending a message." },
-  { title: "Fees in dollars", body: "You pay small network fees in USDC, not in a separate token." },
-  { title: "Your wallet, your record", body: "A wallet is your account on Arc. What you do there is public and yours." }
+const HOW: { title: string; body: string; icon: LucideIcon }[] = [
+  { title: "Money on the internet", body: "Arc is an open network where apps move US dollars (USDC) as easily as sending a message.", icon: Globe },
+  { title: "Fees in dollars", body: "You pay small network fees in USDC, not in a separate token.", icon: Wallet },
+  { title: "Your wallet, your record", body: "A wallet is your account on Arc. What you do there is public and yours.", icon: IdCard }
 ];
 
 export default function Home() {
@@ -35,24 +39,30 @@ export default function Home() {
   const counts = categoryCounts(live);
   const builders = buildersFrom();
   const cat = (c: Category) => `/ecosystem?category=${encodeURIComponent(c)}#protocols`;
-  const explore: { name: string; href: string; count: string }[] = [
-    { name: "Payments", href: cat("Payments"), count: `${counts.Payments} apps` },
-    { name: "Trading", href: cat("Trading"), count: `${counts.Trading} apps` },
-    { name: "Lending", href: cat("Lend & Earn"), count: `${counts["Lend & Earn"]} apps` },
-    { name: "Assets", href: "/assets", count: "Tokens on Arc" },
-    { name: "Apps", href: "/apps", count: `${live.length} apps` },
-    { name: "Builders", href: "/builders", count: `${builders.length} teams` }
+  const explore: { name: string; href: string; count: string; mark: ReactNode; hue: number }[] = [
+    { name: "Payments", href: cat("Payments"), count: `${counts.Payments} apps`, mark: <CategoryTile category="Payments" />, hue: 199 },
+    { name: "Trading", href: cat("Trading"), count: `${counts.Trading} apps`, mark: <CategoryTile category="Trading" />, hue: 222 },
+    { name: "Lending", href: cat("Lend & Earn"), count: `${counts["Lend & Earn"]} apps`, mark: <CategoryTile category="Lend & Earn" />, hue: 168 },
+    { name: "Assets", href: "/assets", count: "Tokens on Arc", mark: <span className="xtile__icon" aria-hidden="true"><Coins /></span>, hue: 38 },
+    { name: "Apps", href: "/apps", count: `${live.length} apps`, mark: <span className="xtile__icon" aria-hidden="true"><Blocks /></span>, hue: 210 },
+    { name: "Builders", href: "/builders", count: `${builders.length} teams`, mark: <span className="xtile__icon" aria-hidden="true"><Code2 /></span>, hue: 260 }
   ];
 
   return (
     <div className="page page--home">
-      <section className="hero hero--v3" aria-labelledby="hero-title">
-        <div className="container">
+      <section className="hero hero--v3 hero--journey" aria-labelledby="hero-title">
+        <div className="container hero__split">
           <div className="hero__copy">
             <span className="eyebrow enter"><b>Arc</b>Free, no sign-up to look around</span>
-            <h1 id="hero-title" className="hero__title">
-              {HEADLINE.map((w, i) => (
-                <Fragment key={i}><span className={`word${i >= 4 ? " gradient-text" : ""}`} style={{ "--i": i } as React.CSSProperties}>{w}</span>{" "}</Fragment>
+            <h1 id="hero-title" className="hero__title hero__title--lines">
+              {HEADLINE.map((line, l) => (
+                <Fragment key={line.join(" ")}>
+                  <span className={`hero__line${l === HEADLINE.length - 1 ? " hero__line--accent" : ""}`}>
+                    {line.map((w, i) => (
+                      <Fragment key={w}><span className="word" style={{ "--i": l * 2 + i } as React.CSSProperties}>{w}</span>{i < line.length - 1 ? " " : ""}</Fragment>
+                    ))}
+                  </span>{l < HEADLINE.length - 1 ? " " : ""}
+                </Fragment>
               ))}
             </h1>
             <p className="hero__sub enter enter-3">Find apps worth trying, earn XP and badges for trying them, and make your passport your own.</p>
@@ -61,6 +71,7 @@ export default function Home() {
               <Link href="/quests" className="btn btn--secondary">Start a Quest</Link>
             </div>
           </div>
+          <HeroJourney />
         </div>
       </section>
 
@@ -78,8 +89,14 @@ export default function Home() {
         <section className="osec" aria-labelledby="explore-title">
           <Head id="explore-title" kicker="Explore" title="Explore Arc" action={<MoreLink href="/apps">Open Explore</MoreLink>} />
           <ul className="xtiles">
-            {explore.map((x) => (
-              <li key={x.name}><Link href={x.href} className="xtile"><span className="xtile__name">{x.name}</span><span className="xtile__count">{x.count}</span></Link></li>
+            {explore.map((x, i) => (
+              <Reveal as="li" key={x.name} delay={i * 50}>
+                <Link href={x.href} className="xtile" style={{ "--xh": x.hue } as React.CSSProperties}>
+                  {x.mark}
+                  <span className="xtile__text"><span className="xtile__name">{x.name}</span><span className="xtile__count">{x.count}</span></span>
+                  <span className="xtile__go" aria-hidden="true"><ArrowUpRight /></span>
+                </Link>
+              </Reveal>
             ))}
           </ul>
         </section>
@@ -92,7 +109,7 @@ export default function Home() {
         <section className="osec" aria-labelledby="passport-title">
           <Head id="passport-title" kicker="Passport" title="Your Passport" action={<MoreLink href="/passport">View Passport</MoreLink>} />
           <div className="hpass-wrap">
-            <PassCard />
+            <div className="hpass__stage"><PassCard /></div>
             <HomePassport />
           </div>
         </section>
@@ -104,14 +121,19 @@ export default function Home() {
             title="How Arc works"
             action={<a className="more-link" href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Learn more<span className="more-link__arrow" aria-hidden="true"><ArrowUpRight /></span></a>}
           />
-          <ul className="pillars pillars--plain pillars--3">
-            {HOW.map((p) => (
-              <li key={p.title} className="pillar">
-                <span className="pillar__title">{p.title}</span>
-                <span className="pillar__body">{p.body}</span>
-              </li>
-            ))}
-          </ul>
+          <ol className="hsteps">
+            {HOW.map((p, i) => {
+              const Icon = p.icon;
+              return (
+                <Reveal as="li" key={p.title} delay={i * 90} className="hstep">
+                  <span className="hstep__num mono" aria-hidden="true">0{i + 1}</span>
+                  <span className="hstep__icon" aria-hidden="true"><Icon /></span>
+                  <span className="hstep__title">{p.title}</span>
+                  <span className="hstep__body">{p.body}</span>
+                </Reveal>
+              );
+            })}
+          </ol>
         </section>
       </div>
     </div>

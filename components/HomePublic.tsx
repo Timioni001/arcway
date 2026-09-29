@@ -12,29 +12,39 @@ import { APPS } from "../lib/registry";
 import { AppMark } from "./CategoryIcon";
 import { RelativeDate } from "./RelativeDate";
 import { SourceTag } from "./IntelBits";
+import { DifficultyPips, QUEST_TYPE_LOOK, QuestTypeMark } from "./QuestVisual";
+import { Reveal } from "./Reveal";
 
-/** Popular right now: quests ranked by how many explorers completed them on Arc (all time). */
+/** Popular right now: quests ranked by how many explorers completed them on Arc (all time). Styled as tickets. */
 export function PopularQuests() {
   const passport = useIntel("passport");
   const counts = new Map((passport.data?.data.byQuest ?? []).map((q) => [q.id, q.count]));
   const ranked = [...QUESTS].filter((q) => q.id !== "arc-explorer").sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0)).slice(0, 3);
   return (
     <ul className="qpreview">
-      {ranked.map((q) => {
+      {ranked.map((q, i) => {
         const n = counts.get(q.id);
         return (
-          <li key={q.id}>
-            <Link href={`/quests/${q.id}`} className="qcard">
-              <span className="qcard__top"><span className="tag">{q.type}</span>{n ? <span className="xs secondary">{n.toLocaleString("en-US")} completed</span> : null}</span>
-              <span className="qcard__title">{q.title}</span>
-              <span className="qcard__body">{q.description}</span>
-              <span className="qcard__facts">
-                <span><b className="mono">+{q.xp} XP</b> · {q.badge.name} badge</span>
-                <span className="xs secondary">{DIFFICULTY_LABEL[q.difficulty]} · {q.minutes} min</span>
+          <Reveal as="li" key={q.id} delay={i * 80}>
+            <Link href={`/quests/${q.id}`} className="qcard" style={{ "--qh": QUEST_TYPE_LOOK[q.type].hue } as React.CSSProperties}>
+              <span className="qcard__head">
+                <QuestTypeMark type={q.type} size="lg" />
+                <span className="qcard__type">{q.type}{n ? <small>{n.toLocaleString("en-US")} completed</small> : null}</span>
+                <span className="qcard__xp mono">+{q.xp}<small>XP</small></span>
               </span>
-              <span className="qcard__cta">Start<ArrowRight aria-hidden="true" /></span>
+              <span className="qcard__tear" aria-hidden="true" />
+              <span className="qcard__main">
+                <span className="qcard__title">{q.title}</span>
+                <span className="qcard__body">{q.description}</span>
+                <span className="qcard__facts">
+                  <span className="qcard__badge">{q.badge.name} badge</span>
+                  <DifficultyPips difficulty={q.difficulty} label={DIFFICULTY_LABEL[q.difficulty]} />
+                  <span className="xs secondary">{q.minutes} min</span>
+                </span>
+                <span className="qcard__cta">Start<ArrowRight aria-hidden="true" /></span>
+              </span>
             </Link>
-          </li>
+          </Reveal>
         );
       })}
     </ul>

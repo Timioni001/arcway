@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { useArcwayState } from "../lib/hooks/context";
 import { useIntel } from "../lib/hooks/useIntel";
@@ -8,26 +8,45 @@ import { useStyleProgress } from "../lib/hooks/usePassportStyle";
 import { STYLE_ITEMS, isUnlocked, unlockText } from "../lib/passportStyle";
 import { QUESTS, TOTAL_XP } from "../lib/quests";
 import { Medal } from "./Medal";
+import { Ticker } from "./Ticker";
+import { LEVELS } from "../lib/levels";
 
-/** The four kinds of reward, each with what is true today. Collectibles are not live yet and say so. */
+/** The four kinds of reward as a bento: each one drawn as what it is. Collectibles are not live yet and say so. */
 export function RewardKinds() {
   const passport = useIntel("passport");
   const season = passport.data?.data.season.label;
-  const kinds = [
-    { title: "XP", body: `Every quest adds XP and moves you up a level. ${TOTAL_XP} XP available now.`, href: "/quests", cta: "Earn XP" },
-    { title: "Badges", body: `${QUESTS.length} badges, one for each quest, recorded on Arc with your XP.`, href: "/passport#rewards", cta: "See badges" },
-    { title: "Collectibles", body: "Artwork you can keep and show on your passport.", soon: true },
-    { title: "Season rewards", body: `A new season every month${season ? `, now ${season}` : ""}. Top explorers make the leaderboard.`, href: "/leaderboard", cta: "This season" }
-  ];
+  const [month, year] = (season ?? "").split(" ");
   return (
-    <ul className="rkinds">
-      {kinds.map((k) => (
-        <li key={k.title} className="rkind">
-          <span className="rkind__title">{k.title}{k.soon && <span className="badge badge--muted">Coming soon</span>}</span>
-          <span className="rkind__body">{k.body}</span>
-          {k.href && <Link href={k.href} className="rkind__cta">{k.cta}<ArrowRight aria-hidden="true" /></Link>}
-        </li>
-      ))}
+    <ul className="rbento">
+      <li className="rtile rtile--xp">
+        <span className="rtile__kicker">XP</span>
+        <span className="rtile__big mono"><Ticker value={TOTAL_XP} /><small>XP to earn now</small></span>
+        <ol className="rtile__ladder" aria-label="Levels">
+          {LEVELS.map((l, i) => (
+            <li key={l.name} style={{ "--k": i } as React.CSSProperties}><i aria-hidden="true" /><span>{l.name}</span><small className="mono">{l.min}</small></li>
+          ))}
+        </ol>
+        <Link href="/quests" className="rkind__cta">Earn XP<ArrowRight aria-hidden="true" /></Link>
+      </li>
+      <li className="rtile rtile--badges">
+        <span className="rtile__kicker">Badges</span>
+        <span className="rtile__fan" aria-hidden="true">
+          {QUESTS.slice(0, 3).map((q, i) => <span key={q.id} style={{ "--f": i - 1 } as React.CSSProperties}><Medal questId={q.id} index={i} earned /></span>)}
+        </span>
+        <span className="rkind__body">{QUESTS.length} badges, one per quest, recorded on Arc.</span>
+        <Link href="/passport#rewards" className="rkind__cta">See badges<ArrowRight aria-hidden="true" /></Link>
+      </li>
+      <li className="rtile rtile--collect">
+        <span className="rtile__kicker">Collectibles <span className="badge badge--muted">Coming soon</span></span>
+        <span className="rtile__frame" aria-hidden="true"><Lock /></span>
+        <span className="rkind__body">Artwork you keep and show on your passport.</span>
+      </li>
+      <li className="rtile rtile--season">
+        <span className="rtile__kicker">Season rewards</span>
+        <span className="rtile__cal" aria-hidden="true"><small>{month ? month.slice(0, 3) : "Month"}</small><b>{year ?? ""}</b></span>
+        <span className="rkind__body">A new season every month. Top explorers make the leaderboard.</span>
+        <Link href="/leaderboard" className="rkind__cta">This season<ArrowRight aria-hidden="true" /></Link>
+      </li>
     </ul>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useClaims } from "../lib/hooks/claims";
 import { useArcwayState } from "../lib/hooks/context";
 import { DIFFICULTY_LABEL, QUESTS, QUEST_TIERS, questProgress, type QuestStatus, type QuestView } from "../lib/quests";
+import { QuestTypeMark } from "./QuestVisual";
 import { TransactionStatus } from "./TransactionStatus";
 
 export const STATUS_TEXT: Record<QuestStatus, string> = {
@@ -38,7 +39,7 @@ export function QuestCard({ quest }: { quest: QuestView }) {
   return (
     <article className="quest-card card" data-status={connected ? quest.status : undefined} aria-labelledby={`q-${quest.id}`}>
       <div className="row between">
-        <span className="tag">{quest.type}</span>
+        <span className="row" style={{ gap: 10 }}><QuestTypeMark type={quest.type} /><span className="small" style={{ fontWeight: 650 }}>{quest.type}</span></span>
         {connected && <QuestBadge quest={quest} />}
       </div>
       <div>

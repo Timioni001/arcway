@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-const AMBIENT = ".fdots, .hero__art, .emap, .pass, .glance, .ppromo__card";
+const AMBIENT = ".fdots, .hero__art, .emap, .pass, .glance, .ppromo__card, .jpath, .rbento";
 
 /**
  * Decorative loops (drifting shapes, floating dots, pulsing map core) only run while on screen.
