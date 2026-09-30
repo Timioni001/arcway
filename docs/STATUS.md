@@ -29,7 +29,7 @@ changes with every release.
 | Envio indexer | BUILT | Deploy `indexer/` and set `ARCWAY_INDEXER_URL`; explorer fallback until then |
 | Passkey wallets | BLOCKED | Needs a Circle Client Key, passkey domain and Gas Station policy |
 | Campaigns | BUILT | Deploy `ArcwayCampaigns` and set `NEXT_PUBLIC_CAMPAIGNS_CONTRACT`; preview works now |
-| Arc Mainnet | BLOCKED | Needs mainnet contract deployment and a funded verifier |
+| Arc Mainnet | BLOCKED | Code ready and rehearsed on a local mainnet chain; needs the owner to deploy contracts, fund the verifier and switch Vercel (see DEPLOYMENT.md) |
 
 ## Planned
 

@@ -16,7 +16,8 @@ contracts:
           transaction_fields:
             - hash
 chains:
-  # Arc Testnet. Add the mainnet chain id and address here once the passport is deployed there.
+  # Arc Testnet. For Arc Mainnet, deploy a second indexer with this block's id set to 5042
+  # (and the mainnet passport address / start block in the env), so each network has its own data.
   - id: 5042002
     start_block: ${ENVIO_START_BLOCK:-0}
     contracts:

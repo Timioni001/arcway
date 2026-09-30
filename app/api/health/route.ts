@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { erc20Abi, formatUnits } from "viem";
+import { erc20Abi, formatUnits, parseAbi } from "viem";
 import { passportAbi } from "../../../lib/abi";
-import { ARC_NETWORK, PASSPORT_ADDRESS, USDC_ADDRESS, USDC_DECIMALS, arcChain } from "../../../lib/config";
+import { ARC_NETWORK, CAMPAIGNS_ADDRESS, PASSPORT_ADDRESS, USDC_ADDRESS, USDC_DECIMALS, arcChain } from "../../../lib/config";
 import { publicClient, verifierClient } from "../../../lib/server/arc";
 
 export const dynamic = "force-dynamic";
+
+const campaignsHealthAbi = parseAbi(["function usdc() view returns (address)", "function verifier(address) view returns (bool)"]);
 
 /** Below this, claims will start failing soon. Each claim costs well under 0.01 USDC. */
 const LOW_BALANCE_USDC = 1;
@@ -22,7 +24,9 @@ export async function GET() {
     rpc: { ok: false, block: null as string | null },
     passport: { configured: Boolean(PASSPORT_ADDRESS), address: PASSPORT_ADDRESS ?? null, deployed: false },
     verifier: { configured: Boolean(wallet), address: verifierAddress ?? null, authorized: false, balanceUsdc: null as string | null, low: false },
-    claimsReady: false
+    campaigns: { configured: Boolean(CAMPAIGNS_ADDRESS), address: CAMPAIGNS_ADDRESS ?? null, deployed: false, verifierAuthorized: false, usdcMatches: false },
+    claimsReady: false,
+    campaignsReady: false
   };
 
   try {
@@ -51,7 +55,22 @@ export async function GET() {
       );
     }
   }
+  if (CAMPAIGNS_ADDRESS) {
+    checks.push(publicClient.getCode({ address: CAMPAIGNS_ADDRESS }).then((code) => { result.campaigns.deployed = Boolean(code && code !== "0x"); }).catch(() => {}));
+    checks.push(
+      publicClient.readContract({ address: CAMPAIGNS_ADDRESS, abi: campaignsHealthAbi, functionName: "usdc" })
+        .then((token) => { result.campaigns.usdcMatches = String(token).toLowerCase() === USDC_ADDRESS.toLowerCase(); }).catch(() => {})
+    );
+    if (verifierAddress) {
+      checks.push(
+        publicClient.readContract({ address: CAMPAIGNS_ADDRESS, abi: campaignsHealthAbi, functionName: "verifier", args: [verifierAddress] })
+          .then((ok) => { result.campaigns.verifierAuthorized = Boolean(ok); }).catch(() => {})
+      );
+    }
+  }
   await Promise.all(checks);
+  // Campaigns are optional: they never fail the health check, they only report whether they're ready.
+  result.campaignsReady = result.campaigns.deployed && result.campaigns.usdcMatches && result.campaigns.verifierAuthorized && !result.verifier.low;
   result.claimsReady = result.passport.deployed && result.verifier.authorized && !result.verifier.low;
 
   return NextResponse.json(result, { status: result.claimsReady ? 200 : 503, headers: { "cache-control": "no-store" } });

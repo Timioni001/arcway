@@ -1,4 +1,5 @@
 import { keccak256, toBytes, type Hex } from "viem";
+import { IS_MAINNET } from "./config";
 
 export type QuestRequirement =
   | { kind: "hold-usdc"; minAmount: bigint }
@@ -47,7 +48,7 @@ export const QUESTS: Quest[] = [
     xp: 10,
     difficulty: "easy",
     minutes: 3,
-    steps: ["Copy your wallet address.", "Get USDC on Arc (free test USDC on testnet).", "Come back here; your balance updates on its own."],
+    steps: ["Copy your wallet address.", IS_MAINNET ? "Bring USDC to Arc through Arc Portal, a bridge, or an exchange withdrawal." : "Get free test USDC from Circle's faucet.", "Come back here; your balance updates on its own."],
     requirement: { kind: "hold-usdc", minAmount: 1_000_000n }
   },
   {

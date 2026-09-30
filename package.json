@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run typecheck && npm test && npm run build",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@circle-fin/modular-wallets-core": "1.0.16",

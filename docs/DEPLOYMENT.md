@@ -90,14 +90,27 @@ GraphQL endpoint. Without it, passport stats come from the explorer.
 
 # Going live on Arc Mainnet
 
-Mainnet uses real USDC and transactions can't be undone. Use fresh wallets that
-hold only what they need.
+Mainnet uses real USDC and transactions can't be undone. Use fresh wallets that hold only what they
+need, and never paste a private key anywhere except your own terminal and Vercel's Sensitive
+variables.
+
+## Launch checklist
+
+1. [ ] Two fresh wallets: a **deployer** (owns the contracts) and a **verifier** (signs claims)
+2. [ ] Fund on Arc Mainnet: deployer ~2 USDC, verifier ~5 USDC
+3. [ ] `forge test` passes
+4. [ ] Deploy ArcwayPassport (and optionally ArcwayCampaigns) with the verifier authorised
+5. [ ] `npm run preflight` against mainnet says **Ready.**
+6. [ ] Vercel Production variables switched to mainnet; Preview keeps testnet
+7. [ ] Redeploy, then `/api/health` returns `"claimsReady": true`
+8. [ ] Claim "Arrive on Arc" with a real wallet holding 1 USDC, and see it on the leaderboard
 
 ## What it costs (at today's ~20 gwei fee)
 
 | Action | Gas | Cost |
 |---|---|---|
 | Deploy passport + authorise verifier | ~750k | ~$0.02 |
+| Deploy campaigns + authorise verifier | ~2.5M | ~$0.06 |
 | Each XP claim (paid by the verifier) | ~116k | ~$0.003 |
 
 5 USDC in the verifier wallet covers well over 1,000 claims.
@@ -109,10 +122,9 @@ cast wallet new            # run twice: one DEPLOYER (owner), one VERIFIER
 cast wallet import mainnet-deployer --interactive   # paste the deployer key
 ```
 
-Fund on Arc Mainnet: deployer ~1 USDC, verifier ~5 USDC
-(via https://portal.arc.io, Across, or an exchange withdrawal to Arc).
+Fund on Arc Mainnet via https://portal.arc.io, a bridge, or an exchange withdrawal to Arc.
 
-## 2. Deploy the passport (one command)
+## 2. Deploy the contracts
 
 ```bash
 cd contracts
@@ -120,60 +132,71 @@ forge install foundry-rs/forge-std --no-git   # once
 forge test
 export ARC_RPC_URL=https://rpc.mainnet.arc.io
 export VERIFIER_ADDRESS=0x...   # the verifier wallet's address
+
 forge script script/Deploy.s.sol:Deploy --rpc-url $ARC_RPC_URL --account mainnet-deployer --broadcast
+# prints ArcwayPassport: 0x...
+
+# optional, for live campaigns:
+forge script script/DeployCampaigns.s.sol:DeployCampaigns --rpc-url $ARC_RPC_URL --account mainnet-deployer --broadcast
+# prints ArcwayCampaigns: 0x...
 ```
 
-It prints `ArcwayPassport: 0x...`. Check the verifier is authorised:
+Optional: verify the source at https://explorer.arc.io (Contract → Verify & Publish, Solidity single
+file from `forge flatten src/ArcwayPassport.sol`, compiler 0.8.30, optimizer on, 200 runs).
+
+## 3. Pre-flight (read-only, from your machine)
 
 ```bash
-cast call <PASSPORT> "verifier(address)(bool)" $VERIFIER_ADDRESS --rpc-url $ARC_RPC_URL   # true
+NEXT_PUBLIC_ARC_NETWORK=mainnet \
+NEXT_PUBLIC_PASSPORT_CONTRACT=0x... \
+NEXT_PUBLIC_CAMPAIGNS_CONTRACT=0x... \
+VERIFIER_ADDRESS=0x... \
+npm run preflight
 ```
 
-Optional: verify the source at https://explorer.arc.io (Contract → Verify & Publish,
-Solidity single file from `forge flatten src/ArcwayPassport.sol`, compiler 0.8.30,
-optimizer on, 200 runs).
+It checks the chain id (5042), USDC (symbol and decimals), that each contract has code on mainnet,
+that the verifier is authorised on each and holds at least 1 USDC, that the campaigns escrow uses the
+same USDC as the app, and that the explorer API answers. It never sends a transaction. Fix anything
+marked ✗ before switching.
 
-## 3. Point Vercel at mainnet
+## 4. Point Vercel at mainnet
 
 Vercel → Settings → Environment Variables, **Production** environment:
 
 | Name | Value |
 |---|---|
 | `NEXT_PUBLIC_ARC_NETWORK` | `mainnet` |
-| `NEXT_PUBLIC_PASSPORT_CONTRACT` | the new mainnet passport address |
-| `VERIFIER_PRIVATE_KEY` | the new verifier key (Sensitive) |
-| `EXPLORER_API_KEY` | optional: an Arc explorer (Blockscout) API key for higher rate limits on the live intelligence pages |
+| `NEXT_PUBLIC_PASSPORT_CONTRACT` | the mainnet passport address |
+| `NEXT_PUBLIC_CAMPAIGNS_CONTRACT` | the mainnet campaigns address (optional) |
+| `VERIFIER_PRIVATE_KEY` | the verifier key (Sensitive) |
+| `NEXT_PUBLIC_ARC_RPC_URL` | optional: a dedicated mainnet RPC |
+| `EXPLORER_API_KEY` | optional: explorer API key for higher rate limits |
+| `ARCWAY_INDEXER_URL` | optional: a mainnet indexer (chain id 5042), never the testnet one |
 
-Tip: keep your testnet values on the **Preview** environment, so preview
-deployments stay on testnet and production runs on mainnet.
+Keep your testnet values on the **Preview** environment, so preview deployments stay on testnet and
+production runs on mainnet. Passkey wallets stay off on mainnet until `NEXT_PUBLIC_CIRCLE_CLIENT_KEY`
+and Circle's mainnet chain name (`NEXT_PUBLIC_CIRCLE_CHAIN`) are set.
 
 Then **Deployments → latest production → Redeploy**.
 
-## 4. Check it's live
+## 5. Check it's live
 
 Open `https://<your-site>/api/health`. You want:
 
 ```json
-{ "network": "mainnet", "rpc": { "ok": true }, "passport": { "deployed": true },
-  "verifier": { "authorized": true, "low": false }, "claimsReady": true }
+{ "network": "mainnet", "chainId": 5042, "rpc": { "ok": true }, "passport": { "deployed": true },
+  "verifier": { "authorized": true, "low": false }, "claimsReady": true, "campaignsReady": true }
 ```
 
-Then check the intelligence feeds read live data (each returns `data`, `fetchedAt` and a list of any `unavailable` sources):
+`campaignsReady` is only true when a campaigns contract is configured; it never fails the check.
 
-- `https://<your-site>/api/intel/snapshot`
-- `https://<your-site>/api/intel/pulse`
-- `https://<your-site>/api/intel/signals`
+## Rollback
 
-They are cached at the edge for 10–60 seconds, so the explorer sees only a few reads per window.
-
-Then a real run-through with small amounts:
-
-1. Connect a wallet holding ≥ 1 USDC on Arc → claim **Arrive on Arc**.
-2. Make a pay link and pay 0.10 USDC to it from a second wallet → that wallet can claim **First transaction**.
-3. Swap a tiny amount on Uniswap → claim **Explore an app** (Uniswap's contracts are verified on mainnet).
-4. Claim **Arc Explorer**, then share your passport link.
+Set `NEXT_PUBLIC_ARC_NETWORK` back to `testnet` (with the testnet passport address and verifier) and
+redeploy. Contracts stay where they are; nothing onchain needs undoing.
 
 ## Keeping it safe
+
 
 - The verifier key is a hot wallet: keep only a few USDC in it and watch `/api/health` (`low: true` means top it up).
 - To rotate a leaked verifier: from the deployer, `setVerifier(old, false)` then `setVerifier(new, true)`.
