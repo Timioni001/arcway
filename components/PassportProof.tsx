@@ -2,6 +2,7 @@
 
 import { ArrowRight, ArrowUpRight, BadgeCheck } from "lucide-react";
 import Link from "next/link";
+import { useArcwayState } from "../lib/hooks/context";
 import { useState } from "react";
 import { NETWORK_NAME, explorer } from "../lib/config";
 import { timeAgo } from "../lib/format";
@@ -77,6 +78,7 @@ export function LeaderboardView() {
   const [tab, setTab] = useState<"season" | "all">("season");
   const p = q.data?.data;
   const rows = p ? (tab === "season" ? p.season.leaderboard : p.leaderboard) : [];
+  const me = useArcwayState().connection.address?.toLowerCase();
   return (
     <section className="panel" aria-labelledby="lb-title">
       <div className="panel__head">
@@ -101,9 +103,22 @@ export function LeaderboardView() {
           <Link href="/quests" className="btn btn--primary btn--sm">Start a quest <ArrowRight aria-hidden="true" /></Link>
         </div>
       ) : (
+        <>
+        <ol className="podium" aria-label="Top explorers">
+          {[1, 0, 2].map((i) => rows[i] && (
+            <li key={rows[i].address} className="podium__spot" data-place={i + 1}>
+              <Link href={`/passport/${rows[i].address}`} className="podium__who">
+                <span className="podium__avatar"><AddressAvatar address={rows[i].address} /></span>
+                <span className="mono small">{short(rows[i].address)}</span>
+                <span className="xs secondary">{levelFor(rows[i].xp).name}</span>
+              </Link>
+              <span className="podium__block"><b className="mono">{i + 1}</b><span className="mono">{rows[i].xp} XP</span></span>
+            </li>
+          ))}
+        </ol>
         <ol className="lb">
           {rows.map((r, i) => (
-            <li key={r.address} className="lb__row" data-top={i < 3 || undefined}>
+            <li key={r.address} className="lb__row" data-top={i < 3 || undefined} data-me={me && r.address.toLowerCase() === me ? true : undefined}>
               <span className="lb__rank mono">{i + 1}</span>
               <AddressAvatar address={r.address} />
               <Link href={`/passport/${r.address}`} className="lb__who">
@@ -111,10 +126,11 @@ export function LeaderboardView() {
                 <span className="xs secondary">{levelFor(r.xp).name}{r.lastAt ? ` · active ${timeAgo(r.lastAt)}` : ""}</span>
               </Link>
               <span className="lb__quests xs secondary">{r.quests} quest{r.quests === 1 ? "" : "s"}</span>
-              <span className="lb__xp mono">{r.xp} XP</span>
+              <span className="lb__xp mono">{r.xp} XP{i > 0 && <small className="lb__gap">{rows[i - 1].xp - r.xp} behind #{i}</small>}</span>
             </li>
           ))}
         </ol>
+        </>
       )}
       <p className="xs secondary intel-note">Ranked by XP from verified quests, never by wallet balance. Seasons reset on the 1st of each month (UTC); all-time XP stays on your passport.</p>
     </section>

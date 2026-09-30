@@ -6,6 +6,7 @@ import { useClaims } from "../lib/hooks/claims";
 import { useArcwayState } from "../lib/hooks/context";
 import { TOTAL_XP } from "../lib/quests";
 import { STATUS_TEXT } from "./Quests";
+import { Medal } from "./Medal";
 
 /** The starter quests as one campaign: reward, progress and a checklist you can act on. */
 export function Campaign() {
@@ -32,12 +33,7 @@ export function Campaign() {
             <span><Trophy aria-hidden="true" /><b className="mono">{TOTAL_XP}</b> XP</span>
             <span><MedalIcon aria-hidden="true" /><b className="mono">{quests.length}</b> badges</span>
           </div>
-          <div style={{ marginTop: 24 }}>
-            <div className="row between xs secondary"><span>Progress</span><span className="mono">{done}/{quests.length}</span></div>
-            <div className="progress progress--lg" style={{ marginTop: 8 }} role="progressbar" aria-label="Campaign progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
-              <i style={{ width: `${Math.max(pct, 2)}%` }} />
-            </div>
-          </div>
+          <PassTrack />
           <Link href={finished ? "/passport" : `/quests/${next.id}`} className="btn btn--primary" style={{ marginTop: 24 }}>
             {finished ? "View your passport" : done ? "Continue" : "Start campaign"} <ArrowRight aria-hidden="true" />
           </Link>
@@ -70,6 +66,33 @@ export function Campaign() {
           );
         })}
       </ol>
+    </div>
+  );
+}
+
+/** Season-pass style track: each quest is a tier on one XP line, its badge sitting on the node. */
+function PassTrack() {
+  const { quests, connection } = useArcwayState();
+  const connected = connection.status === "connected";
+  let running = 0;
+  const tiers = quests.map((q) => ({ q, at: (running += q.xp) }));
+  const earned = connected ? quests.filter((q) => q.status === "completed").reduce((n, q) => n + q.xp, 0) : 0;
+  const pct = Math.min(100, (earned / running) * 100);
+  return (
+    <div className="ptrack" role="progressbar" aria-label="Arc Starter progress" aria-valuemin={0} aria-valuemax={running} aria-valuenow={earned} aria-valuetext={`${earned} of ${running} XP`}>
+      <div className="ptrack__rail"><i style={{ width: `${Math.max(pct, 1.5)}%` }} /></div>
+      <ol className="ptrack__tiers">
+        {tiers.map(({ q, at }, i) => {
+          const done = connected && q.status === "completed";
+          return (
+            <li key={q.id} className="ptrack__tier" data-done={done} style={{ left: `${(at / running) * 100}%` }}>
+              <span className="ptrack__medal"><Medal questId={q.id} index={i} earned={done} size="sm" /></span>
+              <span className="ptrack__at mono">{at}</span>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="row between xs secondary ptrack__legend"><span>{earned} XP earned</span><span className="mono">{running} XP</span></div>
     </div>
   );
 }

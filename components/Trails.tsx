@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftRight, ArrowRight, ArrowUpRight, Bot, Check, PiggyBank, Rocket, Timer, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, ArrowUpRight, Bot, Check, PiggyBank, Rocket, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { BRIDGE_URL, IS_MAINNET } from "../lib/config";
@@ -28,6 +28,8 @@ function Ring({ done, total }: { done: number; total: number }) {
   );
 }
 
+const TRAIL_HUE: Record<Trail["icon"], number> = { rocket: 214, piggy: 152, swap: 262, bot: 28 };
+
 export function TrailCards({ trails }: { trails: Trail[] }) {
   const done = useTrailSteps();
   return (
@@ -37,20 +39,20 @@ export function TrailCards({ trails }: { trails: Trail[] }) {
         const Icon = ICONS[t.icon];
         return (
           <li key={t.id}>
-            <Link href={`/trails/${t.id}`} className="trail-card spotlight">
-              <span className="row between">
-                <span className="tile" data-shade={(i % 3) + 1}><Icon aria-hidden="true" /></span>
+            <Link href={`/trails/${t.id}`} className="trail-card trail-card--poster" style={{ "--th": TRAIL_HUE[t.icon] } as React.CSSProperties}>
+              <span className="trail-card__art" aria-hidden="true">
+                <Icon className="trail-card__ghost" />
+                <span className="trail-card__badge"><Icon /></span>
                 <span className="trail-card__ring">
                   <Ring done={p.done} total={p.total} />
-                  <span className="mono xs">{p.complete ? <Check aria-hidden="true" style={{ width: 14 }} /> : `${p.done}/${p.total}`}</span>
+                  <span className="mono xs">{p.complete ? <Check style={{ width: 14 }} /> : `${p.done}/${p.total}`}</span>
                 </span>
               </span>
-              <span className="h4" style={{ marginTop: 14 }}>{t.title}</span>
-              <span className="small secondary">{t.goal}</span>
-              <span className="row xs secondary" style={{ gap: 12, marginTop: "auto", paddingTop: 12 }}>
-                <span className="row" style={{ gap: 4 }}><Timer aria-hidden="true" style={{ width: 13 }} />{t.minutes} min</span>
-                <span>{t.steps.length} steps</span>
-                <span className="link" style={{ marginLeft: "auto" }}>{p.complete ? "Review" : p.done ? "Continue" : "Start"} <ArrowRight aria-hidden="true" /></span>
+              <span className="trail-card__body">
+                <span className="trail-card__eyebrow">Goal · {t.steps.length} steps · {t.minutes} min</span>
+                <span className="h4">{t.title}</span>
+                <span className="small secondary">{t.goal}</span>
+                <span className="trail-card__cta">{p.complete ? "Review" : p.done ? "Continue" : "Start"} <ArrowRight aria-hidden="true" /></span>
               </span>
             </Link>
           </li>

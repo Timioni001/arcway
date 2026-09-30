@@ -11,6 +11,7 @@ function Tile({ item }: { item: NavItem }) {
   return (
     <li>
       <Link href={item.href} className="hub-tile">
+        <span className="hub-tile__icon" aria-hidden="true"><item.icon /></span>
         <span className="hub-tile__text"><span className="hub-tile__name">{item.label}</span><span className="hub-tile__blurb">{item.blurb}</span></span>
         <ChevronRight className="hub-tile__go" aria-hidden="true" />
       </Link>
@@ -22,11 +23,11 @@ const byHref = (href: string) => [...MORE_NAV, ...Object.values(SECTION_VIEWS).f
 const withBlurb = (n: NavItem, blurb: string): NavItem => ({ ...n, blurb: n.blurb || blurb });
 
 /** More: everything beyond the four public jobs, simplest first. */
-const GROUPS: { title: string; items: NavItem[] }[] = [
-  { title: "Understand Arc", items: ["/pulse", "/radar", "/signals"].map(byHref) },
-  { title: "Explore more", items: [byHref("/ecosystem"), byHref("/assets"), byHref("/builders")] },
-  { title: "Earn more", items: [byHref("/campaigns"), byHref("/leaderboard")] },
-  { title: "For Builders", items: [withBlurb(byHref("/submit"), "Get your Arc app listed"), byHref("/launch"), byHref("/widgets")] }
+const GROUPS: { title: string; hue: number; items: NavItem[] }[] = [
+  { title: "Understand Arc", hue: 168, items: ["/pulse", "/radar", "/signals"].map(byHref) },
+  { title: "Explore more", hue: 205, items: [byHref("/ecosystem"), byHref("/assets"), byHref("/builders")] },
+  { title: "Earn more", hue: 38, items: [byHref("/campaigns"), byHref("/leaderboard")] },
+  { title: "For Builders", hue: 258, items: [withBlurb(byHref("/submit"), "Get your Arc app listed"), byHref("/launch"), byHref("/widgets")] }
 ];
 
 export function MoreHub() {
@@ -43,12 +44,12 @@ export function MoreHub() {
         <Search aria-hidden="true" /><span>Search apps, quests, builders, addresses…</span>
       </button>
       {GROUPS.map((g, i) => (
-        <section key={g.title} className="hub-group" aria-labelledby={`hub-${i}`}>
+        <section key={g.title} className="hub-group" aria-labelledby={`hub-${i}`} style={{ "--gh": g.hue } as React.CSSProperties}>
           <h2 id={`hub-${i}`} className="hub-group__title">{g.title}</h2>
           <ul className="hub-grid">{g.items.map((n) => <Tile key={n.href} item={n} />)}</ul>
         </section>
       ))}
-      <section className="hub-group" aria-labelledby="hub-you">
+      <section className="hub-group" aria-labelledby="hub-you" style={{ "--gh": 214 } as React.CSSProperties}>
         <h2 id="hub-you" className="hub-group__title">You and settings</h2>
         <ul className="hub-grid">
           {[byHref("/watchlist"), ...YOU_NAV, byHref("/settings")].map((n) => <Tile key={n.href} item={n} />)}
