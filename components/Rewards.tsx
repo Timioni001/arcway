@@ -18,7 +18,7 @@ export function RewardKinds() {
   const season = passport.data?.data.season.label;
   const [month, year] = (season ?? "").split(" ");
   return (
-    <ul className="rbento">
+    <ul className="rbento swipe">
       <li className="rtile rtile--xp">
         <span className="rtile__kicker">XP</span>
         <span className="rtile__big mono"><Ticker value={TOTAL_XP} /><small>XP to earn now</small></span>

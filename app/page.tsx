@@ -153,7 +153,7 @@ export default function Home() {
             title="How Arc works"
             action={<a className="more-link" href={ARC_DOCS_URL} target="_blank" rel="noopener noreferrer">Learn more<span className="more-link__arrow" aria-hidden="true"><ArrowUpRight /></span></a>}
           />
-          <ol className="hsteps">
+          <ol className="hsteps swipe">
             {HOW.map((p, i) => {
               const Icon = p.icon;
               return (

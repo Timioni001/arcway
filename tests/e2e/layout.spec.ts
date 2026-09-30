@@ -38,7 +38,8 @@ async function problems(page: Page) {
     const boxes = els.map((el) => ({ el, r: el.getBoundingClientRect() }));
     for (let i = 0; i < boxes.length; i++) {
       const a = boxes[i];
-      if (a.r.right > doc.clientWidth + 1 && getComputedStyle(a.el.parentElement!).overflowX === "visible") out.push(`off-screen right: ${name(a.el)}`);
+      // Swipe rows scroll sideways on purpose (their container scrolls, the page does not).
+      if (a.r.right > doc.clientWidth + 1 && !a.el.closest(".swipe") && getComputedStyle(a.el.parentElement!).overflowX === "visible") out.push(`off-screen right: ${name(a.el)}`);
       for (let j = i + 1; j < boxes.length; j++) {
         const b = boxes[j];
         if (a.el.contains(b.el) || b.el.contains(a.el)) continue;

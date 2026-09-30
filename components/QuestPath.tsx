@@ -12,7 +12,7 @@ export function QuestPath() {
   const fill = quests.length > 1 ? Math.max(0, done - 1) / (quests.length - 1) : 0;
 
   return (
-    <ol className="path">
+    <ol className="path swipe">
       <span className="path__fill" style={{ width: `calc((100% - 40px) * ${fill})` }} aria-hidden="true" />
       {quests.map((q, i) => {
         const state = connected ? q.status : "todo";

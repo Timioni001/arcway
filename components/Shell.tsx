@@ -1,4 +1,6 @@
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { FooterFold } from "./FooterFold";
 import { ARC_DOCS_URL, BRIDGE_URL, CONTACT_URL, IS_MAINNET } from "../lib/config";
 import { MORE_NAV, PRIMARY_NAV, SECTION_VIEWS, YOU_NAV, type NavItem } from "../lib/nav";
 
@@ -31,12 +33,15 @@ export function Footer() {
           </div>
           {FOOTER.map((g, i) => (
             <nav key={g.title} aria-labelledby={`f-${i}`}>
-              <h2 id={`f-${i}`}>{g.title}</h2>
-              <ul>{g.items.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}</ul>
+              <details className="fgroup" open>
+                <summary><h2 id={`f-${i}`}>{g.title}</h2><ChevronDown className="fgroup__chev" aria-hidden="true" /></summary>
+                <ul>{g.items.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}</ul>
+              </details>
             </nav>
           ))}
           <nav aria-labelledby="f-res">
-            <h2 id="f-res">You &amp; resources</h2>
+            <details className="fgroup" open>
+            <summary><h2 id="f-res">You &amp; resources</h2><ChevronDown className="fgroup__chev" aria-hidden="true" /></summary>
             <ul>
               {YOU_NAV.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
               <li><Link href="/watchlist">Watchlist</Link></li>
@@ -44,7 +49,9 @@ export function Footer() {
               <li><a href={BRIDGE_URL} target="_blank" rel="noopener noreferrer">{IS_MAINNET ? "Get USDC" : "Get test USDC"}</a></li>
               <li><a href="/digest/feed.xml">RSS feed</a></li>
             </ul>
+            </details>
           </nav>
+          <FooterFold />
         </div>
         <div className="footer__base">
           <span>© {new Date().getFullYear()} Arcway · Independent, not affiliated with Circle.</span>

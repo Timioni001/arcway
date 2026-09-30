@@ -23,7 +23,7 @@ export function PopularQuests() {
   const counts = new Map((passport.data?.data.byQuest ?? []).map((q) => [q.id, q.count]));
   const ranked = [...QUESTS].filter((q) => q.id !== "arc-explorer").sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0)).slice(0, 3);
   return (
-    <ul className="qpreview">
+    <ul className="qpreview swipe">
       {ranked.map((q, i) => {
         const n = counts.get(q.id);
         return (

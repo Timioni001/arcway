@@ -33,7 +33,7 @@ const TRAIL_HUE: Record<Trail["icon"], number> = { rocket: 214, piggy: 152, swap
 export function TrailCards({ trails }: { trails: Trail[] }) {
   const done = useTrailSteps();
   return (
-    <ul className="trail-cards">
+    <ul className="trail-cards swipe">
       {trails.map((t, i) => {
         const p = trailProgress(t, done);
         const Icon = ICONS[t.icon];

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRight, BadgeCheck, Pause, Play, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, ChevronDown, Pause, Play, Sparkles, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -21,6 +21,7 @@ const PULSE_KINDS: PulseKind[] = ["app", "deploy", "usdc", "transfer", "call"];
 export function PulseExplorer() {
   const [paused, setPaused] = useState(false);
   const [kind, setKind] = useState<PulseKind | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const q = useIntel("pulse");
   const snap = useIntel("snapshot");
   // Freeze the list while paused so rows don't move under the reader.
@@ -49,7 +50,12 @@ export function PulseExplorer() {
           ))}
         </div>
         <IntelGate query={q} rows={10}>
-          <PulseList events={shown} />
+          <div className="capped" data-open={showAll || undefined}>
+            <PulseList events={shown} />
+          </div>
+          {shown.length > 12 && !showAll && (
+            <button type="button" className="btn btn--secondary btn--sm capped__more" onClick={() => setShowAll(true)}>Show all {shown.length}</button>
+          )}
           {oldest && <p className="xs secondary intel-note">Showing the latest {events.length} events from the explorer, back to {timeAgo(oldest)}. Refreshes every 15 seconds.</p>}
         </IntelGate>
       </section>
@@ -62,7 +68,8 @@ export function PulseExplorer() {
           </IntelGate>
         </section>
         <section className="panel" aria-labelledby="kinds-title">
-          <h2 id="kinds-title" className="panel__title">What the feed shows</h2>
+          <details className="fold-mobile" open>
+          <summary><h2 id="kinds-title" className="panel__title">What the feed shows</h2><ChevronDown className="fgroup__chev" aria-hidden="true" /></summary>
           <dl className="defs">
             <div><dt>App</dt><dd>A transaction to a contract a listed app has published.</dd></div>
             <div><dt>Deployment</dt><dd>A new contract created on Arc.</dd></div>
@@ -70,6 +77,7 @@ export function PulseExplorer() {
             <div><dt>Transfer</dt><dd>USDC sent directly between addresses.</dd></div>
             <div><dt>Contract call</dt><dd>A call to a contract not listed on Arcway.</dd></div>
           </dl>
+          </details>
         </section>
       </aside>
     </div>
