@@ -377,7 +377,7 @@ test("home speaks to people first: quests, rewards, explore, passport; no raw ne
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Explore Arc. Complete quests. Build your Passport.");
   await expect(page.locator(".hero").getByRole("link", { name: "Explore Arc" })).toHaveAttribute("href", "/apps");
   await expect(page.locator(".hero").getByRole("link", { name: "Start a Quest" })).toHaveAttribute("href", "/quests");
-  const order = ["Popular right now", "What you can earn", "Explore Arc", "What's new on Arc", "Your Passport", "How Arc works"];
+  const order = ["Popular right now", "What you can earn", "Explore Arc", "What's new on Arc", "Top explorers", "Built something on Arc?", "How Arc works"];
   let last = -1;
   for (const name of order) {
     const box = (await page.getByRole("region", { name, exact: true }).boundingBox())!;
@@ -390,6 +390,9 @@ test("home speaks to people first: quests, rewards, explore, passport; no raw ne
   await expect(page.getByRole("region", { name: "What you can earn" })).toContainText("Coming soon");
   await expect(page.getByRole("region", { name: "Explore Arc" }).locator(".xtile")).toHaveCount(6);
   await expect(page.getByRole("region", { name: "What's new on Arc" }).locator(".news__item").first()).toContainText("New app added");
+  // The season leader from onchain passport data, and a way in for builders.
+  await expect(page.locator(".hlb__leader")).toContainText("35");
+  await expect(page.getByRole("region", { name: "Built something on Arc?" }).getByRole("link", { name: /Submit your app/ })).toHaveAttribute("href", "/submit");
   // No technical graphs, pulse rows or contract counts on the public home.
   await expect(page.locator(".pulse-row, .emap, .now__item, .spark")).toHaveCount(0);
   await expect(page.locator(".hero").getByRole("button", { name: /Connect/ })).toHaveCount(0);

@@ -9,7 +9,7 @@ test("home sections", async ({ page }, info) => {
   await mockIntel(page);
   await page.goto("/");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
-  const ids = ["hero-title", "popular-title", "rewards-title", "explore-title", "new-title", "passport-title", "how-title"];
+  const ids = ["hero-title", "popular-title", "rewards-title", "explore-title", "new-title", "lb-home-title", "build-title", "how-title"];
   for (const id of ids) {
     const section = page.locator(`section[aria-labelledby="${id}"]`);
     await section.scrollIntoViewIfNeeded();

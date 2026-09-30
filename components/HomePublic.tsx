@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Crown, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useArcwayState } from "../lib/hooks/context";
 import { useIntel } from "../lib/hooks/useIntel";
@@ -9,7 +9,9 @@ import { levelFor } from "../lib/levels";
 import { getItem, unlockedCount } from "../lib/passportStyle";
 import { DIFFICULTY_LABEL, QUESTS } from "../lib/quests";
 import { APPS } from "../lib/registry";
+import { AddressAvatar } from "./AddressAvatar";
 import { AppMark } from "./CategoryIcon";
+import { useClientDate } from "../lib/hooks/useClientDate";
 import { RelativeDate } from "./RelativeDate";
 import { SourceTag } from "./IntelBits";
 import { DifficultyPips, QUEST_TYPE_LOOK, QuestTypeMark } from "./QuestVisual";
@@ -115,6 +117,60 @@ export function HomePassport() {
         )}
         {connected && <p className="xs secondary" style={{ marginTop: 10 }}>{styles.unlocked} of {styles.total} styles unlocked</p>}
       </div>
+    </div>
+  );
+}
+
+/** Top explorers this season, as a stage: the leader large, the next four as a ranked strip. */
+export function HomeLeaderboard() {
+  const q = useIntel("passport");
+  const { connection } = useArcwayState();
+  const now = useClientDate();
+  const p = q.data?.data;
+  const rows = p?.season.leaderboard ?? [];
+  const me = connection.address?.toLowerCase();
+  const myRank = me ? rows.findIndex((r) => r.address.toLowerCase() === me) : -1;
+  const daysLeft = now ? Math.max(0, new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).getTime() - now.getTime()) / 86_400_000 : null;
+  const [leader, ...rest] = rows;
+  return (
+    <div className="hlb">
+      <div className="hlb__season">
+        <span className="hlb__kicker">Season</span>
+        <b>{p?.season.label ?? "This month"}</b>
+        <small>{daysLeft === null ? "Resets on the 1st (UTC)" : `${Math.ceil(daysLeft)} day${Math.ceil(daysLeft) === 1 ? "" : "s"} left`}</small>
+        <span className="hlb__you">{me ? (myRank >= 0 ? `You are #${myRank + 1}` : "You are not ranked yet") : "Connect to see your rank"}</span>
+      </div>
+      {q.isPending ? (
+        <div className="hlb__board"><div className="skeleton" style={{ height: 120, borderRadius: 20 }} /></div>
+      ) : !leader ? (
+        <div className="hlb__board hlb__empty">
+          <span className="hlb__crown" aria-hidden="true"><Crown /></span>
+          <b>The board is open</b>
+          <span className="small">No XP recorded this season yet. Claim a quest and take the first spot.</span>
+          <Link href="/quests" className="btn btn--primary btn--sm">Start a quest <ArrowRight aria-hidden="true" /></Link>
+        </div>
+      ) : (
+        <div className="hlb__board">
+          <Link href={`/passport/${leader.address}`} className="hlb__leader">
+            <span className="hlb__crown" aria-hidden="true"><Crown /></span>
+            <span className="podium__avatar hlb__avatar"><AddressAvatar address={leader.address} size="lg" /></span>
+            <span className="hlb__who"><span className="mono">{leader.address.slice(0, 6)}…{leader.address.slice(-4)}</span><small>{levelFor(leader.xp).name} · {leader.quests} quest{leader.quests === 1 ? "" : "s"}</small></span>
+            <span className="hlb__xp mono">{leader.xp}<small>XP</small></span>
+          </Link>
+          {rest.length > 0 && (
+            <ol className="hlb__list" start={2}>
+              {rest.slice(0, 4).map((r, i) => (
+                <li key={r.address}>
+                  <span className="hlb__rank mono" data-rank={i + 2}>{i + 2}</span>
+                  <AddressAvatar address={r.address} />
+                  <Link href={`/passport/${r.address}`} className="mono small">{r.address.slice(0, 6)}…{r.address.slice(-4)}</Link>
+                  <span className="mono small hlb__pts">{r.xp} XP</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
     </div>
   );
 }

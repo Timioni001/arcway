@@ -1,12 +1,11 @@
-import { ArrowRight, ArrowUpRight, Blocks, Code2, Coins, Globe, IdCard, Wallet, type LucideIcon } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Blocks, Check, Code2, Coins, Globe, IdCard, Wallet, type LucideIcon } from "lucide-react";
 import { CategoryTile } from "../components/CategoryIcon";
 import { Reveal } from "../components/Reveal";
 import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 import { HeroJourney } from "../components/HeroJourney";
-import { HomeNews, HomePassport, PopularQuests } from "../components/HomePublic";
+import { HomeLeaderboard, HomeNews, PopularQuests } from "../components/HomePublic";
 import { MoreLink } from "../components/Onboarding";
-import { PassCard } from "../components/PassCard";
 import { RewardKinds } from "../components/Rewards";
 import { buildersFrom } from "../lib/builders";
 import { ARC_DOCS_URL } from "../lib/config";
@@ -106,11 +105,44 @@ export default function Home() {
           <HomeNews />
         </section>
 
-        <section className="osec" aria-labelledby="passport-title">
-          <Head id="passport-title" kicker="Passport" title="Your Passport" action={<MoreLink href="/passport">View Passport</MoreLink>} />
-          <div className="hpass-wrap">
-            <div className="hpass__stage"><PassCard /></div>
-            <HomePassport />
+        <section className="osec" aria-labelledby="lb-home-title">
+          <Head id="lb-home-title" kicker="Leaderboard" title="Top explorers" action={<MoreLink href="/leaderboard">Full leaderboard</MoreLink>} />
+          <HomeLeaderboard />
+        </section>
+
+        <section className="osec" aria-labelledby="build-title">
+          <div className="hbuild">
+            <div className="hbuild__copy">
+              <div className="ohead__kicker">For Builders</div>
+              <h2 id="build-title" className="ohead__title">Built something on Arc?</h2>
+              <p className="ohead__lede">Get your app listed so people can find it, try it in quests and follow its activity. Then add a live badge to your site, or fund a campaign.</p>
+              <div className="hbuild__actions">
+                <Link href="/submit" className="btn btn--primary">Submit your app <ArrowRight aria-hidden="true" /></Link>
+                <Link href="/launch" className="btn btn--secondary">Launch a campaign</Link>
+              </div>
+              <ol className="hbuild__steps">
+                <li><b>1</b>Share your app and its contracts</li>
+                <li><b>2</b>Arcway checks them live on Arc</li>
+                <li><b>3</b>Get listed with a badge</li>
+              </ol>
+            </div>
+            <div className="hbuild__preview" aria-hidden="true">
+              <div className="hbuild__window">
+                <span className="hbuild__dots"><i /><i /><i /></span>
+                <div className="hbuild__listing">
+                  <span className="hbuild__logo" />
+                  <span className="hbuild__lines"><i /><i /></span>
+                  <span className="badge badge--live"><span className="dot" />Live</span>
+                </div>
+                <div className="hbuild__checks">
+                  <span><Check />Contract found on Arc</span>
+                  <span><Check />Source verified</span>
+                  <span><Check />Listed on Arcway</span>
+                </div>
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="hbuild__badge" src="/api/badge/uniswap" alt="" width={180} height={40} />
+            </div>
           </div>
         </section>
 
