@@ -8,6 +8,7 @@ import { useStyleProgress } from "../lib/hooks/usePassportStyle";
 import { STYLE_ITEMS, isUnlocked, unlockText } from "../lib/passportStyle";
 import { QUESTS, TOTAL_XP } from "../lib/quests";
 import { Medal } from "./Medal";
+import { QUEST_TYPE_LOOK } from "./QuestVisual";
 import { Ticker } from "./Ticker";
 import { LEVELS } from "../lib/levels";
 
@@ -51,6 +52,22 @@ export function RewardKinds() {
   );
 }
 
+/** A passport visa stamp: an ink ring with lettering around the badge, tilted like it was pressed by hand. */
+function Stamp({ id, label, hue, tilt, earned, children }: { id: string; label: string; hue: number; tilt: number; earned: boolean; children: React.ReactNode }) {
+  const path = `stamp-${id}`;
+  return (
+    <span className="stamp" data-earned={earned} style={{ "--sh": hue, "--st": `${tilt}deg` } as React.CSSProperties}>
+      <svg viewBox="0 0 120 120" className="stamp__ring" aria-hidden="true">
+        <defs><path id={path} d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0" /></defs>
+        <circle cx="60" cy="60" r="56" className="stamp__outer" />
+        <circle cx="60" cy="60" r="34" className="stamp__inner" />
+        <text className="stamp__text"><textPath href={`#${path}`} startOffset="0">{`ARCWAY · ${label.toUpperCase()} · ARC · `}</textPath></text>
+      </svg>
+      <span className="stamp__medal">{children}</span>
+    </span>
+  );
+}
+
 /** Badges as a collection: artwork, name, what it's for, how it was earned, and how many explorers hold it. */
 export function BadgeGallery() {
   const { quests, connection } = useArcwayState();
@@ -64,7 +81,9 @@ export function BadgeGallery() {
         const count = held.get(q.id);
         return (
           <li key={q.id} className="bgallery__item" data-earned={earned}>
-            <Medal questId={q.id} index={i} earned={earned} />
+            <Stamp id={q.id} label={q.badge.name} hue={QUEST_TYPE_LOOK[q.type].hue} tilt={[-8, 6, -4, 9][i % 4]} earned={earned}>
+              <Medal questId={q.id} index={i} earned={earned} />
+            </Stamp>
             <div className="bgallery__text">
               <span className="bgallery__name">{q.badge.name}</span>
               <span className="small secondary">{q.badge.description}</span>
@@ -98,7 +117,7 @@ export function Achievements() {
         <>
           <div className="pstyle__label" style={{ marginTop: 14 }}>Up next</div>
           <ul className="achv__list">
-            {next.map((i) => <li key={`${i.kind}-${i.id}`} className="achv__item achv__item--next"><span><b>{i.name}</b> <span className="xs secondary">{i.kind} · {unlockText(i)}</span></span></li>)}
+            {next.map((i) => <li key={`${i.kind}-${i.id}`} className="achv__item achv__item--next"><Lock aria-hidden="true" /><span><b>{i.name}</b> <span className="xs secondary">{i.kind} · {unlockText(i)}</span></span></li>)}
           </ul>
         </>
       )}

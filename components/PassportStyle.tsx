@@ -17,13 +17,15 @@ export function PassportCustomizer() {
   useEffect(() => setName(style.name), [style.name]);
   const { unlocked, total } = unlockedCount(progress);
 
-  if (connection.status !== "connected" || !address) {
-    return <p className="small secondary">Connect your wallet to style your passport. Styles unlock as you complete quests and explore apps.</p>;
-  }
+  const preview = connection.status !== "connected" || !address;
   return (
-    <div className="pstyle">
-      <p className="xs secondary">{unlocked} of {total} styles unlocked · saved in this browser, not onchain</p>
-      <div className="pstyle__field">
+    <div className="pstyle" data-preview={preview || undefined}>
+      {preview ? (
+        <p className="pstyle__note small">Connect your wallet to style your passport. Styles unlock as you complete quests and explore apps.</p>
+      ) : (
+        <p className="xs secondary">{unlocked} of {total} styles unlocked · saved in this browser, not onchain</p>
+      )}
+      {!preview && <div className="pstyle__field">
         <label htmlFor={nameId} className="pstyle__label">Display name</label>
         <input
           id={nameId}
@@ -35,13 +37,13 @@ export function PassportCustomizer() {
           onBlur={() => update({ name })}
           onKeyDown={(e) => { if (e.key === "Enter") update({ name }); }}
         />
-      </div>
+      </div>}
       {(["theme", "frame", "title"] as StyleKind[]).map((kind) => (
         <fieldset key={kind} className="pstyle__field">
           <legend className="pstyle__label">{KIND_TITLE[kind]}</legend>
           <div className="pstyle__options">
             {itemsOf(kind).map((item) => {
-              const open = isUnlocked(item, progress);
+              const open = !preview && isUnlocked(item, progress);
               const current = style[kind] === item.id;
               return (
                 <button
@@ -57,7 +59,7 @@ export function PassportCustomizer() {
                   {kind === "theme" && <span className="pstyle__swatch" data-theme={item.id} aria-hidden="true" />}
                   <span className="pstyle__opt-text">
                     <span className="pstyle__opt-name">{item.name}</span>
-                    {!open && <span className="xs secondary">{unlockText(item)}</span>}
+                    {!open && <span className="xs secondary">{item.unlock ? unlockText(item) : "Included"}</span>}
                   </span>
                   {current ? <Check aria-hidden="true" /> : !open ? <Lock aria-hidden="true" /> : null}
                 </button>
@@ -66,7 +68,7 @@ export function PassportCustomizer() {
           </div>
         </fieldset>
       ))}
-      <p className="xs secondary">Apps explored counts apps you opened from Arcway in this browser ({progress.apps} so far).</p>
+      {!preview && <p className="xs secondary">Apps explored counts apps you opened from Arcway in this browser ({progress.apps} so far).</p>}
     </div>
   );
 }

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Activity } from "../../components/Activity";
 import { NextStep } from "../../components/NextStep";
-import { PassCard } from "../../components/PassCard";
-import { PassportStats, ProfileCard } from "../../components/PassportParts";
-import { MyPassportActions, PassportLookup } from "../../components/PassportActions";
+import { PassportLookup } from "../../components/PassportActions";
+import { PassportStage } from "../../components/PassportStage";
 import { LevelLadder } from "../../components/PassportSection";
 import { PassportCustomizer } from "../../components/PassportStyle";
 import { Achievements, BadgeGallery, QuestHistory } from "../../components/Rewards";
@@ -13,21 +12,7 @@ export const metadata: Metadata = { title: "Passport", description: "Your Arc id
 export default function PassportPage() {
   return (
     <div className="container page">
-      <div className="row between" style={{ alignItems: "flex-end", gap: 16, marginBottom: 32 }}>
-        <div>
-          <div className="label" style={{ color: "var(--link)" }}>Passport</div>
-          <h1 className="h1" style={{ marginTop: 10 }}>Your Arc identity</h1>
-        </div>
-        <MyPassportActions />
-      </div>
-
-      <div className="showcase" style={{ alignItems: "start" }}>
-        <div className="showcase__card"><PassCard /></div>
-        <div className="showcase__copy showcase__copy--wide">
-          <ProfileCard />
-          <PassportStats />
-        </div>
-      </div>
+      <PassportStage />
 
       <section className="section" style={{ paddingTop: 56 }} aria-labelledby="style-title">
         <h2 id="style-title" className="h3" style={{ marginBottom: 20 }}>Make it yours</h2>
@@ -40,8 +25,11 @@ export default function PassportPage() {
         </div>
       </section>
 
-      <section className="section" id="rewards" style={{ paddingTop: 56 }} aria-labelledby="badges-title">
-        <h2 id="badges-title" className="h3" style={{ marginBottom: 20 }}>Rewards</h2>
+      <section className="section ppaper" id="rewards" aria-labelledby="badges-title">
+        <div className="ppaper__head">
+          <h2 id="badges-title" className="h3">Rewards</h2>
+          <span className="xs secondary">Every stamp is recorded on Arc when you claim its quest.</span>
+        </div>
         <BadgeGallery />
       </section>
 
