@@ -30,7 +30,7 @@ changes with every release.
 | Asset markets (prices) | COMING SOON | No authoritative price source for Arc yet |
 | Activity, What's New, today's summary, Insights | LIVE | Explorer-backed, with provenance; under More |
 | Search, Watchlist, Settings | LIVE | Watchlist is stored per browser |
-| Quests (Beginner tier) and Passport | LIVE | Passport contract `0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107` |
+| Quests (Beginner tier) and Passport | LIVE | Mainnet passport `0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c` (testnet: `0xa8a4A8FdE3fdCe351b9b22ACc3368e3b308b0107`) |
 | Passport styles (name, themes, frames, titles) | LIVE | Offchain, saved per browser |
 | Quest tiers Explorer, Regular, Advanced | COMING SOON | Need new quests with onchain checks |
 | Collectibles | COMING SOON | |
