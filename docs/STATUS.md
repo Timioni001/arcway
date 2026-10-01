@@ -11,7 +11,17 @@ changes with every release.
 | COMING SOON | Shown in the UI as coming soon |
 | PLANNED | Agreed, not started |
 
-## Current (Arc Testnet)
+## Arc Mainnet (live since October 1, 2026)
+
+| Contract | Address |
+|---|---|
+| ArcwayPassport | `0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c` |
+| ArcwayCampaigns | `0x229f7A3bbd861149bfF05EAACa186e7ffaEEc26c` |
+| Verifier (signer) | `0xF11Dd8b50714fFF3F22eEE6EC641c5dC4fC4A6f6` |
+
+`/api/health` on production reports `claimsReady` and `campaignsReady`. Preview deployments stay on Arc Testnet.
+
+## Feature status
 
 | Area | Status | Notes |
 |---|---|---|
@@ -28,8 +38,8 @@ changes with every release.
 | Submit a project, Badges, RSS | LIVE | Listings reviewed through GitHub issues |
 | Envio indexer | BUILT | Deploy `indexer/` and set `ARCWAY_INDEXER_URL`; explorer fallback until then |
 | Passkey wallets | BLOCKED | Needs a Circle Client Key, passkey domain and Gas Station policy |
-| Campaigns | BUILT | Deploy `ArcwayCampaigns` and set `NEXT_PUBLIC_CAMPAIGNS_CONTRACT`; preview works now |
-| Arc Mainnet | BLOCKED | Code ready and rehearsed on a local mainnet chain; needs the owner to deploy contracts, fund the verifier and switch Vercel (see DEPLOYMENT.md) |
+| Campaigns | LIVE | Escrow deployed on mainnet; projects can launch funded campaigns |
+| Arc Mainnet | LIVE | Passport and Campaigns deployed, verifier authorised and funded |
 
 ## Planned
 
