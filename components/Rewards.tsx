@@ -4,8 +4,6 @@ import { ArrowRight, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { useArcwayState } from "../lib/hooks/context";
 import { useIntel } from "../lib/hooks/useIntel";
-import { useStyleProgress } from "../lib/hooks/usePassportStyle";
-import { STYLE_ITEMS, isUnlocked, unlockText } from "../lib/passportStyle";
 import { QUESTS, TOTAL_XP } from "../lib/quests";
 import { Medal } from "./Medal";
 import { QUEST_TYPE_LOOK } from "./QuestVisual";
@@ -97,31 +95,6 @@ export function BadgeGallery() {
         );
       })}
     </ul>
-  );
-}
-
-/** Styles unlocked so far, as achievements; the next ones show exactly what to do. */
-export function Achievements() {
-  const progress = useStyleProgress();
-  const earnable = STYLE_ITEMS.filter((i) => i.unlock);
-  const done = earnable.filter((i) => isUnlocked(i, progress));
-  const next = earnable.filter((i) => !isUnlocked(i, progress)).slice(0, 3);
-  return (
-    <div className="achv">
-      {done.length === 0 ? <p className="small secondary">No achievements yet. Your first quest unlocks a new card theme and a frame.</p> : (
-        <ul className="achv__list">
-          {done.map((i) => <li key={`${i.kind}-${i.id}`} className="achv__item"><Check aria-hidden="true" /><span><b>{i.name}</b> <span className="xs secondary">{i.kind} unlocked · {unlockText(i).toLowerCase()}</span></span></li>)}
-        </ul>
-      )}
-      {next.length > 0 && (
-        <>
-          <div className="pstyle__label" style={{ marginTop: 14 }}>Up next</div>
-          <ul className="achv__list">
-            {next.map((i) => <li key={`${i.kind}-${i.id}`} className="achv__item achv__item--next"><Lock aria-hidden="true" /><span><b>{i.name}</b> <span className="xs secondary">{i.kind} · {unlockText(i)}</span></span></li>)}
-          </ul>
-        </>
-      )}
-    </div>
   );
 }
 

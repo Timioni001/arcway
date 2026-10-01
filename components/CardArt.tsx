@@ -1,8 +1,12 @@
+'use client';
+
 /**
  * Passport card designs, in the spirit of premium payment cards: every theme is a printed pattern,
  * not a flat colour. Patterns are generated from fixed seeds, so server and browser render the
  * same artwork (no hydration mismatch). Pure SVG, decorative only.
  */
+
+import { useId } from "react";
 
 const W = 316;
 const H = 200;
@@ -81,16 +85,20 @@ const WAVES = Array.from({ length: 9 }, (_, i) => {
 export const CARD_THEMES = ["arc", "graphite", "midnight", "dawn", "prism", "aurora", "pearl"] as const;
 
 export function CardArt({ theme }: { theme: string }) {
+  // Unique per instance: the same page can show the passport and small previews of every theme.
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const carbon = `carbon-${uid}`;
+  const holo = `holo-${uid}`;
   return (
     <svg className="card-art" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs>
-        <pattern id="carbon" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <pattern id={carbon} width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="4" height="4" fill="rgba(255,255,255,.06)" />
           <rect x="4" y="4" width="4" height="4" fill="rgba(255,255,255,.06)" />
           <rect x="4" width="4" height="4" fill="rgba(0,0,0,.25)" />
           <rect y="4" width="4" height="4" fill="rgba(0,0,0,.25)" />
         </pattern>
-        <linearGradient id="holo" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={holo} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#7CF5D8" /><stop offset=".35" stopColor="#8AB8FF" /><stop offset=".65" stopColor="#D49CFF" /><stop offset="1" stopColor="#FFC6A8" />
         </linearGradient>
       </defs>
@@ -106,7 +114,7 @@ export function CardArt({ theme }: { theme: string }) {
       )}
       {theme === "midnight" && (
         <g>
-          <rect width={W} height={H} fill="url(#carbon)" />
+          <rect width={W} height={H} fill={`url(#${carbon})`} />
           <circle cx="250" cy="40" r="90" className="card-art__glow" />
         </g>
       )}
@@ -114,7 +122,7 @@ export function CardArt({ theme }: { theme: string }) {
       {theme === "prism" && <g>{PRISM.map((t, i) => <path key={i} d={t.d} fill="#fff" fillOpacity={t.o} />)}</g>}
       {theme === "aurora" && (
         <g className="card-art__waves">
-          {WAVES.map((d, i) => <path key={i} d={d} stroke="url(#holo)" strokeOpacity={0.25 + (i % 3) * 0.15} />)}
+          {WAVES.map((d, i) => <path key={i} d={d} stroke={`url(#${holo})`} strokeOpacity={0.25 + (i % 3) * 0.15} />)}
         </g>
       )}
     </svg>

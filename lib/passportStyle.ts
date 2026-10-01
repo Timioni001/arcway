@@ -65,6 +65,16 @@ export function unlockText(item: StyleItem): string {
   return "";
 }
 
+/** How far along an item is: 1 of 3 quests, 2 of 5 apps, 0 of 1 for a named quest. Null when included. */
+export function unlockProgress(item: StyleItem, p: StyleProgress): { have: number; need: number } | null {
+  const u = item.unlock;
+  if (!u) return null;
+  if (u.questId) return { have: p.questIds.includes(u.questId) ? 1 : 0, need: 1 };
+  if (u.quests !== undefined) return { have: Math.min(p.quests, u.quests), need: u.quests };
+  if (u.apps !== undefined) return { have: Math.min(p.apps, u.apps), need: u.apps };
+  return null;
+}
+
 /** Letters, numbers, spaces and . _ - only; 24 characters at most. */
 export function cleanName(raw: string): string {
   return raw.replace(/[^\p{L}\p{N} ._-]/gu, "").replace(/\s+/g, " ").trimStart().slice(0, 24);

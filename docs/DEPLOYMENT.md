@@ -14,7 +14,7 @@ optional Envio hosted indexer, and two Foundry-deployed contracts.
 | `NEXT_PUBLIC_CAMPAIGNS_CONTRACT` | public | ArcwayCampaigns address; campaigns stay in preview until set |
 | `NEXT_PUBLIC_CIRCLE_CLIENT_KEY` | public | Passkey wallets; off until set |
 | `NEXT_PUBLIC_CIRCLE_CLIENT_URL`, `NEXT_PUBLIC_CIRCLE_CHAIN` | public | Optional Circle overrides |
-| `NEXT_PUBLIC_BRIDGE_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CONTACT_URL` | public | Optional links |
+| `NEXT_PUBLIC_BRIDGE_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CONTACT_URL`, `NEXT_PUBLIC_X_URL` | public | Optional links (`NEXT_PUBLIC_X_URL` adds the X icon to the footer) |
 | `VERIFIER_PRIVATE_KEY` | server, sensitive | Signs passport records, campaign entries and results |
 | `EXPLORER_API_KEY` | server | Optional, if the explorer rate-limits |
 | `ARCWAY_INDEXER_URL` | server | Optional Envio GraphQL endpoint |

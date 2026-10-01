@@ -432,7 +432,12 @@ test("passport: rewards gallery and styles that unlock through participation", a
   await expect(gallery.first()).toContainText("Not earned yet");
   await expect(gallery.filter({ hasText: "Arrival" })).toContainText("Held by 2 explorers");
   await expect(page.getByRole("region", { name: "Make it yours" })).toContainText("Connect your wallet to style your passport");
-  await expect(page.getByRole("region", { name: "Achievements" })).toContainText("Complete 1 quest");
+  const style = page.getByRole("region", { name: "Make it yours" });
+  await expect(style.locator(".pcol__item--locked").first()).toContainText("Complete 1 quest");
+  await expect(style.getByRole("progressbar", { name: "Midnight carbon: 0 of 1" })).toBeVisible();
+  await style.getByRole("tab", { name: /Titles/ }).click();
+  await expect(style.locator(".pcol__item--locked")).toHaveCount(3);
+  await expect(page.getByRole("navigation", { name: "On this page" }).getByRole("link")).toHaveText(["Style", "Badges", "Progress", "Activity"]);
 });
 
 test("assets: list ranked by holders, entity page with activity, markets and related apps", async ({ page }) => {

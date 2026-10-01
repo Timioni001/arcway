@@ -57,6 +57,8 @@ export const SUBMIT_APP_URL =
 
 /** Where people reach the team (terms, privacy, support). */
 export const CONTACT_URL = process.env.NEXT_PUBLIC_CONTACT_URL || "https://github.com/Timioni001/arcway/issues";
+/** Arcway on X, shown in the footer when set (e.g. https://x.com/arcwayworld). */
+export const X_URL = process.env.NEXT_PUBLIC_X_URL || "";
 export const LEGAL_UPDATED = "September 26, 2026";
 
 /**
