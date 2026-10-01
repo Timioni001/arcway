@@ -2732,3 +2732,48 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1
 .pstyle__swatch[data-theme="pearl"] { background: linear-gradient(135deg, #FFFFFF, #DCE6F5); box-shadow: inset 0 0 0 1px rgba(16, 34, 74, .15); }
 .pstyle__swatch[data-theme="aurora"] { background: linear-gradient(135deg, #7CF5D8, #8AB8FF, #D49CFF, #FFC6A8); }
 .pass[data-theme="dawn"] :is(.pass__label, .pass__xp, .pass__name, .mono) { text-shadow: 0 1px 8px rgba(80, 30, 90, .35); }
+
+/* Passport holo: rainbow foil + sparkle that shift with the pointer, glare on top.
+   Registered so the pointer position can transition and drift on touch screens. */
+@property --mx { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+@property --my { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+.pass::before, .pass::after { display: none; }
+.pass { --hyp: 0; --lift: 1; transform: rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--lift));
+  transition: transform 600ms cubic-bezier(.2, .8, .2, 1), box-shadow 300ms var(--ease), --mx 300ms ease-out, --my 300ms ease-out; }
+.pass:hover { --lift: 1.02; transition: transform 140ms linear, box-shadow 300ms var(--ease), --mx 80ms linear, --my 80ms linear;
+  box-shadow: 0 44px 80px -24px rgba(36, 108, 176, .6), inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 0 0 1px rgba(255, 255, 255, .22); }
+.pass__holo, .pass__glare { position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 400ms var(--ease); }
+.pass__holo {
+  mix-blend-mode: hard-light; filter: saturate(1.4);
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, .95) 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(255, 255, 255, .7) 0 .8px, transparent 1.4px),
+    repeating-linear-gradient(110deg, hsl(2, 100%, 73%) 0%, hsl(53, 100%, 69%) 5%, hsl(93, 100%, 69%) 10%, hsl(176, 100%, 76%) 15%, hsl(228, 100%, 74%) 20%, hsl(283, 100%, 73%) 25%, hsl(2, 100%, 73%) 30%),
+    repeating-linear-gradient(-45deg, #0E152E 0%, hsl(180, 10%, 60%) 3.8%, hsl(180, 29%, 66%) 4.5%, hsl(180, 10%, 60%) 5.2%, #0E152E 10%, #0E152E 12%);
+  background-size: 23px 23px, 37px 31px, 400% 400%, 300% 300%;
+  background-position:
+    calc(var(--mx) * .3) calc(var(--my) * .3), calc(var(--mx) * -.2) calc(var(--my) * .4),
+    var(--mx) var(--my), calc(100% - var(--mx)) calc(100% - var(--my));
+  background-blend-mode: screen, screen, normal, normal;
+  -webkit-mask-image: radial-gradient(farthest-corner circle at var(--mx) var(--my), #000 10%, rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, .25) 85%);
+  mask-image: radial-gradient(farthest-corner circle at var(--mx) var(--my), #000 10%, rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, .25) 85%);
+}
+.pass__glare { mix-blend-mode: overlay;
+  background: radial-gradient(farthest-corner circle at var(--mx) var(--my), rgba(255, 255, 255, .8) 8%, rgba(255, 255, 255, .3) 22%, rgba(0, 0, 0, .22) 95%); }
+.pass:hover .pass__holo { opacity: calc(.3 + var(--hyp) * .35); }
+.pass:hover .pass__glare { opacity: .75; }
+/* The dark card glows more under foil, so it takes less; the white card takes a pastel wash */
+.pass[data-theme="midnight"]:hover .pass__holo { opacity: calc(.2 + var(--hyp) * .25); }
+.pass[data-theme="pearl"]:hover .pass__holo { opacity: calc(.4 + var(--hyp) * .3); }
+.pass[data-theme="pearl"]:hover .pass__glare { opacity: .5; }
+/* Touch screens: no hover, so the foil drifts on its own */
+@keyframes holo-drift { 0% { --mx: 10%; --my: 20%; } 50% { --mx: 70%; --my: 40%; } 100% { --mx: 95%; --my: 85%; } }
+@media (hover: none) {
+  .pass__holo, .pass__glare { animation: holo-drift 7s ease-in-out infinite alternate; }
+  .pass__holo { opacity: .3; }
+  .pass__glare { opacity: .45; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pass, .pass:hover { --lift: 1; }
+  .pass__holo, .pass__glare { animation: none; }
+}

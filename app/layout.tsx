@@ -9,22 +9,17 @@ import { Footer } from "../components/Shell";
 import { AmbientPause } from "../components/AmbientPause";
 import { SpotlightTracker } from "../components/SpotlightTracker";
 import { Celebrate } from "../components/Celebrate";
+import { SITE_URL } from "../lib/site";
 import { THEME_INIT_SCRIPT } from "../lib/theme";
 import "./globals.css";
 import "./components.css";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
-  (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) ||
-  "http://localhost:3000";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   openGraph: { siteName: "Arcway", type: "website" },
   twitter: { card: "summary_large_image" },
-  title: { default: "Arcway — Understand what's happening on Arc", template: "%s · Arcway" },
-  description: "Arc ecosystem intelligence: explore applications, live activity, builders and verified signals across Arc."
+  title: { default: "Arcway — Explore Arc. Complete quests. Build your Passport.", template: "%s · Arcway" },
+  description: "Discover the apps on Arc, complete quests onchain and build a Passport that proves what you've done."
 };
 
 export const viewport: Viewport = {

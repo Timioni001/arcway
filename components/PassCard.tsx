@@ -11,20 +11,23 @@ import { getItem, type PassportStyle } from "../lib/passportStyle";
 import { CardArt, CardChip } from "./CardArt";
 import { LogoMark } from "./Logo";
 
-/** The passport as a physical card: tilts and catches light under the pointer. */
+/** The passport as a physical card: tilts under the pointer and its holo foil shifts with the light. */
 export function PassCardView({ address, xp, done, look }: { address?: string; xp: number; done: boolean[]; look?: PassportStyle }) {
   const ref = useRef<HTMLDivElement>(null);
   const shown = useCountUp(xp);
   const level = levelFor(xp);
   const tilt = useCallback((px: number, py: number, el: HTMLElement) => {
-    el.style.setProperty("--ry", `${px * 7}deg`);
-    el.style.setProperty("--rx", `${-py * 7}deg`);
+    el.style.setProperty("--ry", `${px * 10}deg`);
+    el.style.setProperty("--rx", `${-py * 10}deg`);
+    el.style.setProperty("--hyp", Math.min(1, Math.hypot(px, py)).toFixed(3));
   }, []);
   usePointerVars(ref, tilt);
 
   return (
     <div className="pass" ref={ref} data-theme={look?.theme ?? "arc"} role="img" aria-label={`Arcway passport${look?.name ? ` of ${look.name}` : ""}: ${level.name}, ${xp} XP`}>
       <CardArt theme={look?.theme ?? "arc"} />
+      <div className="pass__holo" aria-hidden="true" />
+      <div className="pass__glare" aria-hidden="true" />
       <div className="pass__top">
         <span className="pass__brand"><LogoMark className="logo__mark" id="aw-mark-pass" /> arcway</span>
         <span className="pass__label">Passport</span>

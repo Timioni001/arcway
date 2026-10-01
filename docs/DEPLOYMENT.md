@@ -64,9 +64,28 @@ or misspelled: fix it in **Settings → Environment Variables**, then **Deployme
 Every push to the repo's default branch redeploys automatically. Changing an
 environment variable needs a manual **Redeploy**.
 
-## Custom domain (optional)
+## Domain: arcway.world
 
-**Settings → Domains → Add**, then follow the DNS instructions Vercel shows.
+Production deployments use `https://arcway.world` for share images, the sitemap and robots.txt
+(`lib/site.ts`). `NEXT_PUBLIC_SITE_URL` overrides it; previews keep their own address.
+
+1. Vercel → project → **Settings → Domains → Add** `arcway.world`. Choose **Add arcway.world and
+   redirect www.arcway.world to it**.
+2. At the registrar, set the records Vercel shows (use its exact values if they differ from these):
+   | Type | Name | Value |
+   | --- | --- | --- |
+   | `A` | `@` | `76.76.21.21` |
+   | `CNAME` | `www` | `cname.vercel-dns.com` |
+   Or switch the domain's nameservers to `ns1.vercel-dns.com` / `ns2.vercel-dns.com` and Vercel
+   manages everything. Remove any old `A`/`AAAA` parking records for `@`.
+3. Wait for both rows to show **Valid Configuration** (HTTPS is issued automatically).
+4. Optional: in **Domains**, edit the old `*.vercel.app` production domain and set it to redirect
+   (308) to `arcway.world`, so old links land on the new address.
+5. Passkey wallets: in the Circle Console (Keys → Client Keys), add `arcway.world` as an allowed
+   passkey domain. Passkeys are bound to the domain they were made on, so wallets created on the
+   old address keep working only there; re-adding the wallet's address in a regular wallet is the way across.
+6. Check: `https://arcway.world/api/health`, `https://arcway.world/robots.txt`, and paste the home
+   URL into a post composer on X to see the card.
 
 ---
 
