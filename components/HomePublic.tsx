@@ -7,7 +7,7 @@ import { useIntel } from "../lib/hooks/useIntel";
 import { usePassportStyle } from "../lib/hooks/usePassportStyle";
 import { levelFor } from "../lib/levels";
 import { getItem, unlockedCount } from "../lib/passportStyle";
-import { DIFFICULTY_LABEL, QUESTS } from "../lib/quests";
+import { DIFFICULTY_LABEL, QUESTS, timeLabel } from "../lib/quests";
 import { APPS } from "../lib/registry";
 import { AddressAvatar } from "./AddressAvatar";
 import { AppMark } from "./CategoryIcon";
@@ -21,7 +21,7 @@ import { Reveal } from "./Reveal";
 export function PopularQuests() {
   const passport = useIntel("passport");
   const counts = new Map((passport.data?.data.byQuest ?? []).map((q) => [q.id, q.count]));
-  const ranked = [...QUESTS].filter((q) => q.id !== "arc-explorer").sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0)).slice(0, 3);
+  const ranked = [...QUESTS].filter((q) => q.tier === "Beginner" && q.requirement.kind !== "complete-quests").sort((a, b) => (counts.get(b.id) ?? 0) - (counts.get(a.id) ?? 0)).slice(0, 3);
   return (
     <ul className="qpreview swipe">
       {ranked.map((q, i) => {
@@ -41,7 +41,7 @@ export function PopularQuests() {
                 <span className="qcard__facts">
                   <span className="qcard__badge">{q.badge.name} badge</span>
                   <DifficultyPips difficulty={q.difficulty} label={DIFFICULTY_LABEL[q.difficulty]} />
-                  <span className="xs secondary">{q.minutes} min</span>
+                  <span className="xs secondary">{timeLabel(q)}</span>
                 </span>
                 <span className="qcard__cta">Start<ArrowRight aria-hidden="true" /></span>
               </span>

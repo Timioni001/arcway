@@ -138,9 +138,9 @@ import { levelFor } from "../lib/levels";
 describe("levelFor", () => {
   it("maps XP to level and progress toward the next", () => {
     expect(levelFor(0)).toMatchObject({ index: 0, name: "Newcomer", progress: 0 });
-    expect(levelFor(35)).toMatchObject({ name: "Explorer", progress: 0 });
-    expect(levelFor(72).progress).toBeCloseTo(0.4933, 3);
-    expect(levelFor(500)).toMatchObject({ name: "Pathfinder", progress: 1, next: undefined });
+    expect(levelFor(110)).toMatchObject({ name: "Explorer", progress: 0 });
+    expect(levelFor(230).progress).toBeCloseTo(0.5, 3);
+    expect(levelFor(2145)).toMatchObject({ name: "Pathfinder", progress: 1, next: undefined });
   });
 });
 
@@ -313,7 +313,7 @@ import { DEFAULT_STYLE, STYLE_ITEMS, cleanName, isUnlocked, resolveStyle, unlock
 
 describe("passport styles", () => {
   const none = { quests: 0, apps: 0, questIds: [] as string[] };
-  const some = { quests: 3, apps: 5, questIds: ["arrive-with-usdc", "first-tx", "explore-app"] };
+  const some = { quests: 12, apps: 0, questIds: ["arrive-with-usdc", "first-tx", "explore-app", "arc-explorer", "five-tx", "app-actions-3", "three-days", "arc-voyager", "twenty-five-tx", "app-actions-10", "week-on-arc", "fifty-usdc"] };
   it("starts with only the defaults unlocked", () => {
     expect(STYLE_ITEMS.filter((i) => isUnlocked(i, none)).every((i) => i.unlock === null)).toBe(true);
     expect(unlockedCount(none)).toEqual({ unlocked: 0, total: STYLE_ITEMS.filter((i) => i.unlock).length });
@@ -321,8 +321,8 @@ describe("passport styles", () => {
   it("unlocks by participation and says how", () => {
     const halo = STYLE_ITEMS.find((i) => i.id === "halo")!;
     expect(isUnlocked(halo, some)).toBe(true);
-    expect(unlockText(halo)).toBe("Complete 3 quests");
-    expect(unlockText(STYLE_ITEMS.find((i) => i.id === "app-hopper")!)).toBe("Explore 5 Arc apps");
+    expect(unlockText(halo)).toBe("Complete 12 quests");
+    expect(unlockText(STYLE_ITEMS.find((i) => i.id === "app-hopper")!)).toBe("Complete the App regular quest");
     expect(isUnlocked(STYLE_ITEMS.find((i) => i.id === "aurora")!, some)).toBe(false);
   });
   it("never shows a locked style, even if one was stored", () => {
@@ -333,5 +333,47 @@ describe("passport styles", () => {
   it("keeps display names short and plain", () => {
     expect(cleanName("<b>Ada</b>  Lovelace!!")).toBe("bAdab Lovelace");
     expect(cleanName("x".repeat(40))).toHaveLength(24);
+  });
+});
+
+import { activeDays, appActions, checkQuest } from "../lib/server/verify";
+import { getQuest as quest } from "../lib/quests";
+describe("tier quests (server checks)", () => {
+  const tx = (day: string, to = "0xabc", success = true) => ({ hash: "0x", timestamp: `${day}T10:00:00Z`, from: "0x1", to, method: null, success });
+  const snap = (over: Partial<{ usdcBalance: bigint; txCount: number; completed: Set<string>; items: ReturnType<typeof tx>[] }> = {}) => ({
+    usdcBalance: over.usdcBalance ?? 0n,
+    txCount: over.txCount ?? 0,
+    completed: over.completed ?? new Set(["arrive-with-usdc", "first-tx", "explore-app", "arc-explorer"]),
+    activity: async () => over.items ?? []
+  });
+  it("counts distinct successful days and verified-app actions", () => {
+    const items = [tx("2026-10-01"), tx("2026-10-01"), tx("2026-10-02"), tx("2026-10-03", "0xabc", false)];
+    expect(activeDays(items)).toBe(2);
+    expect(appActions(items, new Set(["0xabc"]))).toBe(3);
+  });
+  it("keeps a tier closed until its gate is recorded", async () => {
+    expect(await checkQuest(quest("five-tx")!, snap({ txCount: 9, completed: new Set() }))).toEqual({ eligible: false, reason: "Claim Arc Explorer first to open this tier." });
+  });
+  it("judges transaction counts and active days, and says how far along you are", async () => {
+    expect(await checkQuest(quest("five-tx")!, snap({ txCount: 5 }))).toEqual({ eligible: true });
+    expect(await checkQuest(quest("five-tx")!, snap({ txCount: 3 }))).toEqual({ eligible: false, reason: "3 of 5 transactions so far." });
+    expect(await checkQuest(quest("three-days")!, snap({ items: [tx("2026-10-01"), tx("2026-10-02"), tx("2026-10-04")] }))).toEqual({ eligible: true });
+    expect(await checkQuest(quest("three-days")!, snap({ items: [tx("2026-10-01")] }))).toEqual({ eligible: false, reason: "1 of 3 days so far." });
+  });
+  it("names the quests a finale still needs", async () => {
+    const r = await checkQuest(quest("arc-voyager")!, snap({ completed: new Set(["arc-explorer", "five-tx"]) }));
+    expect(r).toEqual({ eligible: false, reason: "Claim Back for more, Three days in first." });
+  });
+});
+
+describe("fetchActivity paging", () => {
+  it("follows next_page_params up to the page limit", async () => {
+    const user = "0x7a00000000000000000000000000000000092f1a" as const;
+    const urls: string[] = [];
+    const page = (n: number, next: object | null) => ({ ok: true, status: 200, json: async () => ({ items: [{ hash: `0x${n}`, timestamp: "2026-10-01T00:00:00Z", status: "ok" }], next_page_params: next }) });
+    const fetchImpl = async (url: string) => { urls.push(url); return urls.length === 1 ? page(1, { block_number: 9, index: 2 }) : page(2, { block_number: 5, index: 0 }); };
+    const items = await fetchActivity(user, fetchImpl as unknown as typeof fetch, 2);
+    expect(items.map((i) => i.hash)).toEqual(["0x1", "0x2"]);
+    expect(urls[1]).toContain("&block_number=9&index=2");
   });
 });

@@ -27,8 +27,18 @@ data.
   the passport contract. Each card shows the type (Learn, Explore, Try an app, Onchain action,
   Collect, Seasonal, Community), what you will do, the reward (XP and badge), difficulty (Beginner,
   Intermediate, Advanced) and time.
-- **Progression**: Beginner, Explorer, Regular, Advanced. Beginner is live; later tiers show as coming
-  soon until their quests exist.
+- **Progression**: 17 quests in four tiers, 2,145 XP in total. Each tier opens when the previous
+  tier's finale is recorded:
+  | Tier | Quests | XP |
+  | --- | --- | --- |
+  | Beginner | Arrive on Arc (1 USDC), First transaction, Explore an app, Arc Explorer (finale) | 110 |
+  | Explorer | 5 transactions, 3 verified-app actions, active on 3 days, Arc Voyager (finale) | 240 |
+  | Regular | 25 transactions, 10 verified-app actions, active on 7 days, hold 50 USDC, Arc Regular (finale) | 595 |
+  | Advanced | 100 transactions, 25 verified-app actions, active on 20 days, Arc Pathfinder (finale) | 1,200 |
+  Everything is checked on the server from Arc: USDC balance, the wallet's nonce, and its successful
+  transactions from the explorer (distinct UTC days; calls to verified apps' published contracts).
+- **Levels**: Newcomer 0, Arrival 35, Explorer 110, Voyager 350, Regular 945, Pathfinder 2,145 XP:
+  one level per finished tier.
 - **Rewards**: XP, badges (one per quest, onchain), season rewards (monthly leaderboard), collectibles
   (coming soon).
 - Views: Campaigns, Leaderboard (monthly season and all time, with onchain proof).
@@ -36,10 +46,11 @@ data.
 ## Passport
 
 - **Identity** (`/passport`): card, name, level, XP, apps explored, quests done.
-- **Make it yours**: display name, card theme (Arc blue, Midnight, Dawn, Aurora), avatar frame (Ring,
-  Halo) and title (First Mover, App Hopper, Arc Explorer). Each locked option says how to unlock it,
-  for example "Complete 3 quests" or "Explore 5 Arc apps". Saved in the browser; a locked style can
-  never be shown even if stored.
+- **Make it yours**: display name, card design (Arc blue and Graphite included; Midnight carbon,
+  Dawn contour, Prism, Pearl and Aurora holo unlock with tier finales and quest counts), avatar
+  frame (Ring at 4 quests, Halo at 12) and title (First Mover, Arc Explorer, App Hopper, Resident,
+  Pathfinder). Each locked piece shows what unlocks it and how far along you are. Saved in the
+  browser; a locked style can never be shown even if stored.
 - **Rewards gallery**: every badge with artwork, what it is for, the quest that earns it, whether you
   hold it and how many explorers hold it.
 - **Achievements, quest history, levels, activity summary**, and a public passport lookup.

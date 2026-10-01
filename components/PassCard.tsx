@@ -1,5 +1,6 @@
 'use client';
 
+import { tiersDone } from "../lib/quests";
 import { useCallback, useRef } from "react";
 import { shortAddress } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
@@ -58,7 +59,7 @@ export function PassCard() {
       look={connected ? style : undefined}
       address={connected ? connection.address : undefined}
       xp={connected ? xp : 0}
-      done={quests.map((q) => connected && q.status === "completed")}
+      done={tiersDone(connected ? quests : quests.map((q) => ({ ...q, status: "todo" as const })))}
     />
   );
 }

@@ -1,9 +1,11 @@
 /** Passport levels by XP. A progress identity, not a financial rank (§17). */
 export const LEVELS = [
   { min: 0, name: "Newcomer" },
-  { min: 10, name: "Arrival" },
-  { min: 35, name: "Explorer" },
-  { min: 110, name: "Pathfinder" }
+  { min: 35, name: "Arrival" },
+  { min: 110, name: "Explorer" },
+  { min: 350, name: "Voyager" },
+  { min: 945, name: "Regular" },
+  { min: 2145, name: "Pathfinder" }
 ] as const;
 
 export function levelFor(xp: number) {

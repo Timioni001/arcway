@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { nextStep, type JourneyInput } from "../lib/journey";
-import { questViews } from "../lib/quests";
+import { QUESTS, QUEST_TIERS, TOTAL_XP, getQuest, questViews, tierXp, timeLabel } from "../lib/quests";
 
 const views = (completed: string[] = [], eligible: Record<string, boolean> = {}) =>
   questViews({ completed: new Set(completed), eligible });
@@ -45,11 +45,30 @@ describe("nextStep", () => {
   it("asks to switch network only when a transaction is needed", () => {
     expect(nextStep({ ...base, onArc: false, txCount: 0, recordingEnabled: false }).id).toBe("switch-network");
     const allDone = views(["arrive-with-usdc", "first-tx", "explore-app", "arc-explorer"]);
-    expect(nextStep({ ...base, onArc: false, quests: allDone }).id).toBe("done");
+    expect(nextStep({ ...base, onArc: false, quests: allDone })).toMatchObject({ id: "keep-going", title: "Next: Getting comfortable" });
   });
 
   it("points to discovery until an app interaction happens", () => {
     expect(nextStep({ ...base, quests: views(["arrive-with-usdc", "first-tx"]) }).id).toBe("explore-app");
+  });
+});
+
+describe("tiers", () => {
+  it("keeps later tiers locked until the previous finale is recorded", () => {
+    const v = views(["arrive-with-usdc", "first-tx", "explore-app"], { "five-tx": true });
+    expect(v.find((q) => q.id === "five-tx")).toMatchObject({ status: "locked", lockedBy: ["arc-explorer"] });
+    const open = views(["arrive-with-usdc", "first-tx", "explore-app", "arc-explorer"], { "five-tx": true });
+    expect(open.find((q) => q.id === "five-tx")!.status).toBe("claimable");
+    expect(open.find((q) => q.id === "arc-voyager")!.lockedBy).toEqual(["five-tx", "app-actions-3", "three-days"]);
+  });
+  it("adds up to 2,145 XP across 17 quests, one level per finished tier", () => {
+    expect(QUESTS).toHaveLength(17);
+    expect(TOTAL_XP).toBe(2145);
+    expect(QUEST_TIERS.map((t) => tierXp(t))).toEqual([110, 240, 595, 1200]);
+  });
+  it("shows how long multi-day quests take", () => {
+    expect(timeLabel(getQuest("week-on-arc")!)).toBe("7 days");
+    expect(timeLabel(getQuest("century")!)).toBe("2 h");
   });
 });
 

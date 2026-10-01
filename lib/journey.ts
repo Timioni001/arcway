@@ -35,6 +35,7 @@ export type JourneyStep = {
     | "first-transaction"
     | "claim"
     | "explore-app"
+    | "keep-going"
     | "done";
   title: string;
   body: string;
@@ -127,9 +128,20 @@ export function nextStep(input: JourneyInput): JourneyStep {
     };
   }
 
+  // Starter tier done: point at the next open quest in the later tiers.
+  const next = input.quests.find((q) => q.status === "todo");
+  if (next) {
+    return {
+      id: "keep-going",
+      title: `Next: ${next.title}`,
+      body: `${next.description} ${next.howTo}`,
+      action: { type: "discover", label: "Explore apps" }
+    };
+  }
+  const locked = input.quests.some((q) => q.status !== "completed");
   return {
     id: "done",
-    title: "You've finished the starter quests",
+    title: locked ? "You've finished the starter quests" : "Every quest done. Pathfinder.",
     body: input.recordingEnabled
       ? "Keep exploring apps to grow your passport."
       : "Claiming XP opens soon. Your progress is saved.",

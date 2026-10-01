@@ -48,7 +48,7 @@ export function OverviewStats() {
         <div className="progress" aria-hidden="true"><i style={{ width: `${connected ? Math.max(3, level.progress * 100) : 0}%` }} /></div>
       </Stat>
       <Stat icon={<Flame />} label="Day streak" value={connected && activity.isSuccess ? streak : dash} sub={connected ? (streak ? "days in a row with activity" : "Make a transaction to start one") : "Days in a row you use Arc"} />
-      <Stat icon={<Target />} label="Quests" value={connected ? `${done}/${quests.length}` : dash} sub="Arc Starter campaign">
+      <Stat icon={<Target />} label="Quests" value={connected ? `${done}/${quests.length}` : dash} sub="Across four tiers">
         <div className="progress" aria-hidden="true"><i style={{ width: `${connected ? (done / quests.length) * 100 : 0}%` }} /></div>
       </Stat>
       <Stat icon={<LayoutGrid />} label="Apps on Arc" value={liveApps} sub={`Across ${CATEGORIES.length} categories`} />

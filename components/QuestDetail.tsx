@@ -6,17 +6,20 @@ import { BRIDGE_URL, NETWORK_NAME } from "../lib/config";
 import { useClaims } from "../lib/hooks/claims";
 import { useArcwayState } from "../lib/hooks/context";
 import { useWallet } from "../lib/hooks/useWallet";
-import { getQuest, questProgress, type QuestRequirement } from "../lib/quests";
+import { getQuest, questProgress, timeLabel, type QuestRequirement } from "../lib/quests";
 import { QuestBadge, questNumber } from "./Quests";
 import { Status } from "./Status";
 import { TransactionStatus } from "./TransactionStatus";
 
 function requirement(req: QuestRequirement): string {
   switch (req.kind) {
-    case "hold-usdc": return `At least 1 USDC in your wallet on ${NETWORK_NAME}.`;
+    case "hold-usdc": return `At least ${Number(req.minAmount / 1_000_000n)} USDC in your wallet on ${NETWORK_NAME}.`;
     case "first-transaction": return `At least one payment or swap from your wallet on ${NETWORK_NAME}.`;
     case "app-interaction": return "One completed action in a verified app.";
-    case "complete-quests": return "The other three starter quests claimed.";
+    case "tx-count": return `At least ${req.min} transactions from your wallet on ${NETWORK_NAME}.`;
+    case "active-days": return `Successful transactions on ${req.min} different days (UTC). They don't need to be in a row.`;
+    case "app-actions": return `${req.min} successful actions in verified apps.`;
+    case "complete-quests": return `These quests claimed first: ${req.questIds.map((id) => getQuest(id)?.title ?? id).join(", ")}.`;
   }
 }
 
@@ -76,7 +79,7 @@ export function QuestDetail({ questId }: { questId: string }) {
           <span className="badge mono">+{quest.xp} XP</span>
           {connected && <QuestBadge quest={quest} />}
           <span className="tag" style={{ textTransform: "capitalize" }}>{quest.difficulty}</span>
-          <span className="tag mono">{quest.minutes} min</span>
+          <span className="tag mono">{timeLabel(quest)}</span>
         </div>
       </header>
 

@@ -124,7 +124,6 @@ export function PassportCustomizer() {
           </>
         )}
       </div>
-      {!preview && <p className="xs secondary">Apps explored counts apps you opened from Arcway in this browser ({progress.apps} so far).</p>}
     </div>
   );
 }

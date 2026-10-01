@@ -1,5 +1,6 @@
 'use client';
 
+import { tiersDone } from "../lib/quests";
 import { ArrowRight, ExternalLink as ExternalIcon } from "lucide-react";
 import Link from "next/link";
 import type { Address } from "viem";
@@ -36,7 +37,7 @@ export function PublicPassport({ address }: { address: Address }) {
       )}
 
       <div className="showcase" style={{ marginTop: 32, alignItems: "start" }}>
-        <div className="showcase__card"><PassCardView address={address} xp={xp} done={quests.map((q) => q.status === "completed")} /></div>
+        <div className="showcase__card"><PassCardView address={address} xp={xp} done={tiersDone(quests)} /></div>
         <div className="showcase__copy showcase__copy--wide">
           <section className="card pad-lg" aria-labelledby="pp-levels">
             <h2 id="pp-levels" className="h4">Level</h2>

@@ -1,3 +1,4 @@
+import { getQuest } from "./quests";
 import { readJson, writeJson } from "./storage";
 
 /**
@@ -20,23 +21,24 @@ export type PassportStyle = { name: string; theme: string; frame: string; title:
 export const STYLE_ITEMS: StyleItem[] = [
   { id: "arc", kind: "theme", name: "Arc blue", unlock: null },
   { id: "graphite", kind: "theme", name: "Graphite", unlock: null },
-  { id: "midnight", kind: "theme", name: "Midnight carbon", unlock: { quests: 1 } },
-  { id: "dawn", kind: "theme", name: "Dawn contour", unlock: { apps: 3 } },
-  { id: "prism", kind: "theme", name: "Prism", unlock: { quests: 3 } },
-  { id: "pearl", kind: "theme", name: "Pearl", unlock: { apps: 5 } },
-  { id: "aurora", kind: "theme", name: "Aurora holo", unlock: { questId: "arc-explorer" } },
+  { id: "midnight", kind: "theme", name: "Midnight carbon", unlock: { questId: "arc-explorer" } },
+  { id: "dawn", kind: "theme", name: "Dawn contour", unlock: { questId: "arc-voyager" } },
+  { id: "prism", kind: "theme", name: "Prism", unlock: { quests: 10 } },
+  { id: "pearl", kind: "theme", name: "Pearl", unlock: { questId: "arc-regular" } },
+  { id: "aurora", kind: "theme", name: "Aurora holo", unlock: { questId: "arc-pathfinder" } },
   { id: "none", kind: "frame", name: "No frame", unlock: null },
-  { id: "ring", kind: "frame", name: "Ring", unlock: { quests: 1 } },
-  { id: "halo", kind: "frame", name: "Halo", unlock: { quests: 3 } },
+  { id: "ring", kind: "frame", name: "Ring", unlock: { quests: 4 } },
+  { id: "halo", kind: "frame", name: "Halo", unlock: { quests: 12 } },
   { id: "none", kind: "title", name: "No title", unlock: null },
   { id: "first-mover", kind: "title", name: "First Mover", unlock: { questId: "first-tx" } },
-  { id: "app-hopper", kind: "title", name: "App Hopper", unlock: { apps: 5 } },
-  { id: "arc-explorer", kind: "title", name: "Arc Explorer", unlock: { questId: "arc-explorer" } }
+  { id: "app-hopper", kind: "title", name: "App Hopper", unlock: { questId: "app-actions-10" } },
+  { id: "arc-explorer", kind: "title", name: "Arc Explorer", unlock: { questId: "arc-explorer" } },
+  { id: "resident", kind: "title", name: "Resident", unlock: { questId: "twenty-days" } },
+  { id: "pathfinder", kind: "title", name: "Pathfinder", unlock: { questId: "arc-pathfinder" } }
 ];
 
 export const DEFAULT_STYLE: PassportStyle = { name: "", theme: "arc", frame: "none", title: "none" };
 
-const QUEST_NAMES: Record<string, string> = { "first-tx": "First transaction", "arc-explorer": "Arc Explorer" };
 
 export function itemsOf(kind: StyleKind): StyleItem[] {
   return STYLE_ITEMS.filter((i) => i.kind === kind);
@@ -59,7 +61,7 @@ export function isUnlocked(item: StyleItem, p: StyleProgress): boolean {
 export function unlockText(item: StyleItem): string {
   const u = item.unlock;
   if (!u) return "Included";
-  if (u.questId) return `Complete the ${QUEST_NAMES[u.questId] ?? u.questId} quest`;
+  if (u.questId) return `Complete the ${getQuest(u.questId)?.title ?? u.questId} quest`;
   if (u.quests !== undefined) return `Complete ${u.quests} quest${u.quests === 1 ? "" : "s"}`;
   if (u.apps !== undefined) return `Explore ${u.apps} Arc apps`;
   return "";

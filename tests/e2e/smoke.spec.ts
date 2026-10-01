@@ -421,22 +421,23 @@ test("quest cards say what you will do, the reward, difficulty and time", async 
   await expect(card).toContainText("Beginner");
   await expect(card).toContainText("2 min");
   await expect(card.getByRole("link", { name: "Start" })).toHaveAttribute("href", "/quests/first-tx");
-  await expect(page.locator(".tier")).toHaveText([/Beginner/, /Explorer.*Coming soon/, /Regular.*Coming soon/, /Advanced.*Coming soon/]);
+  await expect(page.locator(".tier")).toHaveText([/Beginner.*0\/4/, /Explorer.*opens after Arc Explorer/, /Regular.*opens after Arc Voyager/, /Advanced.*opens after Arc Regular/]);
 });
 
 test("passport: rewards gallery and styles that unlock through participation", async ({ page }) => {
   await open(page, "/passport");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Your Arc identity");
   const gallery = page.locator(".bgallery__item");
-  await expect(gallery).toHaveCount(4);
+  await expect(gallery).toHaveCount(17);
+  await expect(page.getByRole("region", { name: "Advanced badges" })).toContainText("Pathfinder");
   await expect(gallery.first()).toContainText("Not earned yet");
   await expect(gallery.filter({ hasText: "Arrival" })).toContainText("Held by 2 explorers");
   await expect(page.getByRole("region", { name: "Make it yours" })).toContainText("Connect your wallet to style your passport");
   const style = page.getByRole("region", { name: "Make it yours" });
-  await expect(style.locator(".pcol__item--locked").first()).toContainText("Complete 1 quest");
+  await expect(style.locator(".pcol__item--locked").first()).toContainText("Complete the Arc Explorer quest");
   await expect(style.getByRole("progressbar", { name: "Midnight carbon: 0 of 1" })).toBeVisible();
   await style.getByRole("tab", { name: /Titles/ }).click();
-  await expect(style.locator(".pcol__item--locked")).toHaveCount(3);
+  await expect(style.locator(".pcol__item--locked")).toHaveCount(5);
   await expect(page.getByRole("navigation", { name: "On this page" }).getByRole("link")).toHaveText(["Style", "Badges", "Progress", "Activity"]);
 });
 

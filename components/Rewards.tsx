@@ -4,7 +4,7 @@ import { ArrowRight, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { useArcwayState } from "../lib/hooks/context";
 import { useIntel } from "../lib/hooks/useIntel";
-import { QUESTS, TOTAL_XP } from "../lib/quests";
+import { QUESTS, QUEST_TIERS, TOTAL_XP } from "../lib/quests";
 import { Medal } from "./Medal";
 import { QUEST_TYPE_LOOK } from "./QuestVisual";
 import { Ticker } from "./Ticker";
@@ -66,35 +66,48 @@ function Stamp({ id, label, hue, tilt, earned, children }: { id: string; label: 
   );
 }
 
-/** Badges as a collection: artwork, name, what it's for, how it was earned, and how many explorers hold it. */
+/** Badges as a collection, one shelf per tier: artwork, name, what it's for, how it's earned, and how many explorers hold it. */
 export function BadgeGallery() {
   const { quests, connection } = useArcwayState();
   const passport = useIntel("passport");
   const connected = connection.status === "connected";
   const held = new Map((passport.data?.data.byQuest ?? []).map((q) => [q.id, q.count]));
   return (
-    <ul className="bgallery">
-      {quests.map((q, i) => {
-        const earned = connected && q.status === "completed";
-        const count = held.get(q.id);
+    <div className="bshelves">
+      {QUEST_TIERS.map((tier) => {
+        const inTier = quests.filter((q) => q.tier === tier);
+        if (!inTier.length) return null;
+        const earnedN = connected ? inTier.filter((q) => q.status === "completed").length : 0;
         return (
-          <li key={q.id} className="bgallery__item" data-earned={earned}>
-            <Stamp id={q.id} label={q.badge.name} hue={QUEST_TYPE_LOOK[q.type].hue} tilt={[-8, 6, -4, 9][i % 4]} earned={earned}>
-              <Medal questId={q.id} index={i} earned={earned} />
-            </Stamp>
-            <div className="bgallery__text">
-              <span className="bgallery__name">{q.badge.name}</span>
-              <span className="small secondary">{q.badge.description}</span>
-              <span className="xs secondary">How: <Link className="link" href={`/quests/${q.id}`}>{q.title}</Link> quest</span>
-              <span className="bgallery__meta">
-                {earned ? <span className="badge badge--live"><Check aria-hidden="true" />Earned · on Arc</span> : <span className="badge badge--muted">Not earned yet</span>}
-                {count !== undefined && <span className="xs secondary">Held by {count.toLocaleString("en-US")} explorer{count === 1 ? "" : "s"}</span>}
-              </span>
-            </div>
-          </li>
+          <section key={tier} className="bshelf" aria-label={`${tier} badges`}>
+            <h3 className="bshelf__head"><span>{tier}</span><span className="mono xs">{earnedN}/{inTier.length}</span></h3>
+            <ul className="bgallery swipe">
+              {inTier.map((q) => {
+                const i = quests.indexOf(q);
+                const earned = connected && q.status === "completed";
+                const count = held.get(q.id);
+                return (
+                  <li key={q.id} className="bgallery__item" data-earned={earned}>
+                    <Stamp id={q.id} label={q.badge.name} hue={QUEST_TYPE_LOOK[q.type].hue} tilt={[-8, 6, -4, 9][i % 4]} earned={earned}>
+                      <Medal questId={q.id} index={i} earned={earned} />
+                    </Stamp>
+                    <div className="bgallery__text">
+                      <span className="bgallery__name">{q.badge.name}</span>
+                      <span className="small secondary">{q.badge.description}</span>
+                      <span className="xs secondary">How: <Link className="link" href={`/quests/${q.id}`}>{q.title}</Link> quest · +{q.xp} XP</span>
+                      <span className="bgallery__meta">
+                        {earned ? <span className="badge badge--live"><Check aria-hidden="true" />Earned · on Arc</span> : <span className="badge badge--muted">Not earned yet</span>}
+                        {count !== undefined && <span className="xs secondary">Held by {count.toLocaleString("en-US")} explorer{count === 1 ? "" : "s"}</span>}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         );
       })}
-    </ul>
+    </div>
   );
 }
 

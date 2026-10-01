@@ -1,7 +1,7 @@
 import { erc20Abi, type Address } from "viem";
 import { passportAbi } from "../abi";
 import { PASSPORT_ADDRESS, USDC_ADDRESS } from "../config";
-import { QUESTS, questHash, type Quest } from "../quests";
+import { QUESTS, getQuest, questHash, type Quest } from "../quests";
 import { questEligibleContracts } from "../registry";
 import { fetchActivity, type ActivityItem } from "./activity";
 import { publicClient } from "./arc";
@@ -37,11 +37,26 @@ export async function snapshot(user: Address): Promise<ChainSnapshot> {
     readCompleted(user)
   ]);
   let activity: Promise<ActivityItem[]> | undefined;
-  return { usdcBalance, txCount, completed, activity: () => (activity ??= fetchActivity(user)) };
+  return { usdcBalance, txCount, completed, activity: () => (activity ??= fetchActivity(user, fetch, 5)) };
 }
+
+/** Days (UTC) with at least one successful transaction. */
+export function activeDays(items: ActivityItem[]): number {
+  return new Set(items.filter((tx) => tx.success && tx.timestamp).map((tx) => tx.timestamp.slice(0, 10))).size;
+}
+
+/** Successful transactions sent to a verified app's published contracts. */
+export function appActions(items: ActivityItem[], contracts: Set<string>): number {
+  return items.filter((tx) => tx.success && tx.to && contracts.has(tx.to.toLowerCase())).length;
+}
+
+const progress = (have: number, need: number, unit: string) => `${Math.min(have, need)} of ${need} ${unit} so far.`;
 
 /** Server-side source of truth for quest completion. Never trust the browser's claim. */
 export async function checkQuest(quest: Quest, snap: ChainSnapshot): Promise<Eligibility> {
+  if (quest.after && !snap.completed.has(quest.after)) {
+    return { eligible: false, reason: `Claim ${getQuest(quest.after)?.title ?? "the previous tier"} first to open this tier.` };
+  }
   const req = quest.requirement;
   switch (req.kind) {
     case "hold-usdc":
@@ -61,11 +76,25 @@ export async function checkQuest(quest: Quest, snap: ChainSnapshot): Promise<Eli
         ? { eligible: true }
         : { eligible: false, reason: "No action in a verified app yet." };
     }
+    case "tx-count":
+      return snap.txCount >= req.min
+        ? { eligible: true }
+        : { eligible: false, reason: progress(snap.txCount, req.min, "transactions") };
+    case "active-days": {
+      const days = activeDays(await snap.activity());
+      return days >= req.min ? { eligible: true } : { eligible: false, reason: progress(days, req.min, "days") };
+    }
+    case "app-actions": {
+      const contracts = questEligibleContracts();
+      if (contracts.size === 0) return { eligible: false, reason: "Verified apps are coming soon." };
+      const n = snap.txCount === 0 ? 0 : appActions(await snap.activity(), contracts);
+      return n >= req.min ? { eligible: true } : { eligible: false, reason: progress(n, req.min, "actions in verified apps") };
+    }
     case "complete-quests": {
       const missing = req.questIds.filter((id) => !snap.completed.has(id));
       return missing.length === 0
         ? { eligible: true }
-        : { eligible: false, reason: "Claim the other starter quests first." };
+        : { eligible: false, reason: `Claim ${missing.map((id) => getQuest(id)?.title ?? id).join(", ")} first.` };
     }
   }
 }

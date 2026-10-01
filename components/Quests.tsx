@@ -4,7 +4,7 @@ import { ArrowRight, Check, Lock } from "lucide-react";
 import Link from "next/link";
 import { useClaims } from "../lib/hooks/claims";
 import { useArcwayState } from "../lib/hooks/context";
-import { DIFFICULTY_LABEL, QUESTS, QUEST_TIERS, questProgress, type QuestStatus, type QuestView } from "../lib/quests";
+import { DIFFICULTY_LABEL, QUESTS, QUEST_TIERS, questProgress, timeLabel, type QuestStatus, type QuestView } from "../lib/quests";
 import { QuestTypeMark } from "./QuestVisual";
 import { TransactionStatus } from "./TransactionStatus";
 
@@ -49,7 +49,7 @@ export function QuestCard({ quest }: { quest: QuestView }) {
       <dl className="quest-card__facts">
         <div><dt>Reward</dt><dd><span className="quest-card__xp mono">+{quest.xp} XP</span><span className="xs secondary">{quest.badge.name} badge</span></dd></div>
         <div><dt>Difficulty</dt><dd>{DIFFICULTY_LABEL[quest.difficulty]}</dd></div>
-        <div><dt>Time</dt><dd>{quest.minutes} min</dd></div>
+        <div><dt>Time</dt><dd>{timeLabel(quest)}</dd></div>
       </dl>
       {connected && <span className="mono xs secondary">{pct}% done</span>}
       {connected && (
@@ -82,6 +82,15 @@ export function QuestGrid() {
   );
 }
 
+/** "2/4 quests done", or which finale opens the tier while it is still locked. */
+function tierStatus(inTier: QuestView[], done: number, all: QuestView[]): string {
+  if (!inTier.length) return "Coming soon";
+  const gate = inTier[0].after;
+  const open = !gate || all.find((q) => q.id === gate)?.status === "completed";
+  if (!open) return `${inTier.length} quests · opens after ${all.find((q) => q.id === gate)?.title ?? "the previous tier"}`;
+  return `${done}/${inTier.length} quests done`;
+}
+
 /** Progression: Beginner first; each later tier introduces a little more of Arc. */
 export function QuestTiers() {
   const { quests, connection } = useArcwayState();
@@ -95,7 +104,7 @@ export function QuestTiers() {
           <li key={tier} className="tier" data-live={inTier.length > 0}>
             <span className="tier__step mono" aria-hidden="true">{i + 1}</span>
             <span className="tier__name">{tier}</span>
-            <span className="xs secondary">{inTier.length ? `${done}/${inTier.length} quests done` : "Coming soon"}</span>
+            <span className="xs secondary">{tierStatus(inTier, done, quests)}</span>
           </li>
         );
       })}
