@@ -136,9 +136,12 @@ test("following an app shows it under Following and survives a reload", async ({
 test("sorting A–Z orders apps by name", async ({ page }) => {
   await open(page, "/apps");
   await page.getByLabel("Sort apps").selectOption("az");
-  const names = await page.locator(".app-card h3").allTextContents();
-  expect(names.length).toBeGreaterThan(3);
-  expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+  // The list renders through a deferred value, so wait for the sorted order to settle.
+  const cards = page.locator(".app-card h3");
+  await expect.poll(async () => {
+    const names = await cards.allTextContents();
+    return names.length > 3 && names.every((n, i) => i === 0 || names[i - 1].localeCompare(n) <= 0);
+  }).toBe(true);
 });
 
 test("passport lookup validates the address", async ({ page }) => {
