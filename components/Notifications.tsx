@@ -36,7 +36,7 @@ export function Notifications() {
 
   return (
     <div className="notif" ref={rootRef}>
-      <button ref={triggerRef} type="button" className="icon-btn" aria-label={`Notifications${unread ? `, ${unread} new` : ""}`} aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((o) => !o)}>
+      <button ref={triggerRef} type="button" className="icon-btn" data-tip="Notifications" aria-label={`Notifications${unread ? `, ${unread} new` : ""}`} aria-expanded={open} aria-controls={panelId} onClick={() => setOpen((o) => !o)}>
         <Bell aria-hidden="true" />
         {unread > 0 && <span className="icon-btn__dot" aria-hidden="true" />}
       </button>

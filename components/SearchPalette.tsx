@@ -88,7 +88,7 @@ export function openSearch() {
 /** A trigger styled for where it sits; the palette itself is mounted once by the shell. */
 export function SearchButton({ variant = "bar" }: { variant?: "bar" | "icon" }) {
   return variant === "icon" ? (
-    <button className="icon-btn" onClick={openSearch} aria-label="Search" aria-keyshortcuts="Control+K Meta+K">
+    <button className="icon-btn" data-tip="Search  ⌘K" onClick={openSearch} aria-label="Search" aria-keyshortcuts="Control+K Meta+K">
       <Search aria-hidden="true" />
     </button>
   ) : (

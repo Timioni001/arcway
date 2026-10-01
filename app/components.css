@@ -2618,3 +2618,57 @@ html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 :root.dark .protocol-head { border-color: rgba(169, 221, 244, .14); background: radial-gradient(60% 120% at 0% 0%, rgba(79, 180, 234, .18), transparent 60%), radial-gradient(50% 100% at 100% 0%, rgba(120, 100, 255, .12), transparent 60%), var(--surface); }
 .protocol-head > :first-child { box-shadow: 0 18px 36px -18px rgba(16, 34, 74, .5), 0 0 0 6px color-mix(in srgb, var(--surface) 70%, transparent); border-radius: 22px; }
 @media (max-width: 760px) { .protocol-head { padding: 22px 18px; border-radius: 24px; } }
+
+/* ================= Finishing touches (patterns from shadcn/ui, in Arcway's own tokens) ================= */
+/* One focus ring everywhere: a soft 3px halo, never the browser default, only for keyboard focus */
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent); outline-offset: 2px; }
+:is(.input, .search, textarea, select):focus-visible, .search:focus-within { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 30%, transparent); }
+.input[aria-invalid="true"], textarea[aria-invalid="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 18%, transparent); }
+.input[aria-invalid="true"]:focus-visible { border-color: var(--error); box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 28%, transparent); }
+
+/* Disabled means disabled: dimmed, no hover, no pointer */
+.btn:disabled, .btn[aria-disabled="true"], .chip:disabled, .icon-btn:disabled { opacity: .5; cursor: not-allowed; pointer-events: none; box-shadow: none; }
+
+/* Icons inside controls never steal clicks or shrink */
+:is(.btn, .chip, .icon-btn, .rail__link, .tag, .badge) svg { flex-shrink: 0; pointer-events: none; }
+
+/* Type: balanced headings, no lonely last words in paragraphs, steady numbers */
+:is(h1, h2, h3, .phead__title, .ohead__title, .pstage__title) { text-wrap: balance; }
+:is(p, .phead__lead, .ohead__lede, .small) { text-wrap: pretty; }
+input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+:is(.metric, .stat, .hpass__stats, .pstage__stats, .lring, .qcard__xp, .rtile__big, .hlb__xp) { font-variant-numeric: tabular-nums; }
+
+/* Tooltips for icon-only buttons (hover or keyboard focus; touch screens rely on the label) */
+@media (hover: hover) {
+  [data-tip] { position: relative; }
+  [data-tip]::after { content: attr(data-tip); position: absolute; top: calc(100% + 8px); left: 50%; z-index: 120; translate: -50% -4px; scale: .96; padding: 6px 10px; border-radius: 8px; white-space: pre;
+    font-size: 12px; font-weight: 500; line-height: 1; color: var(--background); background: var(--text); box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .35);
+    opacity: 0; pointer-events: none; transition: opacity 150ms var(--ease), translate 150ms var(--ease), scale 150ms var(--ease); transition-delay: 0ms; }
+  [data-tip]:hover::after, [data-tip]:focus-visible::after { opacity: 1; translate: -50% 0; scale: 1; transition-delay: 350ms; }
+  .rail__toggle[data-tip]::after { top: 50%; left: calc(100% + 10px); translate: -4px -50%; }
+  .rail__toggle[data-tip]:hover::after, .rail__toggle[data-tip]:focus-visible::after { translate: 0 -50%; }
+  [aria-expanded="true"][data-tip]::after { display: none; }
+}
+
+/* Keyboard shortcut badges */
+.kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 5px; font: 500 11px var(--font-geist-sans), sans-serif; color: var(--text-secondary);
+  background: var(--surface-soft); box-shadow: inset 0 -1px 0 var(--border-strong), inset 0 0 0 1px var(--border); user-select: none; }
+
+/* Toasts: stacked, tap to dismiss, slide out on leave */
+.toast { border: 0; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 20px 50px rgba(16, 34, 74, .3), inset 0 0 0 1px rgba(255, 255, 255, .08); transition: opacity 200ms var(--ease), translate 200ms var(--ease); }
+.toast[data-leaving] { opacity: 0; translate: 0 8px; }
+:root.dark .toast { background: linear-gradient(180deg, #14325A, #0E2647); }
+@media (max-width: 860px) { .toasts { justify-items: center; } .toast { width: 100%; max-width: 420px; } }
+
+/* Dialog: a calmer scrim and the panel scales in from 96% (no bounce) */
+.palette-backdrop { background: rgba(7, 21, 43, .45); }
+.palette { animation: dialog-in 180ms var(--ease) both; }
+@keyframes dialog-in { from { opacity: 0; scale: .96; } }
+
+/* Scrollbars that belong to the theme */
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text-muted) 45%, transparent) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { border: 3px solid transparent; border-radius: 10px; background: color-mix(in srgb, var(--text-muted) 45%, transparent) padding-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) { [data-tip]::after, .toast, .palette { transition: none; animation: none; } }

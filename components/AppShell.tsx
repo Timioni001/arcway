@@ -107,7 +107,7 @@ export function Rail() {
           <LogoMark id="aw-mark-rail" />
           <span className="logo__word rail__label">arcway</span>
         </Link>
-        <button type="button" className="icon-btn rail__toggle" onClick={toggle} aria-label="Toggle sidebar" aria-expanded={tabletOpen || undefined}>
+        <button type="button" className="icon-btn rail__toggle" data-tip="Toggle sidebar" onClick={toggle} aria-label="Toggle sidebar" aria-expanded={tabletOpen || undefined}>
           <PanelLeftClose className="rail__icon-close" aria-hidden="true" />
           <PanelLeftOpen className="rail__icon-open" aria-hidden="true" />
         </button>
@@ -155,7 +155,7 @@ function Crumbs({ pathname }: { pathname: string }) {
 function WatchlistLink() {
   const count = useWatchCount();
   return (
-    <Link href="/watchlist" className="icon-btn" aria-label={`Watchlist${count ? `, ${count} followed` : ""}`}>
+    <Link href="/watchlist" className="icon-btn" data-tip="Watchlist" aria-label={`Watchlist${count ? `, ${count} followed` : ""}`}>
       <Bookmark aria-hidden="true" />
       {count > 0 && <span className="icon-btn__count mono" aria-hidden="true">{count > 99 ? "99+" : count}</span>}
     </Link>
