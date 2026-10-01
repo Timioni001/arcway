@@ -8,7 +8,7 @@ import { usePointerVars } from "../lib/hooks/usePointerVars";
 import { levelFor } from "../lib/levels";
 import { usePassportStyle } from "../lib/hooks/usePassportStyle";
 import { getItem, type PassportStyle } from "../lib/passportStyle";
-import { Forms } from "./Forms";
+import { CardArt, CardChip } from "./CardArt";
 import { LogoMark } from "./Logo";
 
 /** The passport as a physical card: tilts and catches light under the pointer. */
@@ -24,17 +24,18 @@ export function PassCardView({ address, xp, done, look }: { address?: string; xp
 
   return (
     <div className="pass" ref={ref} data-theme={look?.theme ?? "arc"} role="img" aria-label={`Arcway passport${look?.name ? ` of ${look.name}` : ""}: ${level.name}, ${xp} XP`}>
-      <Forms />
+      <CardArt theme={look?.theme ?? "arc"} />
       <div className="pass__top">
         <span className="pass__brand"><LogoMark className="logo__mark" id="aw-mark-pass" /> arcway</span>
         <span className="pass__label">Passport</span>
       </div>
+      <CardChip />
       <div className="pass__bottom">
         <div>
           {look?.name && <div className="pass__name">{look.name}</div>}
           <div className="pass__label">{address ? level.name : "Your level"}{look && look.title !== "none" && <> · {getItem("title", look.title)?.name}</>}</div>
           <div className="pass__xp" style={{ marginTop: 8 }}>{String(shown).padStart(3, "0")} XP</div>
-          <div className="mono" style={{ marginTop: 10, fontSize: 13, color: "#A9DDF4" }}>{address ? shortAddress(address) : "0x0000…0000"}</div>
+          <div className="mono pass__addr" style={{ marginTop: 10, fontSize: 13 }}>{address ? shortAddress(address) : "0x0000…0000"}</div>
         </div>
         <div className="pass__dots" aria-hidden="true">
           {done.map((d, i) => <i key={i} data-on={d} />)}

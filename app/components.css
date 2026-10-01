@@ -2672,3 +2672,63 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1
 ::-webkit-scrollbar-track { background: transparent; }
 
 @media (prefers-reduced-motion: reduce) { [data-tip]::after, .toast, .palette { transition: none; animation: none; } }
+
+/* ================= Passport cards: printed designs, like premium payment cards ================= */
+.pass { --ink: #F4FAFF; --ink-soft: rgba(244, 250, 255, .78); color: var(--ink); }
+.card-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.pass > .pass__top, .pass > .pass__bottom, .card-chip { position: relative; z-index: 1; }
+.pass .pass__label, .pass__addr { color: var(--ink-soft) !important; }
+.pass .mono { color: var(--ink-soft) !important; }
+.pass__xp, .pass__name, .pass__brand { color: var(--ink); }
+
+/* Chip + contactless, sitting where a card's chip sits */
+.card-chip { position: absolute !important; left: 32px; top: 36%; display: flex; align-items: center; gap: 10px; }
+.card-chip svg:first-child { width: 46px; height: auto; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .25)); }
+.card-chip__nfc { width: 22px; height: 22px; color: var(--ink-soft); }
+@media (max-width: 520px) { .card-chip { left: 22px; top: 33%; } .card-chip svg:first-child { width: 36px; } .card-chip__nfc { width: 18px; height: 18px; } }
+
+/* Arc blue: sky to royal with a guilloché security print */
+.pass[data-theme="arc"] { background: radial-gradient(80% 100% at 100% 0%, rgba(169, 221, 244, .7), transparent 55%), linear-gradient(135deg, #4FB4EA 0%, #3298D8 40%, #1D5E9F 100%); }
+.card-art__guilloche path { fill: none; stroke: rgba(255, 255, 255, .22); stroke-width: .7; }
+
+/* Graphite: brushed metal with a machined arc */
+.pass[data-theme="graphite"] { background: linear-gradient(180deg, rgba(255, 255, 255, .14), transparent 45%), linear-gradient(135deg, #5C6673 0%, #3A424D 45%, #20262E 100%); }
+.card-art__brushed line { stroke: #fff; stroke-width: .6; }
+.card-art__arc { fill: none; stroke: rgba(255, 255, 255, .16); stroke-width: 1.2; }
+
+/* Midnight carbon: woven carbon fibre under a blue glow */
+.pass[data-theme="midnight"] { background: linear-gradient(135deg, #16284A 0%, #0D1B35 55%, #060D1C 100%); }
+.card-art__glow { fill: rgba(79, 180, 234, .22); filter: blur(30px); }
+
+/* Dawn contour: sunset with topographic lines */
+.pass[data-theme="dawn"] { background: radial-gradient(80% 100% at 100% 0%, rgba(255, 214, 170, .85), transparent 55%), linear-gradient(135deg, #F4A37A 0%, #D9708F 50%, #6E54B0 100%); }
+.card-art__topo path { fill: none; stroke: rgba(255, 255, 255, .3); stroke-width: .8; }
+
+/* Prism: faceted low-poly glass */
+.pass[data-theme="prism"] { background: linear-gradient(135deg, #2E2A8C 0%, #4C3FC2 40%, #1E8FB8 100%); }
+
+/* Pearl: a white card with blue security print (dark ink) */
+.pass[data-theme="pearl"] { --ink: #10224A; --ink-soft: rgba(16, 34, 74, .65);
+  background: radial-gradient(70% 90% at 0% 0%, rgba(255, 255, 255, .95), transparent 60%), radial-gradient(60% 80% at 100% 100%, rgba(214, 230, 255, .9), transparent 60%), linear-gradient(135deg, #F7F9FD 0%, #E7EEF9 55%, #DCE6F5 100%);
+  box-shadow: 0 30px 60px -24px rgba(16, 34, 74, .35), inset 0 0 0 1px rgba(16, 34, 74, .08); }
+.pass[data-theme="pearl"] .card-art__guilloche path { stroke: rgba(36, 108, 176, .2); }
+.pass[data-theme="pearl"] .pass__dots i { background: rgba(16, 34, 74, .14); }
+.pass[data-theme="pearl"] .pass__dots i[data-on="true"] { background: #246CB0; box-shadow: none; }
+.pass[data-theme="pearl"] .pass__xp { text-shadow: none; }
+
+/* Aurora holo: iridescent foil with flowing bands */
+.pass[data-theme="aurora"] { background: radial-gradient(70% 90% at 0% 100%, rgba(120, 240, 200, .5), transparent 60%), radial-gradient(80% 100% at 100% 0%, rgba(169, 150, 255, .65), transparent 55%), linear-gradient(135deg, #1F7A8C 0%, #245E9E 50%, #3C2F7A 100%); }
+.card-art__waves path { fill: none; stroke-width: 1.4; }
+
+/* The old decorative forms are replaced by the printed designs */
+.pass .forms { display: none; }
+
+/* Style studio swatches mirror the cards */
+.pstyle__swatch[data-theme="arc"] { background: linear-gradient(135deg, #4FB4EA, #1D5E9F); }
+.pstyle__swatch[data-theme="graphite"] { background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .12) 0 1px, transparent 1px 3px), linear-gradient(135deg, #5C6673, #20262E); }
+.pstyle__swatch[data-theme="midnight"] { background: repeating-conic-gradient(rgba(255, 255, 255, .08) 0 25%, rgba(0, 0, 0, .25) 0 50%) 0 0 / 6px 6px, linear-gradient(135deg, #16284A, #060D1C); }
+.pstyle__swatch[data-theme="dawn"] { background: linear-gradient(135deg, #F4A37A, #6E54B0); }
+.pstyle__swatch[data-theme="prism"] { background: conic-gradient(from 30deg, #2E2A8C, #4C3FC2, #1E8FB8, #2E2A8C); }
+.pstyle__swatch[data-theme="pearl"] { background: linear-gradient(135deg, #FFFFFF, #DCE6F5); box-shadow: inset 0 0 0 1px rgba(16, 34, 74, .15); }
+.pstyle__swatch[data-theme="aurora"] { background: linear-gradient(135deg, #7CF5D8, #8AB8FF, #D49CFF, #FFC6A8); }
+.pass[data-theme="dawn"] :is(.pass__label, .pass__xp, .pass__name, .mono) { text-shadow: 0 1px 8px rgba(80, 30, 90, .35); }

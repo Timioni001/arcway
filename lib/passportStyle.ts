@@ -19,9 +19,12 @@ export type PassportStyle = { name: string; theme: string; frame: string; title:
 
 export const STYLE_ITEMS: StyleItem[] = [
   { id: "arc", kind: "theme", name: "Arc blue", unlock: null },
-  { id: "midnight", kind: "theme", name: "Midnight", unlock: { quests: 1 } },
-  { id: "dawn", kind: "theme", name: "Dawn", unlock: { apps: 3 } },
-  { id: "aurora", kind: "theme", name: "Aurora", unlock: { questId: "arc-explorer" } },
+  { id: "graphite", kind: "theme", name: "Graphite", unlock: null },
+  { id: "midnight", kind: "theme", name: "Midnight carbon", unlock: { quests: 1 } },
+  { id: "dawn", kind: "theme", name: "Dawn contour", unlock: { apps: 3 } },
+  { id: "prism", kind: "theme", name: "Prism", unlock: { quests: 3 } },
+  { id: "pearl", kind: "theme", name: "Pearl", unlock: { apps: 5 } },
+  { id: "aurora", kind: "theme", name: "Aurora holo", unlock: { questId: "arc-explorer" } },
   { id: "none", kind: "frame", name: "No frame", unlock: null },
   { id: "ring", kind: "frame", name: "Ring", unlock: { quests: 1 } },
   { id: "halo", kind: "frame", name: "Halo", unlock: { quests: 3 } },
