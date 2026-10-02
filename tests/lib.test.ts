@@ -377,3 +377,33 @@ describe("fetchActivity paging", () => {
     expect(urls[1]).toContain("&block_number=9&index=2");
   });
 });
+
+import { explorerRequest, explorerSources } from "../lib/server/explorer";
+describe("explorer sources", () => {
+  it("routes through the Blockscout PRO API when a proapi_ key is set, explorer second", () => {
+    const prev = process.env.EXPLORER_API_KEY;
+    process.env.EXPLORER_API_KEY = "proapi_test";
+    const s = explorerSources();
+    expect(s[0]).toMatchObject({ name: "blockscout-pro", key: "proapi_test" });
+    expect(s[0].base).toMatch(/^https:\/\/api\.blockscout\.com\/\d+\/api\/v2$/);
+    expect(s[1]).toMatchObject({ name: "explorer", key: undefined });
+    if (prev === undefined) delete process.env.EXPLORER_API_KEY; else process.env.EXPLORER_API_KEY = prev;
+  });
+  it("treats a Cloudflare challenge page as a failure and tries the next source", async () => {
+    const prev = process.env.EXPLORER_API_KEY;
+    process.env.EXPLORER_API_KEY = "proapi_test";
+    const calls: string[] = [];
+    const fetchImpl = async (url: string) => {
+      calls.push(url);
+      return url.includes("api.blockscout.com")
+        ? new Response(JSON.stringify({ total_blocks: "1" }), { headers: { "content-type": "application/json" } })
+        : new Response("<html>Just a moment…</html>", { status: 403, headers: { "content-type": "text/html" } });
+    };
+    const res = await explorerRequest("/stats", {}, fetchImpl as unknown as typeof fetch);
+    expect(await res.json()).toEqual({ total_blocks: "1" });
+    expect(calls[0]).toContain("apikey=proapi_test");
+    delete process.env.EXPLORER_API_KEY;
+    await expect(explorerRequest("/stats", {}, fetchImpl as unknown as typeof fetch)).rejects.toThrow(/challenge page/);
+    if (prev !== undefined) process.env.EXPLORER_API_KEY = prev;
+  });
+});

@@ -3,6 +3,7 @@ import { erc20Abi, formatUnits, parseAbi } from "viem";
 import { passportAbi } from "../../../lib/abi";
 import { ARC_NETWORK, CAMPAIGNS_ADDRESS, PASSPORT_ADDRESS, USDC_ADDRESS, USDC_DECIMALS, arcChain } from "../../../lib/config";
 import { publicClient, verifierClient } from "../../../lib/server/arc";
+import { explorerRequest, explorerSources } from "../../../lib/server/explorer";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,12 @@ export async function GET() {
     verifier: { configured: Boolean(wallet), address: verifierAddress ?? null, authorized: false, balanceUsdc: null as string | null, low: false },
     campaigns: { configured: Boolean(CAMPAIGNS_ADDRESS), address: CAMPAIGNS_ADDRESS ?? null, deployed: false, verifierAuthorized: false, usdcMatches: false },
     claimsReady: false,
-    campaignsReady: false
+    campaignsReady: false,
+    /** Where live Arc data comes from. The explorer feeds activity, assets and wallet history. */
+    data: {
+      explorer: { sources: explorerSources().map((s) => s.name), ok: false, via: null as string | null, error: null as string | null },
+      proKey: Boolean(process.env.EXPLORER_API_KEY?.trim().startsWith("proapi_"))
+    }
   };
 
   try {
@@ -68,6 +74,11 @@ export async function GET() {
       );
     }
   }
+  checks.push(
+    explorerRequest("/stats", { cache: "no-store" })
+      .then((res) => { result.data.explorer.ok = res.ok; result.data.explorer.via = res.url.includes("api.blockscout.com") ? "blockscout-pro" : new URL(res.url || "http://x").host || null; })
+      .catch((e) => { result.data.explorer.error = e instanceof Error ? e.message.slice(0, 160) : "unreachable"; })
+  );
   await Promise.all(checks);
   // Campaigns are optional: they never fail the health check, they only report whether they're ready.
   result.campaignsReady = result.campaigns.deployed && result.campaigns.usdcMatches && result.campaigns.verifierAuthorized && !result.verifier.low;

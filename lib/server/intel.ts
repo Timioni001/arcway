@@ -10,6 +10,7 @@ import {
   getAddress, getAddressCounters, getAddressLogs, getAddressTxs, getContractCounters, getHotContracts, getLatestTxs,
   getStats, getToken, getTokenCounters, getTokenTransfers, getTokens, getTxChart, getVerifiedContracts, settle
 } from "./explorer";
+import { rpcPassportCompletions, rpcPulse, rpcStats } from "./rpcIntel";
 
 /** Thrown when every source for a view failed; routes turn it into a 502. */
 export class IntelUnavailable extends Error {}
@@ -34,7 +35,7 @@ async function protocolFor(app: ArcApp): Promise<ProtocolIntel> {
 
 export async function loadSnapshot(): Promise<Intel<Snapshot>> {
   const [stats, chart, counters, usdc, protocols] = await Promise.all([
-    settle(getStats()),
+    settle(getStats()).then((s) => s ?? settle(rpcStats())),
     settle(getTxChart()),
     settle(getContractCounters()),
     settle(getTokenCounters(USDC_ADDRESS)),
@@ -45,7 +46,12 @@ export async function loadSnapshot(): Promise<Intel<Snapshot>> {
 }
 
 export async function loadPulse(): Promise<Intel<PulseEvent[]>> {
-  const [txs, transfers] = await Promise.all([settle(getLatestTxs()), settle(getTokenTransfers(USDC_ADDRESS))]);
+  let [txs, transfers] = await Promise.all([settle(getLatestTxs()), settle(getTokenTransfers(USDC_ADDRESS))]);
+  if (!txs && !transfers) {
+    // Explorer unreachable: read the latest blocks and USDC transfers from Arc directly.
+    const rpc = await settle(rpcPulse());
+    if (rpc) ({ txs, transfers } = rpc);
+  }
   return envelope(buildPulse({ txs, transfers, network: ARC_NETWORK }).slice(0, 60), { txs, transfers });
 }
 
@@ -108,6 +114,12 @@ export async function loadPassport(): Promise<Intel<PassportStats>> {
   if (indexed) {
     const data = buildPassportStats({ address: PASSPORT_ADDRESS, logs: null, completions: indexed.rows, truncated: indexed.truncated, info, counters });
     return envelope(data, { info, counters, completions: indexed });
+  }
+  // Then the contract's own events straight from Arc's RPC; the explorer's log index last.
+  const rpc = await settle(rpcPassportCompletions(PASSPORT_ADDRESS));
+  if (rpc) {
+    const data = buildPassportStats({ address: PASSPORT_ADDRESS, logs: null, completions: rpc.rows, truncated: rpc.truncated, info, counters, source: "rpc" });
+    return envelope(data, { completions: rpc });
   }
   const logs = await settle(getAddressLogs(PASSPORT_ADDRESS));
   const data = buildPassportStats({ address: PASSPORT_ADDRESS, logs: logs?.items ?? null, truncated: logs?.truncated, info, counters });

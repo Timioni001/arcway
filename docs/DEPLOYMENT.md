@@ -16,7 +16,9 @@ optional Envio hosted indexer, and two Foundry-deployed contracts.
 | `NEXT_PUBLIC_CIRCLE_CLIENT_URL`, `NEXT_PUBLIC_CIRCLE_CHAIN` | public | Optional Circle overrides |
 | `NEXT_PUBLIC_BRIDGE_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_CONTACT_URL`, `NEXT_PUBLIC_X_URL` | public | Optional links (`NEXT_PUBLIC_X_URL` adds the X icon to the footer) |
 | `VERIFIER_PRIVATE_KEY` | server, sensitive | Signs passport records, campaign entries and results |
-| `EXPLORER_API_KEY` | server | Optional, if the explorer rate-limits |
+| `EXPLORER_API_KEY` | server, sensitive | **Needed on mainnet for live Arc data.** A free Blockscout PRO key (`proapi_…`); see "Live Arc data" below |
+| `EXPLORER_API_URL` | server | Optional: a different Blockscout v2 API base |
+| `PASSPORT_DEPLOY_BLOCK` | server | Optional: the passport's deploy block, so leaderboard reads start there |
 | `ARCWAY_INDEXER_URL` | server | Optional Envio GraphQL endpoint |
 
 `.env.example` has the same list with comments.
@@ -63,6 +65,20 @@ or misspelled: fix it in **Settings → Environment Variables**, then **Deployme
 
 Every push to the repo's default branch redeploys automatically. Changing an
 environment variable needs a manual **Redeploy**.
+
+## Live Arc data (activity, assets, wallet history)
+
+`explorer.arc.io` sits behind a Cloudflare challenge that blocks server requests, so on mainnet
+Arcway reads the same Blockscout API through **api.blockscout.com**, which needs a free key:
+
+1. Sign in at https://dev.blockscout.com → **Keys** → **Create API key** (free tier: 100k credits a
+   day, 5 requests a second, no card). The key starts with `proapi_`.
+2. Vercel → Settings → Environment Variables → `EXPLORER_API_KEY` = the key (Production, Sensitive).
+3. Redeploy, then open `/api/health`: `data.explorer.ok` should be `true` with `via: "blockscout-pro"`.
+
+Without a key, the leaderboard, popular quests, the live feed and block stats still work (they are
+read straight from Arc's RPC); activity history, assets, insights and the history-based quest checks
+need the key.
 
 ## Domain: arcway.world
 

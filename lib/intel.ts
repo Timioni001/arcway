@@ -471,7 +471,7 @@ export type PassportStats = {
   season: { label: string; start: string; leaderboard: PassportExplorer[] };
   truncated: boolean;
   /** Where the completions were read from: Arcway's own indexer, or the Arc explorer's logs. */
-  source: "indexer" | "explorer";
+  source: "indexer" | "explorer" | "rpc";
 };
 
 /** One QuestCompleted event, already decoded (the indexer's Completion rows map straight onto this). */
@@ -496,6 +496,8 @@ export function buildPassportStats(input: {
   info?: BsAddress | null;
   counters?: { transactions_count?: string } | null;
   now?: number;
+  /** Where pre-decoded completions came from (defaults to the indexer). */
+  source?: "indexer" | "rpc";
 }): PassportStats {
   const now = input.now ?? Date.now();
   const season = seasonOf(now);
@@ -503,7 +505,7 @@ export function buildPassportStats(input: {
     deployed: Boolean(input.address), address: input.address, verified: input.info?.is_verified ?? null,
     transactions: toInt(input.counters?.transactions_count), passports: 0, xp: 0, completions: 0, byQuest: [],
     leaderboard: [], season: { ...season, leaderboard: [] }, truncated: Boolean(input.truncated),
-    source: input.completions ? "indexer" : "explorer"
+    source: input.completions ? input.source ?? "indexer" : "explorer"
   };
   if (!input.address || !(input.completions ?? input.logs)) return empty;
 

@@ -1,4 +1,4 @@
-import { explorer } from "../config";
+import { arcChain, explorer } from "../config";
 import { normalizeChart, type ChartPoint } from "../intel";
 
 /**
@@ -76,27 +76,73 @@ export type BsLog = {
 export type BsTokenCounters = { token_holders_count?: string; transfers_count?: string };
 export type BsAddressCounters = { transactions_count?: string; token_transfers_count?: string };
 
-const TIMEOUT_MS = 6_000;
+const TIMEOUT_MS = 8_000;
 const memo = new Map<string, { at: number; ttl: number; value: Promise<unknown> }>();
 
+/**
+ * Where explorer reads go, in order. explorer.arc.io sits behind a Cloudflare challenge that
+ * blocks server requests, so a Blockscout PRO API key (EXPLORER_API_KEY=proapi_…, free at
+ * dev.blockscout.com) routes reads through api.blockscout.com, the same Blockscout v2 API.
+ * EXPLORER_API_URL overrides the base entirely.
+ */
+export function explorerSources(): { name: "custom" | "blockscout-pro" | "explorer"; base: string; key?: string }[] {
+  const key = process.env.EXPLORER_API_KEY?.trim() || undefined;
+  const custom = process.env.EXPLORER_API_URL?.trim().replace(/\/$/, "");
+  const pro = key?.startsWith("proapi_");
+  const out: { name: "custom" | "blockscout-pro" | "explorer"; base: string; key?: string }[] = [];
+  if (custom) out.push({ name: "custom", base: custom, key });
+  else if (pro) out.push({ name: "blockscout-pro", base: `https://api.blockscout.com/${arcChain.id}/api/v2`, key });
+  if (explorer.apiV2 && !custom) out.push({ name: "explorer", base: explorer.apiV2, key: pro ? undefined : key });
+  return out;
+}
+
+// The PRO free tier allows 5 requests a second: keep at most 4 in flight.
+let inFlight = 0;
+const waiting: (() => void)[] = [];
+async function slot<T>(fn: () => Promise<T>): Promise<T> {
+  if (inFlight >= 4) await new Promise<void>((r) => waiting.push(r));
+  inFlight++;
+  try { return await fn(); } finally { inFlight--; waiting.shift()?.(); }
+}
+
+const looksLikeHtml = (res: Response) => (res.headers?.get?.("content-type") ?? "").includes("text/html");
+
+/**
+ * One explorer request, tried against each source until one answers with data (or a real 404).
+ * A Cloudflare challenge page (HTML, usually 403) counts as a failure, never as data.
+ */
+export async function explorerRequest(path: string, init: RequestInit & { next?: { revalidate: number } } = {}, fetchImpl: typeof fetch = fetch): Promise<Response> {
+  const sources = explorerSources();
+  if (!sources.length) throw new Error("No explorer API configured for this network");
+  let last: unknown;
+  for (const src of sources) {
+    const url = `${src.base}${path}${src.key ? `${path.includes("?") ? "&" : "?"}apikey=${encodeURIComponent(src.key)}` : ""}`;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await slot(() => fetchImpl(url, { headers: { accept: "application/json", "user-agent": "Arcway (+https://arcway.world)" }, signal: AbortSignal.timeout(TIMEOUT_MS), ...init } as RequestInit));
+        if (res.status === 429 && attempt === 0) { await new Promise((r) => setTimeout(r, 600)); continue; }
+        if ((res.ok || res.status === 404) && !looksLikeHtml(res)) return res;
+        last = new Error(`${src.name} responded ${res.status}${looksLikeHtml(res) ? " (challenge page)" : ""} for ${path}`);
+      } catch (e) {
+        last = e;
+      }
+      break;
+    }
+  }
+  throw last instanceof Error ? last : new Error(`Explorer unavailable for ${path}`);
+}
+
 async function get<T>(path: string, ttlSeconds: number, fetchImpl: typeof fetch = fetch): Promise<T> {
-  if (!explorer.apiV2) throw new Error("No explorer API configured for this network");
-  const key = process.env.EXPLORER_API_KEY;
-  const url = `${explorer.apiV2}${path}${key ? `${path.includes("?") ? "&" : "?"}apikey=${encodeURIComponent(key)}` : ""}`;
   const now = Date.now();
-  const hit = memo.get(url);
+  const hit = memo.get(path);
   if (hit && now - hit.at < hit.ttl * 1000) return hit.value as Promise<T>;
   const value = (async () => {
-    const res = await fetchImpl(url, {
-      headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-      next: { revalidate: ttlSeconds }
-    } as RequestInit);
+    const res = await explorerRequest(path, { next: { revalidate: ttlSeconds } }, fetchImpl);
     if (!res.ok) throw new Error(`Explorer responded ${res.status} for ${path}`);
     return (await res.json()) as T;
   })();
-  memo.set(url, { at: now, ttl: ttlSeconds, value });
-  value.catch(() => memo.delete(url)); // never cache failures
+  memo.set(path, { at: now, ttl: ttlSeconds, value });
+  value.catch(() => memo.delete(path)); // never cache failures
   if (memo.size > 500) for (const [k, v] of memo) if (now - v.at > v.ttl * 1000) memo.delete(k);
   return value;
 }
