@@ -1,0 +1,40 @@
+@font-face{font-family:G;src:url(../../../node_modules/geist/dist/fonts/geist-sans/Geist-Regular.woff2);font-weight:400}
+@font-face{font-family:G;src:url(../../../node_modules/geist/dist/fonts/geist-sans/Geist-Medium.woff2);font-weight:500}
+@font-face{font-family:G;src:url(../../../node_modules/geist/dist/fonts/geist-sans/Geist-SemiBold.woff2);font-weight:600}
+@font-face{font-family:G;src:url(../../../node_modules/geist/dist/fonts/geist-sans/Geist-Bold.woff2);font-weight:700}
+@font-face{font-family:M;src:url(../../../node_modules/geist/dist/fonts/geist-mono/GeistMono-Medium.woff2);font-weight:500}
+*{margin:0;box-sizing:border-box}
+:root{--ink:#0B1B33;--sub:#4A6280;--muted:#6A819C;--sky:#A9DDF4;--blue:#3298D8;--royal:#246CB0;--navy:#173E78;--line:#DCE9F4}
+body{font-family:G;color:var(--ink);overflow:hidden;position:relative;-webkit-font-smoothing:antialiased}
+.mark{display:block}
+.bg-light{position:absolute;inset:0;background:
+ radial-gradient(46% 60% at 86% 14%,rgba(169,221,244,.6),transparent 70%),
+ radial-gradient(40% 50% at 8% 100%,rgba(79,180,234,.16),transparent 70%),#F3F6FA}
+.rings{position:absolute;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 78px,rgba(36,108,176,.12) 79px 80px);
+ -webkit-mask-image:radial-gradient(circle,#000 30%,transparent 70%)}
+.bg-dark{position:absolute;inset:0;background:
+ radial-gradient(50% 60% at 85% 10%,rgba(50,152,216,.45),transparent 70%),
+ radial-gradient(50% 60% at 0% 100%,rgba(36,108,176,.35),transparent 70%),#071528}
+.pill{display:inline-flex;align-items:center;gap:12px;padding:12px 22px 12px 16px;border-radius:99px;border:1px solid #D6E6F3;background:#fff;font-weight:600;color:#17365E;box-shadow:0 10px 30px -14px rgba(23,62,120,.35)}
+.pill i{width:12px;height:12px;border-radius:50%;background:#22A06B;box-shadow:0 0 0 6px rgba(34,160,107,.18)}
+.eyebrow{font-family:M;letter-spacing:.18em;text-transform:uppercase;color:var(--royal)}
+.grad{background:linear-gradient(90deg,#3298D8,#246CB0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo{display:flex;align-items:center;gap:.4em;font-weight:700;letter-spacing:-.03em}
+/* Passport card, in the app's styles */
+.pass{position:absolute;width:520px;height:328px;border-radius:26px;padding:30px 32px;color:#fff;overflow:hidden;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 40px 70px -30px rgba(16,34,74,.55)}
+.pass::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(255,255,255,.07) 23px 24px);mix-blend-mode:overlay}
+.pass .top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:26px;letter-spacing:-.03em}
+.pass .top small{font-family:M;font-size:12px;letter-spacing:.2em;opacity:.85;font-weight:500}
+.pass .top span{display:flex;align-items:center;gap:10px}
+.pass .chip{width:54px;height:40px;border-radius:9px;margin-top:26px;background:linear-gradient(135deg,#F6D98A,#C9973B);box-shadow:inset 0 0 0 1px rgba(120,80,20,.35)}
+.pass .lvl{font-family:M;font-size:13px;letter-spacing:.2em;margin-top:16px;opacity:.9}
+.pass .xp{font-family:M;font-size:52px;font-weight:500;letter-spacing:-.02em;margin-top:2px}
+.pass .addr{font-family:M;font-size:13px;opacity:.75;margin-top:4px}
+.t-arc{background:radial-gradient(80% 100% at 100% 0%,rgba(169,221,244,.6),transparent 60%),linear-gradient(135deg,#4FB4EA 0%,#3298D8 45%,#246CB0 100%)}
+.t-mid{background:radial-gradient(60% 80% at 100% 0%,rgba(50,152,216,.35),transparent 60%),linear-gradient(135deg,#13294D 0%,#0B1B33 100%)}
+.t-aur{background:radial-gradient(70% 90% at 0% 100%,rgba(120,240,200,.5),transparent 60%),radial-gradient(80% 100% at 100% 0%,rgba(169,150,255,.65),transparent 55%),linear-gradient(135deg,#1F7A8C 0%,#245E9E 50%,#3C2F7A 100%)}
+.t-graph{background:radial-gradient(60% 80% at 100% 0%,rgba(255,255,255,.18),transparent 60%),linear-gradient(135deg,#55606E,#2A313B)}
+.t-pearl{color:#17365E!important;background:radial-gradient(70% 90% at 0% 100%,rgba(255,214,236,.8),transparent 60%),radial-gradient(80% 100% at 100% 0%,rgba(190,230,255,.9),transparent 55%),linear-gradient(135deg,#FFFFFF,#E7EEF7)}
+.t-dawn{background:radial-gradient(80% 100% at 100% 0%,rgba(255,214,170,.85),transparent 55%),linear-gradient(135deg,#F4A37A 0%,#D9708F 50%,#6E54B0 100%)}
+.t-prism{background:linear-gradient(135deg,#2E2A8C 0%,#4C3FC2 40%,#1E8FB8 100%)}

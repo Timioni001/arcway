@@ -1,0 +1,79 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+html,body{width:100vw;height:100vh}
+.stage{position:absolute;inset:0;overflow:hidden}
+.c{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 9vmin}
+.in{opacity:0;transform:translateY(30px)}
+h1{font-size:9.4vmin;line-height:.98;letter-spacing:-.045em;font-weight:700}
+.sub{font-size:3vmin;color:var(--sub);margin-top:3vmin;line-height:1.4;max-width:70vmin}
+.eyebrow{font-size:2vmin;margin-bottom:2.6vmin}
+.logo{font-size:6vmin}
+.stats{display:flex;gap:2vmin;margin-top:5vmin;flex-wrap:wrap}
+.stat{background:#fff;border:1px solid var(--line);border-radius:3vmin;padding:2.4vmin 3vmin;box-shadow:0 24px 50px -30px rgba(23,62,120,.35)}
+.stat b{display:block;font-family:M;font-weight:500;font-size:5.4vmin;letter-spacing:-.03em;color:var(--royal)}
+.stat span{font-size:2.2vmin;color:var(--sub)}
+.addr{font-family:M;font-size:2.4vmin;color:#C9EAF3;margin-top:1.2vmin}
+.dark h1{color:#fff}.dark .sub{color:#A9C3DD}
+.tall .c{padding:0 7vmin}
+.tall h1{font-size:12vmin}.tall .sub{font-size:4.2vmin;max-width:none}
+.tall .stat b{font-size:8vmin}.tall .stat span{font-size:3.4vmin}.tall .stat{padding:3.4vmin 4.4vmin;border-radius:4vmin}
+.tall .eyebrow{font-size:3vmin}
+.cards{position:absolute;inset:0}
+.sq .stat{padding:2vmin 2.2vmin;border-radius:2.4vmin}.sq .stat b{font-size:4.4vmin}.sq .stat span{font-size:2vmin}
+.pill{font-size:2.6vmin}
+.tall .pill{font-size:4vmin}
+</style></head><body><div class="stage" id="s"></div>
+<script src="mark.js"></script>
+<script>
+const q = new URLSearchParams(location.search), scene = q.get("scene");
+const W = innerWidth, H = innerHeight, tall = H > W * 1.2, sq = !tall && H > W * .8;
+if (tall) document.body.classList.add("tall"); if (sq) document.body.classList.add("sq");
+const ease = x => x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3);
+const S = {
+ intro: { bg: "light", html: `<div class="rings" style="width:160vmax;height:160vmax;left:50%;top:50%;margin:-80vmax"></div>
+   <div class="c" style="align-items:center;text-align:center"><div class="in" data-at="0.2" id="m"></div>
+   <div class="in logo" data-at="0.6" style="margin-top:3vmin;justify-content:center">arcway</div>
+   <div class="in sub" data-at="1.2" style="margin-top:2vmin">Explore Arc. Complete quests. Build your Passport.</div>
+   <div class="in" data-at="1.8" style="margin-top:4vmin"><span class="pill"><i></i>Live on Arc Mainnet</span></div></div>`,
+   init(){ document.getElementById("m").innerHTML = mark(Math.round(Math.min(W,H)*.16)); } },
+ problem: { bg: "dark", html: `<div class="c dark"><div class="in eyebrow" data-at="0.1" style="color:var(--sky)">The problem</div>
+   <h1><span class="in" data-at="0.3" style="display:block">Arc is new.</span><span class="in" data-at="0.9" style="display:block;color:#7FC4EE">Most people don't know<br>where to start.</span></h1>
+   <p class="in sub" data-at="1.8">Which apps are real? What should I try first? Did it count? Arcway answers all three, on one page.</p></div>` },
+ numbers: { bg: "light", html: `<div class="c"><div class="in eyebrow" data-at="0.1">Built for Arc Mainnet</div>
+   <h1 class="in" data-at="0.3">Real progress,<br><span class="grad">recorded onchain.</span></h1>
+   <div class="stats">${[["15","apps listed"],["17","quests"],["4","tiers"],["2,145","XP to earn"],["7","card designs"]].map((s,i)=>`<div class="stat in" data-at="${0.8+i*0.18}"><b>${s[0]}</b><span>${s[1]}</span></div>`).join("")}</div></div>` },
+ mainnet: { bg: "dark", html: `<div class="c dark"><div class="in eyebrow" data-at="0.1" style="color:var(--sky)">Open source · Live on Arc Mainnet</div>
+   <h1 class="in" data-at="0.3">Two contracts.<br><span style="color:#7FC4EE">Every claim verifiable.</span></h1>
+   <div class="in" data-at="1.0" style="margin-top:4vmin"><div class="sub" style="margin:0;color:#fff;font-weight:600">ArcwayPassport</div><div class="addr">0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c</div></div>
+   <div class="in" data-at="1.4" style="margin-top:2.6vmin"><div class="sub" style="margin:0;color:#fff;font-weight:600">ArcwayCampaigns</div><div class="addr">0x229f7A3bbd861149bfF05EAACa186e7ffaEEc26c</div></div>
+   <p class="in sub" data-at="2.0">github.com/Timioni001/arcway</p></div>` },
+ hook: { bg: "light", html: `<div class="rings" style="width:160vmax;height:160vmax;right:-80vmax;top:-80vmax"></div>
+   <div class="c"><h1><span class="in" data-at="0.1" style="display:block">Explore Arc.</span><span class="in" data-at="0.6" style="display:block">Complete quests.</span><span class="in grad" data-at="1.1" style="display:block">Build your Passport.</span></h1>
+   <div class="in" data-at="1.8" style="margin-top:4vmin"><span class="pill"><i></i>Live on Arc Mainnet</span></div></div>` },
+ cards: { bg: "light", html: `<div class="cards" id="cards"></div><div class="c" style="justify-content:${tall?"flex-start":"flex-end"};padding-${tall?"top":"bottom"}:9vmin">
+   <div class="in eyebrow" data-at="0.2">Your Passport</div><h1 class="in" data-at="0.4" style="font-size:${tall?10:7.4}vmin">Seven designs.<br><span class="grad">Unlocked by doing.</span></h1></div>`,
+   init(){ const k = Math.min(W,H)/1080*(tall?1.25:sq?0.7:0.95); const cx = W/2-260*k, cy = (tall?H*.62:sq?H*.36:H*.36)-164*k;
+     const th=["t-graph","t-mid","t-dawn","t-arc","t-prism","t-pearl","t-aur"], lv=["NEWCOMER","EXPLORER","EXPLORER","VOYAGER","REGULAR","REGULAR","PATHFINDER"], xs=["0","110","180","350","945","1,400","2,145"];
+     document.getElementById("cards").innerHTML = th.map((t,i)=>`<div class="fan" data-i="${i}" style="position:absolute;left:${cx}px;top:${cy}px;transform-origin:50% 140%">${pass(t,0,0,0,xs[i],lv[i]).replace('style="','style="position:relative;transform:scale('+k+');transform-origin:0 0;')}</div>`).join(""); },
+   tick(t){ document.querySelectorAll(".fan").forEach(e=>{ const i=+e.dataset.i, p=ease((t-0.2-i*0.1)/0.9); const a=(i-3)*9*p, dx=(i-3)*(tall?95:sq?78:190)*p*Math.min(W,H)/1080; e.style.transform=`translate(${dx}px,${(1-p)*120+Math.abs(i-3)*14*p}px) rotate(${a}deg)`; e.style.opacity=Math.min(1,p*2); }); } },
+ tiers: { bg: "dark", html: `<div class="c dark"><div class="in eyebrow" data-at="0.1" style="color:var(--sky)">Quests</div>
+   <h1 class="in" data-at="0.3">17 quests.<br><span style="color:#7FC4EE">Four tiers.</span></h1>
+   <div class="stats">${[["110","Beginner"],["240","Explorer"],["595","Regular"],["1,200","Advanced"]].map((s,i)=>`<div class="stat in" data-at="${0.8+i*0.22}" style="background:rgba(255,255,255,.06);border-color:rgba(169,221,244,.22)"><b style="color:#7FC4EE">${s[0]} XP</b><span style="color:#C9DBEC">${s[1]}</span></div>`).join("")}</div>
+   <p class="in sub" data-at="1.9">Every check runs against Arc. Claiming is free.</p></div>` },
+ outro: { bg: "light", html: `<div class="rings" style="width:160vmax;height:160vmax;left:50%;top:50%;margin:-80vmax"></div>
+   <div class="c" style="align-items:center;text-align:center"><div class="in" data-at="0.1" id="m"></div>
+   <h1 class="in" data-at="0.4" style="margin-top:4vmin">Start your Passport.</h1>
+   <div class="in" data-at="0.9" style="margin-top:4vmin"><span class="pill" style="font-size:${tall?5:3.4}vmin"><i></i>arcway.world</span></div>
+   <p class="in sub" data-at="1.4" style="font-size:${tall?3.2:2.2}vmin">Independent. Built on Arc. Not affiliated with Circle.</p></div>`,
+   init(){ document.getElementById("m").innerHTML = mark(Math.round(Math.min(W,H)*.14)); } },
+};
+const sc = S[scene];
+document.getElementById("s").innerHTML = `<div class="${sc.bg==="dark"?"bg-dark":"bg-light"}"></div>` + sc.html;
+sc.init && sc.init();
+const ins = [...document.querySelectorAll(".in")];
+window.setT = (t) => {
+  for (const e of ins) { const p = ease((t - +e.dataset.at) / 0.6); e.style.opacity = p; e.style.transform = `translateY(${(1-p)*30}px)`; }
+  sc.tick && sc.tick(t);
+  const r = document.querySelector(".rings"); if (r) r.style.transform = `scale(${1 + t * 0.03})`;
+};
+window.setT(0);
+</script></body></html>
