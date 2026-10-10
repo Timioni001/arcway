@@ -8,6 +8,7 @@ Everything for the Arc Microgrants submission on DoraHacks and for the Arcway X 
 | [X_ACCOUNT.md](X_ACCOUNT.md) | Profile setup, two weeks of posts, a reply bank and alt text |
 | `png/arcway-logo-480.png` | DoraHacks build logo (480 × 480) |
 | `png/arcway-avatar-400.png`, `png/arcway-avatar-1000.png` | X profile picture |
+| `png/arcway-launch-*` | Launch-day announcement, 1600 × 900, 1080 × 1080 and 1080 × 1350 |
 | `png/arcway-how-*`, `png/arcway-free-*`, `png/arcway-trust-*` | Post images, 1600 × 900 and 1080 × 1080 |
 | `png/arcway-architecture-1600x900.png` | How a quest gets on your Passport |
 | `video/arcway-demo.mp4` | Demo walkthrough of the real app (1920 × 1080) |

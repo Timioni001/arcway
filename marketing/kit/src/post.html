@@ -55,6 +55,19 @@ h1{font-size:92px;line-height:1;letter-spacing:-.045em;font-weight:700;margin-to
 svg.lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 svg.lines path{fill:none;stroke:#3298D8;stroke-width:2.5;stroke-dasharray:7 7}
 svg.lines text{font-family:M;font-size:15px;fill:#246CB0}
+/* launch */
+body:has(.launch) .bg-dark{background:radial-gradient(55% 70% at 78% 30%,rgba(50,152,216,.55),transparent 70%),radial-gradient(50% 60% at 0% 100%,rgba(36,108,176,.4),transparent 70%),#061325}
+.glow{position:absolute;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 70px,rgba(169,221,244,.09) 71px 72px);-webkit-mask-image:radial-gradient(circle,#000 25%,transparent 70%)}
+.launch h1{color:#fff;font-size:118px}
+.square .launch h1{font-size:96px}.tall .launch h1{font-size:104px}
+.launch .live{display:inline-flex;align-items:center;gap:12px;font-family:M;font-size:20px;letter-spacing:.16em;color:#5BE0A5;background:rgba(34,160,107,.14);border:1px solid rgba(91,224,165,.35);padding:10px 18px;border-radius:99px;align-self:flex-start}
+.launch .live i{width:10px;height:10px;border-radius:50%;background:#5BE0A5;box-shadow:0 0 0 6px rgba(91,224,165,.2)}
+.launch .lede{color:#A9C3DD;max-width:640px}
+.launch .row{display:flex;gap:16px;margin-top:34px;flex-wrap:wrap}
+.launch .row div{padding:14px 20px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(169,221,244,.2);color:#fff;font-weight:600;font-size:22px}
+.launch .row b{font-family:M;font-weight:500;color:#7FC4EE;margin-right:8px}
+.launch .foot .logo{color:#fff}
+.deck{position:absolute}
 </style></head><body>
 <script src="mark.js"></script>
 <script>
@@ -62,6 +75,16 @@ const q = new URLSearchParams(location.search), v = q.get("v"), f = q.get("f") |
 document.body.className = f;
 const foot = (dark) => `<div class="foot"><div class="logo">${mark(f==="land"?50:46)}arcway</div><div class="pill"><i></i>arcway.world${f==="land"?" · Live on Arc Mainnet":""}</div></div>`;
 const T = {
+launch: () => { const L=f==="land", Q=f==="square";
+ const deck = L ? {x:930,y:170,s:1} : Q ? {x:560,y:560,s:.72} : {x:330,y:760,s:.9};
+ const cards=[["t-mid",-16,-120,40,"REGULAR","945"],["t-aur",-6,-30,10,"PATHFINDER","2,145"],["t-arc",6,70,-10,"PATHFINDER","2,145"]];
+ return `<div class="bg-dark"></div><div class="glow" style="width:1500px;height:1500px;${L?"left:600px;top:-300px":Q?"left:200px;top:120px":"left:-200px;top:420px"}"></div>
+ <div class="deck" style="left:${deck.x}px;top:${deck.y}px;transform:scale(${deck.s});transform-origin:0 0">${cards.map((c,i)=>pass(c[0],c[2],c[3],c[1],c[5],c[4],i+1)).join("")}</div>
+ <div class="wrap launch"><div class="live"><i></i>NOW LIVE ON ARC MAINNET</div>
+ <h1 style="margin-top:30px">Arcway<br>is live.</h1>
+ <p class="lede">Explore Arc. Complete quests.<br>Build your Passport.</p>
+ ${Q?"":`<div class="row"><div><b>17</b>quests</div><div><b>2,145</b>XP</div><div><b>0</b>USDC to claim</div></div>`}
+ ${foot(true)}</div>`; },
 how: () => `<div class="bg-light"></div><div class="rings" style="width:1400px;height:1400px;right:-500px;top:-600px"></div>
  <div class="wrap"><div class="head"><div class="eyebrow">How Arcway works</div>
  <h1>Three steps.<br><span class="grad">All on Arc.</span></h1></div>

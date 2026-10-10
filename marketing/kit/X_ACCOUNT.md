@@ -40,6 +40,7 @@ After the handle exists, set `NEXT_PUBLIC_X_URL=https://x.com/<handle>` in Verce
 | `video/arcway-teaser-land.mp4` (16:9, 19 s) | Feed posts on desktop |
 | `video/arcway-teaser-square.mp4` (1:1, 19 s) | Feed posts on mobile, replies |
 | `video/arcway-teaser-vertical.mp4` (9:16, 19 s) | Full-screen video, also Reels, TikTok and Shorts |
+| `png/arcway-launch-*` | Launch-day announcement: 1600 × 900, 1080 × 1080 and 1080 × 1350 (tall, fills the most of a phone feed) |
 | `png/arcway-how-*` | How it works |
 | `png/arcway-free-*` | Claiming is free |
 | `png/arcway-trust-*` | Data with sources |

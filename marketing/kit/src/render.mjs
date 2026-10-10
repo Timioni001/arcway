@@ -4,6 +4,9 @@ import { execFileSync } from "node:child_process";
 const src = new URL(".", import.meta.url).pathname;
 const out = new URL("../png/", import.meta.url).pathname;
 const jobs = [
+  ["post.html?v=launch&f=land", 1600, 900, "arcway-launch-1600x900.png"],
+  ["post.html?v=launch&f=square", 1080, 1080, "arcway-launch-1080x1080.png"],
+  ["post.html?v=launch&f=tall", 1080, 1350, "arcway-launch-1080x1350.png"],
   ["avatar.html", 1000, 1000, "arcway-avatar-1000.png"],
   ["post.html?v=how&f=land", 1600, 900, "arcway-how-1600x900.png"],
   ["post.html?v=how&f=square", 1080, 1080, "arcway-how-1080x1080.png"],
