@@ -1,0 +1,134 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+body{background:#F3F6FA}
+body.land{width:1600px;height:900px}
+body.square{width:1080px;height:1080px}
+body.tall{width:1080px;height:1350px}
+.wrap{position:absolute;inset:0;padding:80px;display:flex;flex-direction:column}
+.square .wrap,.tall .wrap{padding:72px}
+.head .eyebrow{font-size:20px}
+h1{font-size:92px;line-height:1;letter-spacing:-.045em;font-weight:700;margin-top:22px}
+.square h1,.tall h1{font-size:84px}
+.lede{font-size:28px;line-height:1.45;color:var(--sub);margin-top:22px;max-width:820px}
+.square .lede,.tall .lede{font-size:27px}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center}
+.foot .logo{font-size:34px}
+.foot .pill{font-size:20px}
+.dark{color:#fff}.dark .lede{color:#A9C3DD}.dark .eyebrow{color:var(--sky)}
+.dark .foot .logo{color:#fff}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:56px}
+.square .steps,.tall .steps{grid-template-columns:1fr;gap:18px;margin-top:44px}
+.step{background:#fff;border:1px solid var(--line);border-radius:28px;padding:30px;box-shadow:0 24px 50px -30px rgba(23,62,120,.35);position:relative}
+.square .step,.tall .step{display:flex;gap:24px;align-items:center;padding:24px 28px}
+.step .n{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;color:#fff;font-family:M;font-size:22px;background:linear-gradient(135deg,#4FB4EA,#246CB0);flex:none}
+.step h3{font-size:34px;letter-spacing:-.03em;margin-top:22px}
+.square .step h3,.tall .step h3{margin-top:0;font-size:32px}
+.step p{font-size:22px;color:var(--sub);margin-top:8px;line-height:1.4}
+.step .tag{position:absolute;right:26px;top:30px;font-family:M;font-size:17px;color:var(--royal);background:#EAF4FB;border-radius:99px;padding:6px 12px}
+.square .step .tag,.tall .step .tag{position:static;margin-left:auto}
+/* sources */
+.srcs{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:50px}
+.square .srcs,.tall .srcs{grid-template-columns:1fr;gap:16px;margin-top:40px}
+.src{border-radius:26px;padding:28px;background:rgba(255,255,255,.06);border:1px solid rgba(169,221,244,.22)}
+.square .src,.tall .src{display:flex;align-items:center;gap:24px;padding:22px 26px}
+.src b{display:inline-block;font-family:M;font-weight:500;font-size:18px;letter-spacing:.12em;text-transform:uppercase;padding:8px 14px;border-radius:99px}
+.src p{font-size:23px;line-height:1.4;color:#C9DBEC;margin-top:16px}
+.square .src p,.tall .src p{margin-top:0}
+.square .src{padding:30px 30px}.square .src p{font-size:27px}.square .srcs{gap:22px;margin-top:56px}.square .never{margin-top:48px;font-size:26px}
+.never{margin-top:36px;font-size:24px;color:#A9C3DD}
+.never s{color:#fff;text-decoration-color:#E5484D;text-decoration-thickness:3px}
+/* free */
+.big{font-size:240px;font-weight:700;letter-spacing:-.06em;line-height:.9}
+.receipt{position:absolute;background:#fff;border-radius:28px;padding:34px;width:520px;border:1px solid var(--line);box-shadow:0 40px 80px -40px rgba(23,62,120,.45)}
+.receipt .row{display:flex;justify-content:space-between;font-size:24px;padding:14px 0;border-bottom:1px dashed var(--line)}
+.receipt .row span:last-child{font-family:M}
+.receipt .row:last-child{border:0;font-weight:700}
+.receipt .ok{display:flex;align-items:center;gap:12px;color:#1A7F52;font-weight:600;font-size:22px;margin-top:18px}
+/* arch */
+.arch{position:relative;flex:1;margin-top:30px}
+.node{position:absolute;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px 24px;box-shadow:0 20px 40px -28px rgba(23,62,120,.4)}
+.node h4{font-size:24px;letter-spacing:-.02em}
+.node p{font-size:17px;color:var(--sub);margin-top:4px;line-height:1.35}
+.node.chain{background:linear-gradient(135deg,#246CB0,#173E78);color:#fff;border:0}
+.node.chain p{color:#C9EAF3}
+.node code{font-family:M;font-size:14px;color:#C9EAF3;display:block;margin-top:6px}
+svg.lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+svg.lines path{fill:none;stroke:#3298D8;stroke-width:2.5;stroke-dasharray:7 7}
+svg.lines text{font-family:M;font-size:15px;fill:#246CB0}
+/* launch */
+body:has(.launch) .bg-dark{background:radial-gradient(55% 70% at 78% 30%,rgba(50,152,216,.55),transparent 70%),radial-gradient(50% 60% at 0% 100%,rgba(36,108,176,.4),transparent 70%),#061325}
+.glow{position:absolute;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 70px,rgba(169,221,244,.09) 71px 72px);-webkit-mask-image:radial-gradient(circle,#000 25%,transparent 70%)}
+.launch h1{color:#fff;font-size:118px}
+.square .launch h1{font-size:96px}.tall .launch h1{font-size:104px}
+.launch .live{display:inline-flex;align-items:center;gap:12px;font-family:M;font-size:20px;letter-spacing:.16em;color:#5BE0A5;background:rgba(34,160,107,.14);border:1px solid rgba(91,224,165,.35);padding:10px 18px;border-radius:99px;align-self:flex-start}
+.launch .live i{width:10px;height:10px;border-radius:50%;background:#5BE0A5;box-shadow:0 0 0 6px rgba(91,224,165,.2)}
+.launch .lede{color:#A9C3DD;max-width:640px}
+.launch .row{display:flex;gap:16px;margin-top:34px;flex-wrap:wrap}
+.launch .row div{padding:14px 20px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(169,221,244,.2);color:#fff;font-weight:600;font-size:22px}
+.launch .row b{font-family:M;font-weight:500;color:#7FC4EE;margin-right:8px}
+.launch .foot .logo{color:#fff}
+.deck{position:absolute}
+</style></head><body>
+<script src="mark.js"></script>
+<script>
+const q = new URLSearchParams(location.search), v = q.get("v"), f = q.get("f") || "land";
+document.body.className = f;
+const foot = (dark) => `<div class="foot"><div class="logo">${mark(f==="land"?50:46)}arcway</div><div class="pill"><i></i>arcway.world${f==="land"?" · Live on Arc Mainnet":""}</div></div>`;
+const T = {
+launch: () => { const L=f==="land", Q=f==="square";
+ const deck = L ? {x:930,y:170,s:1} : Q ? {x:560,y:560,s:.72} : {x:330,y:760,s:.9};
+ const cards=[["t-mid",-16,-120,40,"REGULAR","945"],["t-aur",-6,-30,10,"PATHFINDER","2,145"],["t-arc",6,70,-10,"PATHFINDER","2,145"]];
+ return `<div class="bg-dark"></div><div class="glow" style="width:1500px;height:1500px;${L?"left:600px;top:-300px":Q?"left:200px;top:120px":"left:-200px;top:420px"}"></div>
+ <div class="deck" style="left:${deck.x}px;top:${deck.y}px;transform:scale(${deck.s});transform-origin:0 0">${cards.map((c,i)=>pass(c[0],c[2],c[3],c[1],c[5],c[4],i+1)).join("")}</div>
+ <div class="wrap launch"><div class="live"><i></i>NOW LIVE ON ARC MAINNET</div>
+ <h1 style="margin-top:30px">Arcway<br>is live.</h1>
+ <p class="lede">Explore Arc. Complete quests.<br>Build your Passport.</p>
+ ${Q?"":`<div class="row"><div><b>17</b>quests</div><div><b>2,145</b>XP</div><div><b>0</b>USDC to claim</div></div>`}
+ ${foot(true)}</div>`; },
+how: () => `<div class="bg-light"></div><div class="rings" style="width:1400px;height:1400px;right:-500px;top:-600px"></div>
+ <div class="wrap"><div class="head"><div class="eyebrow">How Arcway works</div>
+ <h1>Three steps.<br><span class="grad">All on Arc.</span></h1></div>
+ <div class="steps">
+  <div class="step"><div class="n">01</div><div><h3>Explore</h3><p>Find apps by goal, with their contracts checked on the explorer.</p></div><span class="tag">15 apps</span></div>
+  <div class="step"><div class="n">02</div><div><h3>Quest</h3><p>Do real things on Arc. We check each one onchain.</p></div><span class="tag">17 quests</span></div>
+  <div class="step"><div class="n">03</div><div><h3>Passport</h3><p>Claim XP and badges for free. Your card levels up.</p></div><span class="tag">2,145 XP</span></div>
+ </div>${foot()}</div>`,
+trust: () => `<div class="bg-dark"></div><div class="wrap dark"><div class="head"><div class="eyebrow">Data you can check</div>
+ <h1>Every number<br>shows its source.</h1></div>
+ <div class="srcs">
+  <div class="src"><b style="background:#123B2B;color:#5BE0A5">Observed</b><p>Read straight from Arc's explorer index.</p></div>
+  <div class="src"><b style="background:#13325A;color:#8CCBF5">Derived</b><p>Calculated from observed data, with the method and period shown.</p></div>
+  <div class="src"><b style="background:#3A2A55;color:#C9A8FF">Project</b><p>Supplied by the app team, and labelled that way.</p></div>
+ </div>
+ <p class="never">Never shown: <s>made-up TVL</s>&nbsp;&nbsp;·&nbsp;&nbsp;<s>fake volume</s>&nbsp;&nbsp;·&nbsp;&nbsp;<s>guessed users</s></p>
+ ${foot(true)}</div>`,
+free: () => `<div class="bg-light"></div><div class="rings" style="width:1300px;height:1300px;${f==="land"?"right:-420px;top:-200px":"right:-600px;bottom:-560px"}"></div>
+ <div class="wrap"><div class="head"><div class="eyebrow">Claiming is free</div>
+ <h1>Earn XP.<br><span class="grad">Pay nothing.</span></h1>
+ <p class="lede">Finish a quest on Arc, come back and claim. Arcway checks it onchain and pays the fee to record it on your Passport.</p></div>
+ <div class="receipt" style="${f==="land"?"right:90px;top:200px":"right:72px;bottom:190px"}">
+  <div class="row"><span>Quest</span><span>First transaction</span></div>
+  <div class="row"><span>XP</span><span>+25</span></div>
+  <div class="row"><span>Badge</span><span>Stamped</span></div>
+  <div class="row"><span>You pay</span><span>0.00 USDC</span></div>
+  <div class="ok">✓ Recorded on Arc Mainnet</div>
+ </div>${foot()}</div>`,
+arch: () => `<div class="bg-light"></div><div class="wrap"><div class="head"><div class="eyebrow">Under the hood</div>
+ <h1 style="font-size:72px">How a quest gets on your Passport</h1></div>
+ <div class="arch">
+  <svg class="lines" viewBox="0 0 1440 520" preserveAspectRatio="none">
+   <path d="M250 110 H430"/><text x="268" y="96">claim</text>
+   <path d="M720 110 H900"/><text x="740" y="96">check + sign</text>
+   <path d="M1060 175 V300"/><text x="1074" y="245">completeQuest()</text>
+   <path d="M570 175 V300"/><text x="584" y="245">reads</text>
+   <path d="M900 380 H730"/><text x="752" y="366">events</text>
+     </svg>
+  <div class="node" style="left:0;top:40px;width:250px"><h4>You</h4><p>Wallet on Arc. Do the quest in any verified app.</p></div>
+  <div class="node" style="left:430px;top:40px;width:290px"><h4>Arcway</h4><p>Next.js app and API. Checks the quest against Arc.</p></div>
+  <div class="node" style="left:900px;top:40px;width:280px"><h4>Verifier</h4><p>Signs only checks that pass. Pays the fee.</p></div>
+  <div class="node" style="left:380px;top:300px;width:350px"><h4>Arc data</h4><p>Blockscout API, Arc RPC fallback, Envio indexer for passport events.</p></div>
+  <div class="node chain" style="left:900px;top:300px;width:420px"><h4>Arc Mainnet</h4><p>ArcwayPassport: XP and badges<br>ArcwayCampaigns: USDC prize pools</p><code>0xF518…D94c · 0x229f…c26c</code></div>
+ </div>${foot()}</div>`
+};
+document.write(T[v]());
+</script></body></html>
