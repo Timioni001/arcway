@@ -1,4 +1,4 @@
-import { getAddress, isAddress, parseUnits, type Address } from "viem";
+import { encodePacked, getAddress, isAddress, keccak256, parseUnits, type Address, type Hex } from "viem";
 import { USDC_DECIMALS } from "./config";
 
 export const MAX_PAY = 1_000_000;
@@ -47,4 +47,17 @@ export function readPayRequest(to: string, params: { amount?: string | null; not
   if (!isAddress(to)) return null;
   const amount = params.amount ? parseAmount(params.amount) : undefined;
   return { to: getAddress(to), amount: amount?.ok ? amount : undefined, note: cleanNote(params.note ?? "") };
+}
+
+/** The note as ArcwayPay accepts it: at most 80 bytes of UTF-8, cut on a character boundary. */
+export function noteForContract(note: string): string {
+  const enc = new TextEncoder();
+  let out = note;
+  while (enc.encode(out).length > NOTE_MAX) out = Array.from(out).slice(0, -1).join("");
+  return out;
+}
+
+/** Ties an onchain receipt to the link that was paid: recipient, amount (0 if the payer chose) and note. */
+export function payLinkId(to: Address, fixedAmount: bigint | undefined, note: string): Hex {
+  return keccak256(encodePacked(["address", "uint256", "string"], [getAddress(to), fixedAmount ?? 0n, note]));
 }

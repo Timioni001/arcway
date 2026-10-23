@@ -1,0 +1,20 @@
+Build ArcwayPay, the contract behind Arcway's USDC pay links (arcway.world/pay), and a small app that uses it.
+
+Contract (contracts/ArcwayPay.sol, Solidity ^0.8.24) must implement context/contracts/src/interfaces/IArcwayPay.sol exactly:
+- Constructor takes the USDC address; expose it as usdc(). On Arc it is 0x3600000000000000000000000000000000000000 (6-decimal ERC-20 view of native USDC).
+- pay(recipient, amount, linkId, note): USDC moves straight from msg.sender to recipient with transferFrom (use SafeERC20). The contract must never hold funds.
+- payWithPermit(...): call permit on USDC, then pay. If permit reverts because an allowance already exists (front-run), continue when allowance is enough.
+- Revert with custom errors on: zero recipient, zero amount, note longer than 80 bytes.
+- Emit Paid(linkId, payer, recipient, amount, note) once per payment.
+- No owner, no admin, no fees, no upgradeability, no receive/fallback.
+
+Tests (Foundry, test/ArcwayPay.t.sol) with a mock 6-decimal ERC-20 that supports EIP-2612:
+- pay moves the exact amount payer→recipient and the contract balance stays 0
+- Paid event has the right fields
+- each revert case
+- payWithPermit works with a real signature; works when allowance was already granted; reverts on a bad signature without allowance
+- fuzz: any amount up to the payer's balance; the contract never ends with a balance
+
+Then audit the contract (reentrancy, approvals, permit front-running, event correctness) and fix anything found.
+
+App (src/): one page where someone connects a wallet on Arc, enters recipient, amount and note, approves USDC (or signs a permit), pays through ArcwayPay, and sees the receipt with the transaction link on explorer.arc.io. Deploy the contract to Arc testnet and wire the app to it.

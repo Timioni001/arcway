@@ -1,0 +1,5 @@
+Audit the Arcway contracts in context/contracts/src/: ArcwayPassport.sol (verifier-recorded quest completions and XP, capped per quest) and ArcwayCampaigns.sol (USDC prize-pool escrow with verifier-signed entries and a published draw).
+
+For each contract: list findings by severity (critical, high, medium, low, informational) with the exact function and line, why it matters, and a concrete fix. Check access control and the two-step ownership transfer, verifier key compromise blast radius, signature replay (chain id, contract address, nonces, expiry), USDC transfer handling, refund and cancel paths, reentrancy, rounding in prize splits, event coverage, and gas griefing.
+
+Then write Foundry tests in test/ that prove each medium-or-higher finding (failing before a fix) and apply the minimal fixes in place. Summarize what changed.

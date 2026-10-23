@@ -6,20 +6,21 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import { erc20Abi, type Address, type Hash } from "viem";
 import { useGasPrice, usePublicClient, useWriteContract } from "wagmi";
-import { BRIDGE_URL, IS_MAINNET, NETWORK_NAME, USDC_ADDRESS, arcChain, explorer } from "../lib/config";
+import { BRIDGE_URL, IS_MAINNET, NETWORK_NAME, PAY_CONTRACT, USDC_ADDRESS, arcChain, explorer } from "../lib/config";
 import { humanizeError } from "../lib/errors";
 import { FEE_ACTIONS, feeUsd, formatUsd } from "../lib/fees";
 import { formatUsdc, shortAddress } from "../lib/format";
 import { useArcwayState } from "../lib/hooks/context";
 import { useToast } from "../lib/hooks/toast";
 import { useWallet } from "../lib/hooks/useWallet";
-import { parseAmount } from "../lib/pay";
+import { noteForContract, parseAmount, payLinkId } from "../lib/pay";
+import { payAbi } from "../lib/payAbi";
 import { CELEBRATE_EVENT } from "./Celebrate";
 import { AddressAvatar } from "./AddressAvatar";
 
 type Phase =
   | { kind: "idle" }
-  | { kind: "wallet" }
+  | { kind: "wallet"; step?: "approve" | "pay" }
   | { kind: "confirming"; hash: Hash }
   | { kind: "done"; hash: Hash; seconds: number }
   | { kind: "error"; message: string; hash?: Hash };
@@ -49,7 +50,21 @@ export function PayCheckout({ to, amount: fixed, note }: { to: Address; amount?:
     setPhase({ kind: "wallet" });
     let hash: Hash | undefined;
     try {
-      hash = await writeContractAsync({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "transfer", args: [to, amt.value], chainId: arcChain.id });
+      if (PAY_CONTRACT && connection.address) {
+        // Through ArcwayPay: approve exactly this amount if needed, then pay with an onchain receipt.
+        const allowance = await client.readContract({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "allowance", args: [connection.address, PAY_CONTRACT] });
+        if (allowance < amt.value) {
+          setPhase({ kind: "wallet", step: "approve" });
+          const approval = await writeContractAsync({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "approve", args: [PAY_CONTRACT, amt.value], chainId: arcChain.id });
+          const ok = await client.waitForTransactionReceipt({ hash: approval, timeout: 60_000 });
+          if (ok.status !== "success") throw new Error("The approval didn't go through. No USDC moved.");
+        }
+        setPhase({ kind: "wallet", step: "pay" });
+        const memo = noteForContract(note);
+        hash = await writeContractAsync({ address: PAY_CONTRACT, abi: payAbi, functionName: "pay", args: [to, amt.value, payLinkId(to, fixed ? amt.value : undefined, memo), memo], chainId: arcChain.id });
+      } else {
+        hash = await writeContractAsync({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "transfer", args: [to, amt.value], chainId: arcChain.id });
+      }
       const t0 = performance.now();
       setPhase({ kind: "confirming", hash });
       const receipt = await client.waitForTransactionReceipt({ hash, timeout: 60_000 });
@@ -77,7 +92,7 @@ export function PayCheckout({ to, amount: fixed, note }: { to: Address; amount?:
   } else {
     action = (
       <button className="btn btn--primary btn--block btn--lg" onClick={send} disabled={!amt.ok || busy} aria-busy={busy}>
-        {phase.kind === "wallet" ? "Confirm in your wallet…" : phase.kind === "confirming" ? "Sending…" : amt.ok ? `Send ${amt.text} USDC` : "Enter an amount"}
+        {phase.kind === "wallet" ? (phase.step === "approve" ? "Approve USDC in your wallet (1 of 2)…" : phase.step === "pay" ? "Confirm the payment (2 of 2)…" : "Confirm in your wallet…") : phase.kind === "confirming" ? "Sending…" : amt.ok ? `Send ${amt.text} USDC` : "Enter an amount"}
       </button>
     );
   }
@@ -129,7 +144,7 @@ export function PayCheckout({ to, amount: fixed, note }: { to: Address; amount?:
           <div className="tx__head"><CircleCheck style={{ color: "var(--success)" }} aria-hidden="true" />Paid {amt.ok ? `${amt.text} USDC` : ""}</div>
           <p className="small secondary" style={{ marginTop: 6 }}><Zap aria-hidden="true" style={{ width: 14, display: "inline", verticalAlign: -2, color: "var(--primary)" }} /> Confirmed on Arc in <b className="mono">{phase.seconds.toFixed(1)}s</b>.</p>
           <div className="row" style={{ marginTop: 10, gap: 16 }}>
-            <a className="link small" href={explorer.tx(phase.hash)} target="_blank" rel="noopener noreferrer">Receipt <ArrowUpRight aria-hidden="true" /></a>
+            <a className="link small" href={explorer.tx(phase.hash)} target="_blank" rel="noopener noreferrer">{PAY_CONTRACT ? "Onchain receipt" : "Receipt"} <ArrowUpRight aria-hidden="true" /></a>
             <Link className="link small" href="/quests">Claim XP for your first transaction</Link>
           </div>
         </div>

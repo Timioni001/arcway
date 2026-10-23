@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { erc20Abi, formatUnits, parseAbi } from "viem";
 import { passportAbi } from "../../../lib/abi";
-import { ARC_NETWORK, CAMPAIGNS_ADDRESS, PASSPORT_ADDRESS, USDC_ADDRESS, USDC_DECIMALS, arcChain } from "../../../lib/config";
+import { ARC_NETWORK, CAMPAIGNS_ADDRESS, PASSPORT_ADDRESS, PAY_CONTRACT, USDC_ADDRESS, USDC_DECIMALS, arcChain } from "../../../lib/config";
 import { publicClient, verifierClient } from "../../../lib/server/arc";
 import { explorerRequest, explorerSources } from "../../../lib/server/explorer";
 
@@ -26,6 +26,7 @@ export async function GET() {
     passport: { configured: Boolean(PASSPORT_ADDRESS), address: PASSPORT_ADDRESS ?? null, deployed: false },
     verifier: { configured: Boolean(wallet), address: verifierAddress ?? null, authorized: false, balanceUsdc: null as string | null, low: false },
     campaigns: { configured: Boolean(CAMPAIGNS_ADDRESS), address: CAMPAIGNS_ADDRESS ?? null, deployed: false, verifierAuthorized: false, usdcMatches: false },
+    pay: { configured: Boolean(PAY_CONTRACT), address: PAY_CONTRACT ?? null, deployed: false, usdcMatches: false },
     claimsReady: false,
     campaignsReady: false,
     /** Where live Arc data comes from. The explorer feeds activity, assets and wallet history. */
@@ -73,6 +74,13 @@ export async function GET() {
           .then((ok) => { result.campaigns.verifierAuthorized = Boolean(ok); }).catch(() => {})
       );
     }
+  }
+  if (PAY_CONTRACT) {
+    checks.push(publicClient.getCode({ address: PAY_CONTRACT }).then((code) => { result.pay.deployed = Boolean(code && code !== "0x"); }).catch(() => {}));
+    checks.push(
+      publicClient.readContract({ address: PAY_CONTRACT, abi: campaignsHealthAbi, functionName: "usdc" })
+        .then((token) => { result.pay.usdcMatches = String(token).toLowerCase() === USDC_ADDRESS.toLowerCase(); }).catch(() => {})
+    );
   }
   checks.push(
     explorerRequest("/stats", { cache: "no-store" })

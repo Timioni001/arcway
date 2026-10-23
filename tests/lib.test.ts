@@ -407,3 +407,20 @@ describe("explorer sources", () => {
     if (prev !== undefined) process.env.EXPLORER_API_KEY = prev;
   });
 });
+
+import { noteForContract, payLinkId } from "../lib/pay";
+describe("ArcwayPay helpers", () => {
+  it("keeps notes within 80 bytes without splitting a character", () => {
+    expect(noteForContract("Dinner")).toBe("Dinner");
+    const long = "é".repeat(60); // 120 bytes
+    const out = noteForContract(long);
+    expect(new TextEncoder().encode(out).length).toBeLessThanOrEqual(80);
+    expect(out).toBe("é".repeat(40));
+  });
+  it("gives one link id per recipient, fixed amount and note", () => {
+    const to = "0x7a00000000000000000000000000000000092f1a";
+    expect(payLinkId(to, 25_000_000n, "Dinner")).toBe(payLinkId(to.toUpperCase().replace("0X", "0x") as `0x${string}`, 25_000_000n, "Dinner"));
+    expect(payLinkId(to, 25_000_000n, "Dinner")).not.toBe(payLinkId(to, undefined, "Dinner"));
+    expect(payLinkId(to, undefined, "Dinner")).toMatch(/^0x[0-9a-f]{64}$/);
+  });
+});

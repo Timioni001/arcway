@@ -73,3 +73,5 @@ export const PASSKEY_WALLETS = Boolean(CIRCLE_CLIENT_KEY && CIRCLE_CHAIN);
 
 /** ArcwayCampaigns escrow ON THE SAME NETWORK. Until it is set, campaigns can be previewed but not launched. */
 export const CAMPAIGNS_ADDRESS = optionalAddress(process.env.NEXT_PUBLIC_CAMPAIGNS_CONTRACT);
+/** ArcwayPay (built in Arc Studio): pay links settle through it with an onchain receipt. Off until set. */
+export const PAY_CONTRACT = optionalAddress(process.env.NEXT_PUBLIC_PAY_CONTRACT);
