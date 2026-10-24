@@ -16,7 +16,7 @@ const ROUTES = [
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
   "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
   "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave",
-  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet", "/campaigns", "/launch",
+  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet", "/campaigns", "/launch", "/sponsor",
   "/assets", "/assets/0x3600000000000000000000000000000000000000"
 ];
 
@@ -404,7 +404,7 @@ test("home speaks to people first: quests, rewards, explore, passport; no raw ne
 test("features live inside their section as views", async ({ page }) => {
   await open(page, "/campaigns");
   const views = page.getByRole("navigation", { name: "Views in this section" });
-  await expect(views.getByRole("link")).toHaveText(["Quests", "Campaigns", "Leaderboard"]);
+  await expect(views.getByRole("link")).toHaveText(["Quests", "Campaigns", "Sponsor", "Leaderboard"]);
   await expect(views.getByRole("link", { name: "Campaigns" })).toHaveAttribute("aria-current", "page");
   await open(page, "/pulse");
   await expect(page.getByRole("navigation", { name: "Views in this section" }).getByRole("link")).toHaveText(["Apps", "Categories", "Assets", "Builders", "What's New", "Activity"]);

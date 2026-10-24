@@ -1,5 +1,5 @@
 import {
-  Activity, Award, Blocks, Bookmark, Code2, Coins, Compass, Gift, House, IdCard, LayoutGrid, Link2, Megaphone, Network, Newspaper, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound, Wallet,
+  Activity, Award, HandCoins, Blocks, Bookmark, Code2, Coins, Compass, Gift, House, IdCard, LayoutGrid, Link2, Megaphone, Network, Newspaper, RadioTower, Rocket, Search, Settings, Target, Trophy, UserRound, Wallet,
   type LucideIcon
 } from "lucide-react";
 import { getBuilder } from "./builders";
@@ -62,6 +62,7 @@ export const SECTION_VIEWS: Record<string, NavItem[]> = {
   "/quests": [
     { href: "/quests", label: "Quests", icon: Target, blurb: "" },
     { href: "/campaigns", label: "Campaigns", icon: Gift, blurb: "Complete tasks, share a USDC prize pool" },
+    { href: "/sponsor", label: "Sponsor", icon: HandCoins, blurb: "Put USDC behind a quest; finishers claim it" },
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy, blurb: "Top explorers this season" }
   ],
   "/submit": [

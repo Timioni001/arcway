@@ -2941,3 +2941,32 @@ button.pcol__item:disabled { cursor: default; }
   .bshelves .bgallery__text { justify-items: center; }
   .bshelves .bgallery__meta { justify-content: center; }
 }
+
+/* Sponsored quests (ArcwayBounties) */
+.bounties { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.bounty { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); }
+.bounty__reward { display: grid; justify-items: center; gap: 2px; min-width: 76px; padding: 8px 10px; border-radius: 12px; background: linear-gradient(160deg, color-mix(in srgb, #FFD27A 28%, transparent), transparent); color: var(--text); }
+.bounty__reward svg { width: 16px; height: 16px; color: #C08A1A; }
+.bounty__reward b { font-size: 18px; }
+.bounty__reward small { font-size: 10.5px; color: var(--text-secondary); }
+.bounty__title { font-weight: 650; }
+.bounty__meta { display: flex; gap: 14px; margin-top: 6px; color: var(--text-secondary); }
+.bounty__meta span { display: inline-flex; align-items: center; gap: 4px; }
+.bounty__meta svg { width: 13px; height: 13px; }
+.bounty__act { text-align: right; }
+.bounty-empty { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 18px 20px; }
+.bounty-empty > svg { width: 22px; height: 22px; color: var(--primary); }
+.sponsor { display: grid; gap: 18px; }
+.sponsor__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sponsor__wide { grid-column: 1 / -1; }
+.sponsor .field { display: grid; gap: 6px; }
+.sponsor__sum { display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; background: var(--surface-soft); border: 1px solid var(--border); }
+.sponsor__sum b { font-size: 24px; }
+.sponsor__how { display: grid; gap: 12px; margin: 14px 0 0; padding-left: 20px; color: var(--text-secondary); }
+.sponsor__how b { color: var(--text); }
+@media (max-width: 720px) {
+  .bounty { grid-template-columns: auto minmax(0, 1fr); }
+  .bounty__act { grid-column: 1 / -1; text-align: left; }
+  .bounty-empty { grid-template-columns: 1fr; }
+  .sponsor__grid { grid-template-columns: 1fr; }
+}

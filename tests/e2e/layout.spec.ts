@@ -5,7 +5,7 @@ import { mockIntel } from "./intelFixtures";
 const ROUTES = [
   "/", "/more", "/apps", "/apps/uniswap", "/quests", "/quests/first-tx", "/passport", "/builders", "/builders/uniswap-labs",
   "/ecosystem", "/pulse", "/radar", "/signals", "/digest", "/leaderboard", "/submit", "/widgets", "/watchlist", "/settings",
-  "/search?q=circle", "/wallet", "/campaigns", "/launch", "/overview", "/activity", "/pay", "/trails/get-started",
+  "/search?q=circle", "/wallet", "/campaigns", "/launch", "/sponsor", "/overview", "/activity", "/pay", "/trails/get-started",
   "/assets", "/assets/0x3600000000000000000000000000000000000000"
 ];
 

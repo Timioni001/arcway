@@ -424,3 +424,29 @@ describe("ArcwayPay helpers", () => {
     expect(payLinkId(to, undefined, "Dinner")).toMatch(/^0x[0-9a-f]{64}$/);
   });
 });
+
+import { bountiesForQuest, endsIn, escrowFor, viewBounty } from "../lib/bounties";
+import { questHash as qh } from "../lib/quests";
+describe("bounties", () => {
+  const raw = (over: Partial<Parameters<typeof viewBounty>[1]> = {}) => ({
+    sponsor: "0x00000000000000000000000000000000000000aa" as const, questId: qh("five-tx"), rewardPerClaim: 2_000_000n,
+    maxClaims: 50, claims: 13, expiresAt: 2_000n, closed: false, title: "Try Arc", ...over
+  });
+  it("knows the quest, what's left and whether it still pays", () => {
+    const b = viewBounty(1, raw(), 1_000);
+    expect(b).toMatchObject({ id: 1, left: 37, status: "open" });
+    expect(b.quest?.id).toBe("five-tx");
+    expect(viewBounty(2, raw({ claims: 50 }), 1_000).status).toBe("empty");
+    expect(viewBounty(3, raw(), 2_000).status).toBe("expired");
+    expect(viewBounty(4, raw({ closed: true }), 1_000).status).toBe("closed");
+  });
+  it("lists a quest's open bounties, biggest reward first", () => {
+    const all = [viewBounty(1, raw(), 1_000), viewBounty(2, raw({ rewardPerClaim: 5_000_000n }), 1_000), viewBounty(3, raw({ questId: qh("first-tx") }), 1_000), viewBounty(4, raw({ claims: 50 }), 1_000)];
+    expect(bountiesForQuest(all, "five-tx").map((b) => b.id)).toEqual([2, 1]);
+  });
+  it("escrows reward × people and says when it ends", () => {
+    expect(escrowFor(2_000_000n, 50)).toBe(100_000_000n);
+    expect(endsIn(1_000n + 90_000n, 1_000)).toBe("1d 1h left");
+    expect(endsIn(1_000n, 2_000)).toBe("Ended");
+  });
+});

@@ -1,0 +1,25 @@
+Build ArcwayBounties: quests that pay, on Arc. Implement context/contracts/src/interfaces/IArcwayBounties.sol exactly, plus tests, an audit, a testnet deployment and a small app.
+
+How it works: anyone escrows USDC behind an Arcway quest. ArcwayPassport (already live; it exposes completedQuest(address user, bytes32 questId) -> bool, see IArcwayPassportView in the same file) is the only judge: every wallet whose passport has that quest recorded can claim one reward, first come first served, until rewards run out or the bounty expires. No owner, no admin keys, no signatures, no upgradeability.
+
+Contract (contracts/ArcwayBounties.sol, Solidity ^0.8.24, OpenZeppelin SafeERC20 + ReentrancyGuard):
+- constructor(address usdc, address passport); both immutable and non-zero.
+- create(): pull rewardPerClaim * maxClaims from msg.sender with safeTransferFrom (check the received amount equals the expected amount). Validate: reward > 0, 1 <= maxClaims <= 10_000, now < expiresAt <= now + 180 days, title <= 80 bytes. Ids start at 1.
+- fund(): anyone can add claims to an open, unexpired bounty; pulls rewardPerClaim * extraClaims; maxClaims grows; keep the 10_000 cap.
+- claim(): checks-effects-interactions. Revert with custom errors when: unknown id, closed, expired, no rewards left, already claimed, passport says the quest is not recorded. Mark claimed, increment claims, then transfer rewardPerClaim to msg.sender.
+- close(): only the sponsor, only after expiry, once. Refund rewardPerClaim * (maxClaims - claims); emit BountyClosed.
+- canClaim() mirrors claim()'s checks without reverting. hasClaimed(), bounty(), bountyCount().
+- Accounting invariant: contract USDC balance == sum over open bounties of rewardPerClaim * (maxClaims - claims).
+
+Tests (Foundry, test/ArcwayBounties.t.sol) with a mock 6-decimal USDC and a mock passport where tests can mark completions:
+- create pulls the exact escrow; each validation revert
+- claim pays once per wallet; second claim reverts; wallet without the quest reverts; rewards run out; expired reverts
+- fund by a third party extends maxClaims and escrow
+- close: only sponsor, only after expiry, refunds the unclaimed remainder exactly, cannot run twice, claims after close revert
+- canClaim matches claim for every case
+- invariant/fuzz test: random sequences of create/fund/claim/close keep the accounting invariant and never let total paid exceed total escrowed
+- a reentrant token or passport cannot double-claim
+
+Then audit the contract (reentrancy, accounting, rounding, griefing via huge titles or many bounties, fee-on-transfer assumption, passport trust) and fix what you find.
+
+Deploy to Arc testnet with a mock passport you can toggle, and build the app (src/): a "Sponsored quests" page listing bounties (title, quest, reward each, rewards left, time left, sponsor), a claim button that shows why you can't claim when canClaim is false, and a sponsor form (pick quest id, reward each, how many people, days) that approves USDC then calls create. Show each transaction with a link to the explorer.

@@ -14,44 +14,51 @@ reviewed on a rolling basis. Submissions are not audited by Arc or Circle.
   potential 20%.
 
 ## What Arcway builds in Arc Studio
-1. **ArcwayPay** (`arc-studio/01-arcway-pay.txt`): the contract behind Arcway pay links. Non-custodial:
-   USDC moves payer → recipient in one call and every payment emits a `Paid` receipt tied to the link.
-   Interface (the spec Studio must honor): `contracts/src/interfaces/IArcwayPay.sol`. Studio writes the
-   contract, the Foundry tests (incl. fuzz and permit), audits it, deploys to testnet, and builds a
-   small pay app. arcway.world/pay already calls it when `NEXT_PUBLIC_PAY_CONTRACT` is set.
-2. **Audit of the live contracts** (`arc-studio/02-audit.txt`): ArcwayPassport and ArcwayCampaigns,
-   findings by severity, proving tests, minimal fixes.
+1. **ArcwayBounties — quests that pay** (`arc-studio/03-arcway-bounties.txt`, the headline build).
+   Anyone escrows USDC behind an Arcway quest; every wallet whose ArcwayPassport has that quest
+   recorded claims one reward, straight from the contract. The live passport contract is the only
+   judge: no admin, no backend, no signatures. Sponsors get unclaimed USDC back after expiry.
+   Spec Studio must honor: `contracts/src/interfaces/IArcwayBounties.sol`. Studio writes the contract,
+   unit + invariant tests, audits it, deploys to testnet and builds a sponsored-quests app.
+   arcway.world already has the UI: sponsored rewards and a claim button on quest pages, a
+   "Sponsored quests" list on /quests and a sponsor form on /sponsor, all live once
+   `NEXT_PUBLIC_BOUNTIES_CONTRACT` is set.
+2. **ArcwayPay** (`arc-studio/01-arcway-pay.txt`, optional second contract): pay links that settle
+   through a contract with an onchain receipt. Spec: `contracts/src/interfaces/IArcwayPay.sol`.
+3. **Audit of the live contracts** (`arc-studio/02-audit.txt`): ArcwayPassport and ArcwayCampaigns.
 
 ## Commands (run where ARC_STUDIO_TOKEN is available)
 ```sh
 npm i -g @circle-fin/arc-studio-cli          # or npx @circle-fin/arc-studio-cli
 arc-studio whoami                             # must pass
-arc-studio run --prompt-file arc-studio/01-arcway-pay.txt \
-  --file contracts/src/interfaces/IArcwayPay.sol --session arcway-pay --output json
-arc-studio pull --session arcway-pay --out arc-studio/out/pay --paths "contracts/**" "test/**" "src/**"
+arc-studio run --prompt-file arc-studio/03-arcway-bounties.txt \
+  --file contracts/src/interfaces/IArcwayBounties.sol --session arcway-bounties --output json
+arc-studio pull --session arcway-bounties --out arc-studio/out/bounties --paths "contracts/**" "test/**" "src/**"
 arc-studio run --prompt-file arc-studio/02-audit.txt \
   --file contracts/src/ArcwayPassport.sol --file contracts/src/ArcwayCampaigns.sol \
   --session arcway-audit --output json
-arc-studio open --session arcway-pay          # the studio.arc.io/app/... URL for the submission
+arc-studio open --session arcway-bounties     # the studio.arc.io/app/... URL for the submission
 ```
-Then copy `ArcwayPay.sol` + its tests into `contracts/`, run `forge test`, and review before mainnet.
+Then copy `ArcwayBounties.sol` + its tests into `contracts/`, run `forge test`, and review before mainnet.
 
 ## Mainnet (the owner does this; keys never leave their machine)
 ```sh
-forge create src/ArcwayPay.sol:ArcwayPay --rpc-url https://rpc.mainnet.arc.io \
-  --private-key $DEPLOYER_KEY --broadcast --constructor-args 0x3600000000000000000000000000000000000000
+forge create src/ArcwayBounties.sol:ArcwayBounties --rpc-url https://rpc.mainnet.arc.io \
+  --private-key $DEPLOYER_KEY --broadcast \
+  --constructor-args 0x3600000000000000000000000000000000000000 0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c
 ```
-Vercel → `NEXT_PUBLIC_PAY_CONTRACT=<address>` → redeploy → `/api/health` shows `pay.deployed: true`,
-`pay.usdcMatches: true`. Then pay a small amount (e.g. 0.10 USDC) through a link on arcway.world/pay:
-that transaction hash is the "USDC through the contract and app" proof.
+Vercel → `NEXT_PUBLIC_BOUNTIES_CONTRACT=<address>` → redeploy → `/api/health` shows
+`bounties.deployed`, `usdcMatches` and `passportMatches` all `true`. Then on arcway.world/sponsor put a
+small bounty (e.g. 0.10 USDC × 5 people) behind a quest you've completed and claim it from the quest
+page: the create and the claim transactions are the "USDC through the contract and app" proof.
 
 ## Submission checklist
-- [ ] Arc Studio project URL (ArcwayPay session) — and the audit session URL as extra evidence
-- [ ] Live app: https://arcway.world/pay (and Studio's preview link)
-- [ ] ArcwayPay mainnet address + the example payment tx on explorer.arc.io
+- [ ] Arc Studio project URL (ArcwayBounties session) — and the audit session URL as extra evidence
+- [ ] Live app: https://arcway.world/sponsor and any quest page (and Studio's preview link)
+- [ ] ArcwayBounties mainnet address + the create and claim txs on explorer.arc.io
 - [ ] Repo: https://github.com/Timioni001/arcway
-- [ ] 60–90 s video: open a pay link → approve → pay → onchain receipt → the contract in Studio
-- [ ] Short description: what ArcwayPay does, what Studio built and audited, and that Arcway's
+- [ ] 60–90 s video: sponsor a quest → finish it → claim the USDC → the contract and tests in Studio
+- [ ] Short description: what ArcwayBounties does, what Studio built and audited, and that Arcway's
       quests, passport and campaigns are already live on Arc mainnet
 
 ## About round 1 staying "Under review"

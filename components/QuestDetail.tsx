@@ -7,6 +7,7 @@ import { useClaims } from "../lib/hooks/claims";
 import { useArcwayState } from "../lib/hooks/context";
 import { useWallet } from "../lib/hooks/useWallet";
 import { getQuest, questProgress, timeLabel, type QuestRequirement } from "../lib/quests";
+import { SponsoredQuests } from "./Bounties";
 import { QuestBadge, questNumber } from "./Quests";
 import { Status } from "./Status";
 import { TransactionStatus } from "./TransactionStatus";
@@ -125,6 +126,7 @@ export function QuestDetail({ questId }: { questId: string }) {
             {action}
             <TransactionStatus state={state} onRetry={() => claim(quest.id)} />
           </section>
+          <SponsoredQuests questId={quest.id} compact />
         </aside>
       </div>
     </>
