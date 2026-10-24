@@ -14,5 +14,9 @@ export const bountiesAbi = parseAbi([
   "function bounty(uint256 id) view returns (Bounty)",
   "function bountyCount() view returns (uint256)",
   "function hasClaimed(uint256 id, address user) view returns (bool)",
-  "function canClaim(uint256 id, address user) view returns (bool)"
+  "function canClaim(uint256 id, address user) view returns (bool)",
+  "error ZeroReward()", "error RewardOverflow()", "error BadMaxClaims()", "error BadExpiry()", "error TitleTooLong()",
+  "error FeeOnTransferRejected()", "error UnknownBounty()", "error BountyClosedErr()", "error BountyExpiredErr()",
+  "error NoneLeft()", "error AlreadyClaimed()", "error QuestNotCompleted()", "error NotExpiredYet()",
+  "error AlreadyClosedErr()", "error NotSponsor()", "error ExtraClaimsZero()", "error MaxClaimsExceeded()", "error Reentrant()"
 ]);

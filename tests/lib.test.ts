@@ -35,6 +35,13 @@ describe("questHash", () => {
 });
 
 describe("humanizeError", () => {
+  it("explains ArcwayBounties reverts in words", async () => {
+    const { BaseError, ContractFunctionRevertedError, encodeErrorResult } = await import("viem");
+    const { bountiesAbi } = await import("../lib/bountiesAbi");
+    const data = encodeErrorResult({ abi: bountiesAbi, errorName: "QuestNotCompleted" });
+    const err = new BaseError("reverted", { cause: new ContractFunctionRevertedError({ abi: bountiesAbi, data, functionName: "claim" }) });
+    expect(humanizeError(err)).toMatch(/passport doesn't have this quest/);
+  });
   it("recognises wallet rejections deep in a cause chain", () => {
     expect(humanizeError({ name: "ConnectorError", cause: { code: 4001 } })).toMatch(/cancelled/);
   });

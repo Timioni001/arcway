@@ -9,20 +9,10 @@ import "../src/ArcwayBounties.sol";
 ///      USDC_ADDRESS     — the USDC ERC-20 on the target chain
 ///      PASSPORT_ADDRESS — the deployed ArcwayPassport contract address
 ///
-/// Example (testnet):
-///   forge script contracts/script/DeployBounties.s.sol \
-///     --rpc-url $RPC_URL --broadcast \
-///     --private-key $PRIVATE_KEY \
-///     -vvvv
-///
-/// Mainnet (Arc Mainnet):
+/// Mainnet (Arc Mainnet), run from contracts/; forge asks for the key instead of reading it from the shell:
 ///   USDC_ADDRESS=0x3600000000000000000000000000000000000000 \
 ///   PASSPORT_ADDRESS=0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c \
-///   forge script contracts/script/DeployBounties.s.sol \
-///     --rpc-url https://rpc.mainnet.arc.io \
-///     --broadcast \
-///     --private-key $PRIVATE_KEY \
-///     -vvvv
+///   forge script script/DeployBounties.s.sol --rpc-url https://rpc.mainnet.arc.io --broadcast --interactives 1
 contract DeployBounties is Script {
     function run() external returns (ArcwayBounties bounties) {
         address usdcAddr     = vm.envAddress("USDC_ADDRESS");

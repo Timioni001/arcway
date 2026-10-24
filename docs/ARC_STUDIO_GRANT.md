@@ -43,9 +43,10 @@ Then copy `ArcwayBounties.sol` + its tests into `contracts/`, run `forge test`, 
 
 ## Mainnet (the owner does this; keys never leave their machine)
 ```sh
-forge create src/ArcwayBounties.sol:ArcwayBounties --rpc-url https://rpc.mainnet.arc.io \
-  --private-key $DEPLOYER_KEY --broadcast \
-  --constructor-args 0x3600000000000000000000000000000000000000 0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c
+cd contracts
+USDC_ADDRESS=0x3600000000000000000000000000000000000000 \
+PASSPORT_ADDRESS=0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c \
+forge script script/DeployBounties.s.sol --rpc-url https://rpc.mainnet.arc.io --broadcast --interactives 1
 ```
 Vercel → `NEXT_PUBLIC_BOUNTIES_CONTRACT=<address>` → redeploy → `/api/health` shows
 `bounties.deployed`, `usdcMatches` and `passportMatches` all `true`. Then on arcway.world/sponsor put a

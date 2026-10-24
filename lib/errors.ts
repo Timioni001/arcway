@@ -6,6 +6,29 @@ type ErrorLike = {
   shortMessage?: string;
   message?: string;
   cause?: unknown;
+  data?: { errorName?: string };
+};
+
+/** ArcwayBounties reverts, in words. */
+const CONTRACT_ERRORS: Record<string, string> = {
+  QuestNotCompleted: "Your passport doesn't have this quest recorded yet. Finish it, then claim.",
+  AlreadyClaimed: "This wallet already claimed this bounty.",
+  NoneLeft: "Every reward in this bounty has been claimed.",
+  BountyExpiredErr: "This bounty has ended.",
+  BountyClosedErr: "This bounty is closed.",
+  UnknownBounty: "That bounty doesn't exist.",
+  NotSponsor: "Only the sponsor can close this bounty.",
+  NotExpiredYet: "You can close this bounty and take back what's left once it ends.",
+  AlreadyClosedErr: "This bounty is already closed.",
+  BadExpiry: "The end date must be within the next 180 days.",
+  BadMaxClaims: "Pick between 1 and 10,000 people.",
+  MaxClaimsExceeded: "A bounty can pay at most 10,000 people.",
+  ZeroReward: "The reward must be more than zero.",
+  RewardOverflow: "That reward is too large.",
+  TitleTooLong: "Keep the title to 80 characters.",
+  ExtraClaimsZero: "Add at least one more reward.",
+  FeeOnTransferRejected: "This token can't be escrowed.",
+  Reentrant: "Something went wrong. Please try again."
 };
 
 /** Walks `cause` chains (viem/wagmi wrap errors several levels deep). */
@@ -46,6 +69,8 @@ export function humanizeError(error: unknown): string {
   if (has((e) => e.name === "HttpRequestError" || e.name === "TimeoutError") || text.includes("failed to fetch")) {
     return "We couldn't reach Arc. Check your connection and try again.";
   }
+  const reverted = errors.find((e) => e.data?.errorName && CONTRACT_ERRORS[e.data.errorName]);
+  if (reverted) return CONTRACT_ERRORS[reverted.data!.errorName!];
   const first = errors.find((e) => e.shortMessage || e.message);
   return first?.shortMessage ?? first?.message ?? "Something went wrong. Please try again.";
 }
