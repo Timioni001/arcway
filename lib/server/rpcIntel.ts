@@ -14,7 +14,7 @@ const QUEST_COMPLETED = parseAbiItem("event QuestCompleted(address indexed user,
 const TRANSFER = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
 
 /** getLogs over a range, halving the window when the node refuses a range that big. */
-async function logsInRange<T>(from: bigint, to: bigint, read: (a: bigint, b: bigint) => Promise<T[]>, startStep = 100_000n): Promise<T[]> {
+export async function logsInRange<T>(from: bigint, to: bigint, read: (a: bigint, b: bigint) => Promise<T[]>, startStep = 100_000n): Promise<T[]> {
   const out: T[] = [];
   let step = startStep;
   let a = from;
@@ -54,7 +54,7 @@ async function deployBlock(address: Address, latest: bigint): Promise<bigint> {
 }
 
 /** Timestamps for the blocks the events landed in (batched, capped; the rest are interpolated). */
-async function blockTimes(blocks: bigint[]): Promise<Map<bigint, number>> {
+export async function blockTimes(blocks: bigint[]): Promise<Map<bigint, number>> {
   const unique = [...new Set(blocks)].sort((x, y) => (x < y ? -1 : 1));
   const times = new Map<bigint, number>();
   const pick = unique.length <= 400 ? unique : unique.filter((_, i) => i % Math.ceil(unique.length / 400) === 0 || i === unique.length - 1);

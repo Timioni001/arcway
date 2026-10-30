@@ -57,6 +57,13 @@ Deployed on Arc mainnet at `0xd73b798a93497a0e45e2482ad07f7127f00521cf` and set 
 small bounty (e.g. 0.10 USDC × 5 people) behind a quest you've completed and claim it from the quest
 page: the create and the claim transactions are the "USDC through the contract and app" proof.
 
+## Mainnet proof (USDC through the contract and the app)
+Both made from arcway.world/sponsor and the quest page, on Arc mainnet (chain 5042):
+- Sponsor: 0.10 USDC × 5 people escrowed behind "Arrive on Arc", bounty #1:
+  https://explorer.arc.io/tx/0xd0516b5fbec7016b9b9cf6907fd0c7f18e425e0637f0cb56aae1f500caf2cc6b
+- Claim: 0.10 USDC paid by the contract to a wallet whose passport has the quest:
+  https://explorer.arc.io/tx/0x018309c1961b3f7b82f7479754a8b0fa1a61af6d8b075fff50d6aa7f848bc0a2
+
 ## Submission checklist
 - [ ] Arc Studio project URL (ArcwayBounties session) — and the audit session URL as extra evidence
 - [ ] Live app: https://arcway.world/sponsor and any quest page (and Studio's preview link)

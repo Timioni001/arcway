@@ -2,6 +2,7 @@ import { HandCoins } from "lucide-react";
 import type { Metadata } from "next";
 import { PageHead } from "../../components/PageHead";
 import { SponsoredQuests, SponsorForm } from "../../components/Bounties";
+import { BountyActivity, BountyStats, StudioBadge, StudioCredit } from "../../components/BountyFeed";
 
 export const metadata: Metadata = { title: "Sponsor a quest", description: "Put USDC behind an Arcway quest. Everyone whose passport has it recorded can claim a share, straight from the contract." };
 
@@ -9,6 +10,7 @@ export default function SponsorPage() {
   return (
     <div className="container page">
       <PageHead icon={HandCoins} kicker="Quests" title="Sponsor a quest" lead="Put USDC behind a quest. Everyone whose passport has it recorded can claim a share, first come first served, straight from the contract." />
+      <div style={{ marginTop: 16 }}><StudioBadge /></div>
       <div className="dash" style={{ marginTop: 28 }}>
         <SponsorForm />
         <div className="card pad-lg">
@@ -22,7 +24,12 @@ export default function SponsorPage() {
         </div>
       </div>
       <h2 className="h3" style={{ margin: "48px 0 16px" }} id="live">Live bounties</h2>
+      <BountyStats />
       <SponsoredQuests />
+      <div className="dash" style={{ marginTop: 28 }}>
+        <BountyActivity />
+        <StudioCredit />
+      </div>
     </div>
   );
 }

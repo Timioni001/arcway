@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useClaims } from "../lib/hooks/claims";
 import { useArcwayState } from "../lib/hooks/context";
 import { DIFFICULTY_LABEL, QUESTS, QUEST_TIERS, questProgress, timeLabel, type QuestStatus, type QuestView } from "../lib/quests";
+import { PaidTag } from "./BountyFeed";
 import { QuestTypeMark } from "./QuestVisual";
 import { TransactionStatus } from "./TransactionStatus";
 
@@ -47,7 +48,7 @@ export function QuestCard({ quest }: { quest: QuestView }) {
         <p className="small secondary" style={{ marginTop: 6 }}>{quest.description}</p>
       </div>
       <dl className="quest-card__facts">
-        <div><dt>Reward</dt><dd><span className="quest-card__xp mono">+{quest.xp} XP</span><span className="xs secondary">{quest.badge.name} badge</span></dd></div>
+        <div><dt>Reward</dt><dd><span className="quest-card__xp mono">+{quest.xp} XP</span><span className="xs secondary">{quest.badge.name} badge</span><PaidTag questId={quest.id} /></dd></div>
         <div><dt>Difficulty</dt><dd>{DIFFICULTY_LABEL[quest.difficulty]}</dd></div>
         <div><dt>Time</dt><dd>{timeLabel(quest)}</dd></div>
       </dl>
