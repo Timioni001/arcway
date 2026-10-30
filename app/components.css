@@ -2970,3 +2970,11 @@ button.pcol__item:disabled { cursor: default; }
   .bounty-empty { grid-template-columns: 1fr; }
   .sponsor__grid { grid-template-columns: 1fr; }
 }
+
+/* Deploy (maintainers) */
+.deploy__facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; }
+.deploy__facts dt { color: var(--text-secondary); }
+.deploy__facts dd { margin: 0; overflow-wrap: anywhere; min-width: 0; }
+.deploy__done { display: grid; gap: 10px; }
+.deploy__addr { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.deploy__addr code { overflow-wrap: anywhere; min-width: 0; padding: 8px 10px; border-radius: 10px; background: var(--surface-soft); }

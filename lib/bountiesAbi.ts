@@ -2,6 +2,7 @@ import { parseAbi } from "viem";
 
 /** ArcwayBounties, per contracts/src/interfaces/IArcwayBounties.sol. */
 export const bountiesAbi = parseAbi([
+  "constructor(address usdc_, address passport_)",
   "struct Bounty { address sponsor; bytes32 questId; uint128 rewardPerClaim; uint32 maxClaims; uint32 claims; uint64 expiresAt; bool closed; string title; }",
   "event BountyCreated(uint256 indexed id, address indexed sponsor, bytes32 indexed questId, uint256 rewardPerClaim, uint256 maxClaims, uint64 expiresAt, string title)",
   "event BountyClaimed(uint256 indexed id, address indexed claimer, uint256 amount)",

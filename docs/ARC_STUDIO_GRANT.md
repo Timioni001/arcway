@@ -41,7 +41,10 @@ arc-studio open --session arcway-bounties     # the studio.arc.io/app/... URL fo
 ```
 Then copy `ArcwayBounties.sol` + its tests into `contracts/`, run `forge test`, and review before mainnet.
 
-## Mainnet (the owner does this; keys never leave their machine)
+## Mainnet (the owner does this; keys never leave their wallet)
+Easiest: open arcway.world/deploy/bounties in a wallet app's browser on Arc mainnet and tap Deploy. It ships the
+exact bytecode `forge test` tested (CI checks `lib/bountiesBytecode.ts` against a fresh build) and confirms the
+new contract points at the live USDC and passport. Or from a terminal:
 ```sh
 cd contracts
 USDC_ADDRESS=0x3600000000000000000000000000000000000000 \

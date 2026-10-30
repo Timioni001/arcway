@@ -16,7 +16,7 @@ const ROUTES = [
   "/pay", "/pay/0x7a00000000000000000000000000000000092f1a?amount=5&note=Coffee", "/trails/get-started",
   "/activity", "/search", "/search?q=circle", "/builders/uniswap-labs",
   "/ecosystem", "/pulse", "/radar", "/signals", "/watchlist", "/settings", "/apps/aave",
-  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet", "/campaigns", "/launch", "/sponsor",
+  "/leaderboard", "/submit", "/widgets", "/digest", "/more", "/wallet", "/campaigns", "/launch", "/sponsor", "/deploy/bounties",
   "/assets", "/assets/0x3600000000000000000000000000000000000000"
 ];
 
