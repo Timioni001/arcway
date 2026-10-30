@@ -51,7 +51,8 @@ USDC_ADDRESS=0x3600000000000000000000000000000000000000 \
 PASSPORT_ADDRESS=0xF51812CF4e7f554eFA8ea61A958e8B68B63eD94c \
 forge script script/DeployBounties.s.sol --rpc-url https://rpc.mainnet.arc.io --broadcast --interactives 1
 ```
-Vercel → `NEXT_PUBLIC_BOUNTIES_CONTRACT=<address>` → redeploy → `/api/health` shows
+Deployed on Arc mainnet at `0xd73b798a93497a0e45e2482ad07f7127f00521cf` and set as the app's mainnet default
+(`NEXT_PUBLIC_BOUNTIES_CONTRACT` only overrides it). `/api/health` shows
 `bounties.deployed`, `usdcMatches` and `passportMatches` all `true`. Then on arcway.world/sponsor put a
 small bounty (e.g. 0.10 USDC × 5 people) behind a quest you've completed and claim it from the quest
 page: the create and the claim transactions are the "USDC through the contract and app" proof.

@@ -73,7 +73,8 @@ export const PASSKEY_WALLETS = Boolean(CIRCLE_CLIENT_KEY && CIRCLE_CHAIN);
 
 /** ArcwayCampaigns escrow ON THE SAME NETWORK. Until it is set, campaigns can be previewed but not launched. */
 export const CAMPAIGNS_ADDRESS = optionalAddress(process.env.NEXT_PUBLIC_CAMPAIGNS_CONTRACT);
-/** ArcwayPay (built in Arc Studio): pay links settle through it with an onchain receipt. Off until set. */
-/** ArcwayBounties (built in Arc Studio): USDC escrowed behind quests, claimed by passports. Off until set. */
-export const BOUNTIES_CONTRACT = optionalAddress(process.env.NEXT_PUBLIC_BOUNTIES_CONTRACT);
+/** ArcwayBounties (written in Arc Studio): USDC escrowed behind quests, claimed by passports. Live on mainnet. */
+export const BOUNTIES_MAINNET = "0xd73b798a93497a0e45e2482ad07f7127f00521cf" as const;
+export const BOUNTIES_CONTRACT = optionalAddress(process.env.NEXT_PUBLIC_BOUNTIES_CONTRACT) ?? (IS_MAINNET ? BOUNTIES_MAINNET : undefined);
+/** ArcwayPay: pay links settle through it with an onchain receipt. Off until set. */
 export const PAY_CONTRACT = optionalAddress(process.env.NEXT_PUBLIC_PAY_CONTRACT);

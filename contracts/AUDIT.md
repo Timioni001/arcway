@@ -49,6 +49,8 @@ Design: anyone escrows `rewardPerClaim × maxClaims` USDC behind a quest. A wall
 
 ## Deploy (mainnet)
 
+Live at `0xd73b798a93497a0e45e2482ad07f7127f00521cf` on Arc mainnet (chain 5042). Its runtime code matches this build, and `usdc()` and `passport()` return the addresses below.
+
 From `contracts/`:
 
 ```
