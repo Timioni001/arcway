@@ -2970,3 +2970,34 @@ button.pcol__item:disabled { cursor: default; }
   .bounty-empty { grid-template-columns: 1fr; }
   .sponsor__grid { grid-template-columns: 1fr; }
 }
+
+/* My bounties (sponsor tools) */
+.my-bounties { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.my-bounty {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px;
+  align-items: start; padding: 14px 16px; border-radius: 14px;
+  border: 1px solid var(--border); background: var(--surface-soft);
+}
+.my-bounty[data-status="expired"] { border-color: color-mix(in srgb, var(--warning) 35%, var(--border)); }
+.my-bounty[data-status="closed"]  { opacity: .6; }
+.my-bounty__title { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; flex-wrap: wrap; }
+.my-bounty__badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; }
+.my-bounty__badge--open    { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+.my-bounty__badge--expired { background: color-mix(in srgb, var(--warning) 16%, transparent); color: var(--warning); }
+.my-bounty__badge--closed  { background: var(--surface-soft); color: var(--text-muted); border: 1px solid var(--border); }
+.my-bounty__badge--empty   { background: color-mix(in srgb, var(--text-muted) 12%, transparent); color: var(--text-muted); }
+.my-bounty__meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.my-bounty__meta span { display: inline-flex; align-items: center; gap: 4px; }
+.my-bounty__meta svg { width: 13px; height: 13px; }
+.my-bounty__acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.my-bounty__topup { display: grid; gap: 6px; margin-top: 6px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
+.my-bounty__topup-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.my-bounty__topup .input { flex: none; }
+.btn--danger { background: color-mix(in srgb, var(--error) 12%, var(--surface)); color: var(--error); border: 1px solid color-mix(in srgb, var(--error) 30%, var(--border)); }
+.btn--danger:hover { background: color-mix(in srgb, var(--error) 20%, var(--surface)); }
+.btn--ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+.btn--ghost:hover { background: var(--surface-soft); color: var(--text); }
+@media (max-width: 640px) {
+  .my-bounty { grid-template-columns: minmax(0, 1fr); }
+  .my-bounty__acts { justify-content: flex-start; }
+}
