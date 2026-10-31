@@ -8,7 +8,7 @@ Copy each block into the matching field. Every claim below is checkable from the
 Arcway
 
 **Tagline** (one line)
-Paid onboarding for Arc: apps put USDC behind real first steps, and the contract pays every new user who completes one.
+Paid onboarding for Arc. Apps put USDC behind real first steps, and a contract pays each new user who completes one.
 
 **Links**
 - Live app: https://arcway.world (sponsored quests: https://arcway.world/sponsor)
@@ -16,6 +16,7 @@ Paid onboarding for Arc: apps put USDC behind real first steps, and the contract
 - Repo: https://github.com/Timioni001/arcway
 - Contract: ArcwayBounties on Arc mainnet, `0xd73b798a93497a0e45e2482ad07f7127f00521cf`, https://explorer.arc.io/address/0xd73b798a93497a0e45e2482ad07f7127f00521cf
 - Video: <YouTube link>
+- Studio's commits: https://github.com/Timioni001/arcway/commits/arc-studio/bounties and https://github.com/Timioni001/arcway/commits/arc-studio/sponsor-tools
 
 ---
 
@@ -29,9 +30,9 @@ Arcway is a front door to Arc. People find apps worth trying, and short quests w
 
 **New in this build: sponsored quests (ArcwayBounties).** Anyone, whether an app team, a community or Arc supporters, can escrow USDC behind a quest. Every wallet that completes the quest claims one reward, paid directly by the contract, first come first served until the pool runs out. Unclaimed USDC returns to the sponsor when the bounty ends.
 
-- **For apps:** an onboarding budget that only pays for people who actually did the thing.
-- **For new users:** a reason to take their first steps on Arc, and get paid for learning.
-- **No admin, no fees, no backend in the payout path.** The contract checks Arcway's on-chain quest record and pays.
+- Apps get an onboarding budget that pays only for people who completed the step.
+- New users get a reason to take their first steps on Arc, and get paid for it.
+- The payout has no admin, fee or backend in the way. The contract checks Arcway's onchain quest record and pays.
 
 ### USDC on Arc mainnet
 Both transactions went through the contract and the live app:
@@ -46,6 +47,7 @@ The Sponsor page shows live totals read from the contract (USDC paid out, reward
   - Studio ran the full Foundry suite (71/71 passing in its sandbox, including an escrow invariant).
   - It ran a first security audit across ArcwayBounties and our two live mainnet contracts.
   - It deployed the stack to Arc testnet: MockUSDC `0x5af7…dad19`, MockPassport `0x18e7…2da4`, ArcwayBounties `0x37bb…c9fd6`.
+- **Built the sponsor tools:** Studio wrote the "Your bounties" panel on /sponsor, which lets sponsors top up a bounty or close it and take back what's unclaimed. Its commits are on `arc-studio/sponsor-tools`. We fixed three bugs in review and merged it.
 - **Verified, then shipped:**
   - We checked each audit finding against the source. The report is in `contracts/AUDIT.md`.
   - We extended the repo's test suite to 46 tests, including a 128,000-call invariant showing the contract always holds exactly what it owes.
@@ -57,13 +59,14 @@ Everything is live at arcway.world:
 - the app directory and quests
 - sponsored quests on the Quests page, with a "Pays X USDC" tag on quest cards
 - the sponsor form, claiming from quest pages, live totals and the payout feed
+- sponsor tools to top up a bounty or close it and get the rest back
 
 The app is mobile-first and works in wallet browsers.
 
 ### What's next
 - App teams sponsor quests for their own apps, so every app listed on Arcway has a paid first step.
 - Quest templates per app, so a team can launch a sponsored quest in a minute.
-- A sponsor dashboard for closing finished bounties and topping up popular ones.
+- Reminders for sponsors when a bounty is about to run out or end.
 
 The microgrant goes to seeding the first sponsored quests with USDC and onboarding the first app teams as sponsors.
 
