@@ -24,7 +24,7 @@ CHROME = "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome"
 # Visuals per script section. Web segments are recorded live from the site; stills come from the PNG pack.
 # secs are planned lengths; each section is scaled to its voiceover. Steps run after the page settles.
 QUEST_FORM = [
-    {"select": "Quest", "option": "First transaction"},
+    {"select": ".sponsor select", "option": "First transaction"},
     {"type": "Reward per person (USDC)", "text": "0.5"},
     {"type": "How many people", "text": "40"},
     {"type": "Runs for (days)", "text": "21"},
@@ -69,7 +69,7 @@ async function run(page, step, field) {
   if (step.scrollBy !== undefined) return scrollTo(page, (await page.evaluate(() => scrollY)) + step.scrollBy, step.ms);
   if (step.scrollTo) { const y = await centerOf(page, step.scrollTo); return y === null ? page.waitForTimeout(step.ms) : scrollTo(page, y, step.ms); }
   if (step.spot) return page.evaluate((sel) => { const el = document.querySelector(sel); if (!el) return; el.style.transition = "box-shadow .5s, outline-color .5s"; el.style.outline = "3px solid rgba(61,145,190,.9)"; el.style.outlineOffset = "6px"; el.style.boxShadow = "0 0 0 12px rgba(61,145,190,.15)"; }, step.spot);
-  if (step.select) { const f = page.getByLabel(step.select, { exact: true }).first(); await f.scrollIntoViewIfNeeded(); await f.focus(); await page.waitForTimeout(400); const v = await f.evaluate((s, t) => [...s.options].find((o) => o.text.includes(t))?.value, step.option); if (v) await f.selectOption(v); return page.waitForTimeout(700); }
+  if (step.select) { const f = page.locator(step.select).first(); await f.scrollIntoViewIfNeeded(); await f.focus(); await page.waitForTimeout(400); const v = await f.evaluate((s, t) => [...s.options].find((o) => o.text.includes(t))?.value, step.option); if (v) await f.selectOption(v); return page.waitForTimeout(700); }
   if (step.type) { const f = field(step.type); await f.scrollIntoViewIfNeeded(); await f.click(); await f.fill(""); await f.pressSequentially(step.text, { delay: step.text.length > 12 ? 45 : 140 }); return page.waitForTimeout(450); }
 }
 const results = [];
