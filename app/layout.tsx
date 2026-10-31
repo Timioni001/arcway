@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   openGraph: { siteName: "Arcway", type: "website" },
   twitter: { card: "summary_large_image" },
-  title: { default: "Arcway — Explore Arc. Complete quests. Build your Passport.", template: "%s · Arcway" },
+  title: { default: "Arcway · Find Arc apps, complete quests, earn rewards", template: "%s · Arcway" },
   description: "Discover the apps on Arc, complete quests onchain and build a Passport that proves what you've done."
 };
 

@@ -129,7 +129,7 @@ export function isActive(pathname: string, href: string): boolean {
 }
 
 const ALL = ALL_PAGES;
-const EXTRA: Record<string, string> = { terms: "Terms of Use", privacy: "Privacy Policy", trails: "Apps", more: "More", digest: "What's New" };
+const EXTRA: Record<string, string> = { terms: "Terms of Use", privacy: "Privacy Policy", trails: "Apps", more: "More", digest: "What's New", deploy: "Deploy" };
 
 export type Crumb = { label: string; href?: string };
 
@@ -147,6 +147,7 @@ export function crumbsFor(pathname: string): Crumb[] {
     first === "trails" ? TRAILS.find((t) => t.id === second)?.title :
     first === "campaigns" ? getCampaignMeta(second)?.title :
     first === "passport" || first === "pay" || first === "assets" ? `${second.slice(0, 6)}…${second.slice(-4)}` :
+    first === "deploy" && second === "bounties" ? "ArcwayBounties" :
     undefined;
   return [sectionCrumb, { label: name ?? "Details" }];
 }
