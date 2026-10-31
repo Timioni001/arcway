@@ -120,7 +120,7 @@ def read_script():
 async def tts(sections):
     for i, text in enumerate(sections):
         path = WORK / f"vo{i}.mp3"
-        if not path.exists():
+        if not path.exists() or path.stat().st_size < 2000:
             await edge_tts.Communicate(text, VOICE, rate=RATE, proxy=os.environ.get("HTTPS_PROXY") or None).save(str(path))
 
 
