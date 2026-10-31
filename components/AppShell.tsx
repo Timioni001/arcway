@@ -1,11 +1,11 @@
 'use client';
 
-import { Bookmark, ChevronDown, ChevronRight, LayoutGrid, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
+import { Bookmark, ChevronRight, Moon, PanelLeftClose, PanelLeftOpen, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Fragment, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { NETWORK_NAME } from "../lib/config";
-import { BOTTOM_NAV, MORE_NAV, NAV_GROUPS, SECONDARY_NAV, crumbsFor, isBottomActive, isNavActive, viewsFor, type NavItem } from "../lib/nav";
+import { BOTTOM_NAV, NAV_GROUPS, RAIL_SECTIONS, SECONDARY_NAV, crumbsFor, isBottomActive, isNavActive, viewsFor, type NavItem } from "../lib/nav";
 import { THEME_EVENT, toggleTheme } from "../lib/theme";
 import { getWatchlist, getWatchlistServer, subscribeWatchlist } from "../lib/watchlist";
 import { Logo, LogoMark } from "./Logo";
@@ -14,7 +14,6 @@ import { SearchButton, openSearch } from "./SearchPalette";
 import { WalletButton } from "./WalletButton";
 
 const RAIL_KEY = "arcway:rail";
-const MORE_KEY = "arcway:rail-more";
 
 function useDark() {
   const [dark, setDark] = useState<boolean | null>(null);
@@ -48,27 +47,16 @@ function RailLink({ item, pathname, onNavigate, exact }: { item: NavItem; pathna
   );
 }
 
-/** "More" expands in place: deeper areas (Activity, What's New, Insights) and secondary tools. */
-function RailMore({ pathname, onNavigate }: { pathname: string; onNavigate: () => void }) {
-  const inMore = MORE_NAV.some((n) => pathname === n.href || pathname.startsWith(`${n.href}/`));
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    let stored = false;
-    try { stored = localStorage.getItem(MORE_KEY) === "open"; } catch { /* not persisted */ }
-    setOpen(stored || inMore);
-  }, [inMore]);
-  const toggle = () => setOpen((o) => {
-    try { localStorage.setItem(MORE_KEY, o ? "closed" : "open"); } catch { /* not persisted */ }
-    return !o;
-  });
+/** Everything beyond the four main jobs, grouped under small headings and always visible. */
+function RailSections({ pathname, onNavigate }: { pathname: string; onNavigate: () => void }) {
   return (
-    <nav className="rail__nav rail__more" aria-label="More">
-      <button type="button" className="rail__link rail__more-toggle" data-label="More" aria-expanded={open} aria-controls="rail-more-list" onClick={toggle}>
-        <LayoutGrid aria-hidden="true" /><span className="rail__label">More</span><ChevronDown className="rail__chev rail__label" aria-hidden="true" />
-      </button>
-      <ul id="rail-more-list" hidden={!open}>
-        {MORE_NAV.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={onNavigate} exact /></li>)}
-      </ul>
+    <nav className="rail__nav rail__sections" aria-label="More">
+      {RAIL_SECTIONS.map((g) => (
+        <div key={g.label} className="rail__group">
+          <div className="rail__heading" aria-hidden="true"><span className="rail__label">{g.label}</span></div>
+          <ul aria-label={g.label}>{g.items.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={onNavigate} exact /></li>)}</ul>
+        </div>
+      ))}
     </nav>
   );
 }
@@ -100,6 +88,8 @@ export function Rail() {
   }, []);
 
   const close = () => setTabletOpen(false);
+  // A page listed in the groups below highlights there, not on its parent job as well.
+  const inSections = RAIL_SECTIONS.some((g) => g.items.some((n) => pathname === n.href || pathname.startsWith(`${n.href}/`)));
   return (
     <aside ref={railRef} className="rail" data-open={tabletOpen} aria-label="Sidebar">
       <div className="rail__brand">
@@ -116,11 +106,11 @@ export function Rail() {
         {NAV_GROUPS.map((g) => (
           <div key={g.label || "top"} className="rail__group">
             {g.label && <div className="rail__heading" aria-hidden="true"><span className="rail__label">{g.label}</span></div>}
-            <ul aria-label={g.label || "Overview"}>{g.items.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}</ul>
+            <ul aria-label={g.label || "Overview"}>{g.items.map((n) => <li key={n.href}><RailLink item={n} pathname={inSections ? "" : pathname} onNavigate={close} /></li>)}</ul>
           </div>
         ))}
       </nav>
-      <RailMore pathname={pathname} onNavigate={close} />
+      <RailSections pathname={pathname} onNavigate={close} />
       <nav className="rail__nav rail__nav--secondary" aria-label="Utilities">
         <ul>
           {SECONDARY_NAV.map((n) => <li key={n.href}><RailLink item={n} pathname={pathname} onNavigate={close} /></li>)}

@@ -326,10 +326,9 @@ test("desktop uses a left rail with the full navigation", async ({ page, isMobil
   await open(page, "/pulse");
   const main = page.getByRole("navigation", { name: "Main" });
   await expect(main.getByRole("link")).toHaveText(["Home", "Explore", "Quests", "Passport"]);
-  // Deeper areas sit under More, which opens by itself on one of its pages.
+  // Deeper areas are always listed, in labelled groups.
   const more = page.getByRole("navigation", { name: "More" });
-  await expect(more.getByRole("button", { name: "More" })).toHaveAttribute("aria-expanded", "true");
-  await expect(more.getByRole("link")).toHaveText(["Activity", "What's New", "Insights", "Builders", "Watchlist", "For Builders", "Settings"]);
+  await expect(more.getByRole("link")).toHaveText(["Sponsor", "Campaigns", "Leaderboard", "Activity", "What's New", "Insights", "Builders", "Watchlist", "For Builders", "Settings"]);
   await expect(more.getByRole("link", { name: "Activity" })).toHaveAttribute("aria-current", "page");
   const rail = page.locator(".rail");
   expect((await rail.boundingBox())!.x).toBeLessThan(5);

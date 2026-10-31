@@ -110,7 +110,7 @@ const LOWER = {
 
 const APP = [
   ["app/01-home", "/", null],
-  ["app/02-explore", "/explore", null],
+  ["app/02-explore", "/apps", null],
   ["app/03-quests-sponsored", "/quests", "#sponsored"],
   ["app/04-quests-paid-tag", "/quests", ".quest-card:has(.paid-tag)"],
   ["app/05-quest-detail", "/quests/arrive-with-usdc", null],

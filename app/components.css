@@ -1933,7 +1933,9 @@ html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .qpreview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 @media (max-width: 800px) { .qpreview { grid-template-columns: minmax(0, 1fr); } }
 
-/* Rail: More expands in place */
+/* Rail: deeper areas in labelled groups */
+.rail__sections { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.rail__sections .rail__link { font-size: 14px; }
 .rail__more { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
 .rail__more-toggle { width: 100%; }
 .rail__chev { margin-left: auto; width: 16px !important; height: 16px !important; transition: transform var(--t-micro) var(--ease); }

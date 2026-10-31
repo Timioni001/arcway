@@ -33,7 +33,7 @@ QUEST_FORM = [
 SECTIONS = [
     [{"web": "/", "secs": 6, "steps": [{"wait": 700}, {"scrollY": 260, "ms": 4200}]}],
     [{"web": "/", "secs": 11, "pre": [{"jumpY": 260}], "steps": [{"scrollY": 1350, "ms": 9500}]}],
-    [{"web": "/explore", "secs": 11, "steps": [{"wait": 900}, {"scrollY": 820, "ms": 8500}]},
+    [{"web": "/apps", "secs": 11, "steps": [{"wait": 900}, {"scrollY": 820, "ms": 8500}]},
      {"web": "/quests", "secs": 12, "steps": [{"wait": 700}, {"scrollTo": ".qroute", "ms": 4500}, {"wait": 2500}, {"scrollBy": 500, "ms": 3500}]}],
     [{"web": "/quests", "secs": 7, "steps": [{"scrollTo": ".quest-card:has(.paid-tag)", "ms": 2800}, {"spot": ".paid-tag"}, {"wait": 3000}]},
      {"web": "/sponsor", "secs": 14, "steps": [{"wait": 600}, *QUEST_FORM, {"spot": ".sponsor__sum"}, {"wait": 1500}]}],

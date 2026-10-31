@@ -91,6 +91,14 @@ export const YOU_NAV: NavItem[] = [
 export const FOLDED_VIEWS: NavItem[] = Object.values(SECTION_VIEWS).flat().filter((v) => v.blurb);
 export const ALL_PAGES: NavItem[] = [...PRIMARY_NAV, ...MORE_NAV, ...FOLDED_VIEWS, ...SECONDARY_NAV, ...YOU_NAV];
 
+const page = (href: string) => ALL_PAGES.find((n) => n.href === href)!;
+/** The desktop sidebar under the four main jobs: every deeper area, grouped and always visible. */
+export const RAIL_SECTIONS: NavGroup[] = [
+  { label: "Earn", items: ["/sponsor", "/campaigns", "/leaderboard"].map(page) },
+  { label: "Discover", items: ["/pulse", "/radar", "/signals", "/builders"].map(page) },
+  { label: "Yours", items: ["/watchlist", "/submit", "/settings"].map(page) }
+];
+
 /** Mobile tabs match the public model; More holds the rest. */
 export const BOTTOM_NAV: NavItem[] = [
   { href: "/", label: "Home", icon: House, blurb: "" },
