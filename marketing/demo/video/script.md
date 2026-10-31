@@ -6,7 +6,7 @@ Voice: en-NG-AbeoNeural, rate -5%. One audio file per section. Timestamps are wh
 You just landed on Arc with some USDC, and nothing tells you what to try first.
 
 ## 2. Who it's for [0:06]
-Arcway is for people new to Arc, like a student in Lagos who just bridged ten dollars, and for the app teams who want those people to actually use their product.
+Arcway is for people new to Arc, like a crypto explorer in Lagos who just bridged ten dollars, and for the app teams who want those people to actually use their product.
 
 ## 3. Feature one, find apps and take first steps [0:17]
 Start on Explore. Every Arc app is listed by category, with the contracts its team publishes and how active they are on chain. Then open Quests. Seventeen short quests in four tiers walk you from holding USDC to using apps regularly. Arcway checks each step against your real activity before it counts.

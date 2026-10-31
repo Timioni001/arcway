@@ -14,3 +14,6 @@ contracts/broadcast
 contracts/lib
 test-results
 playwright-report
+
+# Rendered demo videos (large); regenerate with marketing/demo/video/make_demo.py
+marketing/demo/video/out/
