@@ -134,7 +134,7 @@ for (const [n, l] of Object.entries(LOWER)) await render(n, lowerThird(l), true)
 
 if (process.argv.includes("--app")) {
   for (const [name, path, focus] of APP) {
-    await tab.goto(`https://arcway.world${path}`, { waitUntil: "networkidle" });
+    await tab.goto(`https://arcway.world${path}`, { waitUntil: "load", timeout: 60000 });
     await tab.waitForTimeout(4000);
     if (focus) await tab.evaluate((sel) => { const el = document.querySelector(sel); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 140); }, focus);
     await tab.waitForTimeout(1200);
