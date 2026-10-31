@@ -121,7 +121,7 @@ async def tts(sections):
     for i, text in enumerate(sections):
         path = WORK / f"vo{i}.mp3"
         if not path.exists():
-            await edge_tts.Communicate(text, VOICE, rate=RATE).save(str(path))
+            await edge_tts.Communicate(text, VOICE, rate=RATE, proxy=os.environ.get("HTTPS_PROXY") or None).save(str(path))
 
 
 def card(path, lines):
