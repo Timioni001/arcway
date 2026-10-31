@@ -17,3 +17,4 @@ playwright-report
 
 # Rendered demo videos (large); regenerate with marketing/demo/video/make_demo.py
 marketing/demo/video/out/
+.demo-capture.mjs
