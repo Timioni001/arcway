@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRight, Coins, Gift, LoaderCircle, Timer, Users } from "lucide-react";
+import { ArrowUpRight, Coins, Gift, LoaderCircle, RefreshCw, Timer, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useId, useState } from "react";
 import { erc20Abi, type Hash } from "viem";
@@ -181,6 +181,167 @@ export function SponsorForm() {
       {busy && <p className="xs secondary"><LoaderCircle className="spin" aria-hidden="true" style={{ width: 14, verticalAlign: -2 }} /> Confirm in your wallet.</p>}
       {phase.k === "done" && <p className="small">Your bounty is live. <a className="link" href={explorer.tx(phase.hash)} target="_blank" rel="noopener noreferrer">View transaction <ArrowUpRight aria-hidden="true" /></a> · <Link className="link" href="/quests#sponsored">See it on Quests</Link></p>}
       {phase.k === "error" && <p className="field__error" role="alert">{phase.msg}</p>}
+    </div>
+  );
+}
+
+
+function useTopUp(onDone: () => void) {
+  const client = usePublicClient({ chainId: arcChain.id });
+  const { writeContractAsync } = useWriteContract();
+  const toast = useToast();
+  const [busy, setBusy] = useState<number | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const topUp = async (b: BountyView, extra: number, address: `0x${string}`) => {
+    if (!BOUNTIES_CONTRACT || !client) return;
+    setBusy(b.id); setErr(null);
+    try {
+      const total = BigInt(b.rewardPerClaim) * BigInt(extra);
+      const allowance = await client.readContract({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "allowance", args: [address, BOUNTIES_CONTRACT] });
+      if (allowance < total) {
+        toast("Approving USDC…");
+        const ah = await writeContractAsync({ address: USDC_ADDRESS, abi: erc20Abi, functionName: "approve", args: [BOUNTIES_CONTRACT, total], chainId: arcChain.id });
+        if ((await client.waitForTransactionReceipt({ hash: ah, timeout: 60_000 })).status !== "success") throw new Error("Approval reverted. Nothing moved.");
+      }
+      const hash = await writeContractAsync({ address: BOUNTIES_CONTRACT, abi: bountiesAbi, functionName: "fund", args: [BigInt(b.id), BigInt(extra)], chainId: arcChain.id });
+      if ((await client.waitForTransactionReceipt({ hash, timeout: 60_000 })).status !== "success") throw new Error("Top-up reverted. Nothing moved.");
+      toast(`Added ${extra} more reward${extra === 1 ? "" : "s"}`);
+      onDone();
+    } catch (e) { setErr(humanizeError(e)); } finally { setBusy(null); }
+  };
+  return { topUp, busy, err, clearErr: () => setErr(null) };
+}
+
+function useClose(onDone: () => void) {
+  const client = usePublicClient({ chainId: arcChain.id });
+  const { writeContractAsync } = useWriteContract();
+  const toast = useToast();
+  const [busy, setBusy] = useState<number | null>(null);
+  const [err, setErr] = useState<{ id: number; msg: string } | null>(null);
+
+  const close = async (b: BountyView) => {
+    if (!BOUNTIES_CONTRACT || !client) return;
+    setBusy(b.id); setErr(null);
+    try {
+      const hash = await writeContractAsync({ address: BOUNTIES_CONTRACT, abi: bountiesAbi, functionName: "close", args: [BigInt(b.id)], chainId: arcChain.id });
+      if ((await client.waitForTransactionReceipt({ hash, timeout: 60_000 })).status !== "success") throw new Error("Close reverted. Nothing moved.");
+      toast("Bounty closed. Unclaimed USDC is back in your wallet.");
+      onDone();
+    } catch (e) { setErr({ id: b.id, msg: humanizeError(e) }); } finally { setBusy(null); }
+  };
+  return { close, busy, err, clearErr: () => setErr(null) };
+}
+
+
+function TopUpForm({ b, address, onDone, onCancel }: { b: BountyView; address: `0x${string}`; onDone: () => void; onCancel: () => void }) {
+  const [extra, setExtra] = useState("10");
+  const n = /^\d+$/.test(extra.trim()) ? Number(extra.trim()) : 0;
+  const valid = n >= 1 && n + b.maxClaims <= 10_000;
+  const cost = valid ? usd(BigInt(b.rewardPerClaim) * BigInt(n)) : "—";
+  const { topUp, busy, err, clearErr } = useTopUp(onDone);
+  const inputId = useId();
+
+  return (
+    <div className="my-bounty__topup">
+      <label htmlFor={inputId} className="xs secondary">Extra rewards</label>
+      <div className="my-bounty__topup-row">
+        <input id={inputId} className="input" inputMode="numeric" value={extra} onChange={(e) => { clearErr(); setExtra(e.target.value); }} disabled={!!busy} style={{ width: 80 }} />
+        <span className="xs secondary">× {usd(b.rewardPerClaim)} = <b>{cost} USDC</b></span>
+        <button className="btn btn--primary btn--sm" disabled={!valid || !!busy} aria-busy={!!busy} onClick={() => topUp(b, n, address)}>
+          {busy ? <><LoaderCircle className="spin" style={{ width: 14 }} aria-hidden="true" /> Topping up…</> : "Approve & top up"}
+        </button>
+        <button className="btn btn--ghost btn--sm" onClick={onCancel} disabled={!!busy} aria-label="Cancel">
+          <X style={{ width: 14 }} aria-hidden="true" />
+        </button>
+      </div>
+      {err && <p className="field__error" role="alert">{err}</p>}
+    </div>
+  );
+}
+
+
+function MyBountyRow({ b, address, onDone, actionable, closeBusy, closeErr, onClose }: {
+  b: BountyView;
+  address: `0x${string}`;
+  onDone: () => void;
+  actionable: boolean;
+  closeBusy: boolean;
+  closeErr: string | null;
+  onClose: () => void;
+}) {
+  const [showTopUp, setShowTopUp] = useState(false);
+  const nowSec = Math.floor(Date.now() / 1000);
+  const expired = Number(b.expiresAt) <= nowSec;
+  const canClose = expired && !b.closed;
+  const statusLabel = b.closed ? "Closed" : expired ? "Expired" : "Open";
+
+  return (
+    <li className="my-bounty" data-status={b.status}>
+      <div className="my-bounty__info">
+        <div className="my-bounty__title">
+          {b.title || (b.quest ? b.quest.title : "Sponsored quest")}
+          <span className={`my-bounty__badge my-bounty__badge--${b.status}`}>{statusLabel}</span>
+        </div>
+        <div className="my-bounty__meta xs secondary">
+          <span><Coins aria-hidden="true" /><b className="mono">{usd(b.rewardPerClaim)}</b> USDC each</span>
+          <span><Users aria-hidden="true" />{b.claims} / {b.maxClaims} claimed</span>
+          <span><Timer aria-hidden="true" />{endsIn(b.expiresAt, nowSec)}</span>
+        </div>
+      </div>
+      <div className="my-bounty__acts">
+        {actionable && !b.closed && !expired && (
+          <button className="btn btn--secondary btn--sm" onClick={() => setShowTopUp((v) => !v)} disabled={closeBusy}>
+            <RefreshCw style={{ width: 13 }} aria-hidden="true" /> Top up
+          </button>
+        )}
+        {actionable && canClose && (
+          <button className="btn btn--danger btn--sm" onClick={onClose} disabled={closeBusy} aria-busy={closeBusy}>
+            {closeBusy ? <><LoaderCircle className="spin" style={{ width: 13 }} aria-hidden="true" /> Closing…</> : "Close & refund"}
+          </button>
+        )}
+      </div>
+      {closeErr && <p className="field__error" style={{ gridColumn: "1 / -1" }} role="alert">{closeErr}</p>}
+      {showTopUp && (
+        <div style={{ gridColumn: "1 / -1" }}>
+          <TopUpForm b={b} address={address} onDone={() => { setShowTopUp(false); onDone(); }} onCancel={() => setShowTopUp(false)} />
+        </div>
+      )}
+    </li>
+  );
+}
+
+
+/** Panel for /sponsor: shows all bounties whose sponsor === connected wallet. */
+export function MyBounties() {
+  const { connection, onArc } = useArcwayState();
+  const address = connection.status === "connected" ? connection.address : undefined;
+  const { enabled, bounties, refetch } = useBounties(address);
+  const { close, busy: closeBusy, err: closeErr, clearErr: clearCloseErr } = useClose(refetch);
+
+  if (!enabled || !address) return null;
+
+  const mine = bounties.filter((b) => b.sponsor.toLowerCase() === address.toLowerCase());
+  if (!mine.length) return null;
+
+  return (
+    <div className="card pad-lg" style={{ marginTop: 24 }}>
+      <h2 className="h4" style={{ marginBottom: 16 }}>Your bounties</h2>
+      {!onArc && <p className="xs secondary" style={{ marginBottom: 12 }}>Switch to {NETWORK_NAME} to top up or close.</p>}
+      <ul className="my-bounties">
+        {mine.map((b) => (
+          <MyBountyRow
+            key={b.id}
+            b={b}
+            address={address}
+            onDone={refetch}
+            actionable={onArc}
+            closeBusy={closeBusy === b.id}
+            closeErr={closeErr?.id === b.id ? closeErr.msg : null}
+            onClose={() => { clearCloseErr(); close(b); }}
+          />
+        ))}
+      </ul>
     </div>
   );
 }
