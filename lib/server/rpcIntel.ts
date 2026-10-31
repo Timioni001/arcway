@@ -2,7 +2,7 @@ import { getContractAddress, parseAbiItem, type Address } from "viem";
 import { USDC_ADDRESS } from "../config";
 import type { PassportCompletion } from "../intel";
 import type { BsStats, BsTokenTransfer, BsTx } from "./explorer";
-import { publicClient } from "./arc";
+import { logsClient, publicClient } from "./arc";
 
 /**
  * Reads straight from Arc's RPC, no explorer involved: the passport's own events, the latest
@@ -13,17 +13,26 @@ import { publicClient } from "./arc";
 const QUEST_COMPLETED = parseAbiItem("event QuestCompleted(address indexed user, bytes32 indexed questId, uint256 xpAwarded)");
 const TRANSFER = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
 
-/** getLogs over a range, halving the window when the node refuses a range that big. */
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const isRateLimit = (e: unknown) => /rate limit|too many requests|429/i.test(String((e as { details?: string })?.details ?? "") + String((e as Error)?.message ?? ""));
+
+/**
+ * getLogs over a range in windows. A window the node calls too large shrinks by 4×; a rate limit
+ * waits and retries the same window, since shrinking would only send more requests.
+ */
 export async function logsInRange<T>(from: bigint, to: bigint, read: (a: bigint, b: bigint) => Promise<T[]>, startStep = 100_000n): Promise<T[]> {
   const out: T[] = [];
   let step = startStep;
   let a = from;
+  let waits = 0;
   while (a <= to) {
     const b = a + step - 1n > to ? to : a + step - 1n;
     try {
       out.push(...(await read(a, b)));
       a = b + 1n;
+      waits = 0;
     } catch (e) {
+      if (isRateLimit(e) && waits < 3) { await sleep(800 * 2 ** waits++); continue; }
       if (step <= 500n) throw e;
       step /= 4n;
     }
@@ -80,7 +89,7 @@ export async function rpcPassportCompletions(address: Address): Promise<{ rows: 
   const prev = cache.get(key);
   const from = prev ? prev.to + 1n : await deployBlock(address, latest);
   if (from > latest) return { rows: prev?.rows ?? [], truncated: false };
-  const logs = await logsInRange(from, latest, (a, b) => publicClient.getLogs({ address, event: QUEST_COMPLETED, fromBlock: a, toBlock: b }));
+  const logs = await logsInRange(from, latest, (a, b) => logsClient.getLogs({ address, event: QUEST_COMPLETED, fromBlock: a, toBlock: b }));
   const times = await blockTimes(logs.map((l) => l.blockNumber!).filter((n): n is bigint => n !== null));
   const rows = [...(prev?.rows ?? []), ...logs.map((l) => ({
     user: String(l.args.user).toLowerCase(),

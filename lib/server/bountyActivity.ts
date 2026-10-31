@@ -1,7 +1,7 @@
 import type { Address } from "viem";
 import { bountiesAbi } from "../bountiesAbi";
 import { BOUNTIES_CONTRACT, BOUNTIES_MAINNET, BOUNTIES_MAINNET_BLOCK } from "../config";
-import { publicClient } from "./arc";
+import { logsClient, publicClient } from "./arc";
 import { blockTimes, logsInRange } from "./rpcIntel";
 
 export type BountyEvent = {
@@ -40,7 +40,7 @@ export async function bountyActivity(): Promise<{ events: BountyEvent[] } | unde
   const start = prev ? prev.to + 1n : key === BOUNTIES_MAINNET ? BOUNTIES_MAINNET_BLOCK : latest > 500_000n ? latest - 500_000n : 0n;
   if (start > latest) return { events: prev?.events ?? [] };
   const logs = (await logsInRange(start, latest, (from, to) =>
-    publicClient.getContractEvents({ address, abi: bountiesAbi, fromBlock: from, toBlock: to }) as Promise<Log[]>, 20_000n));
+    logsClient.getContractEvents({ address, abi: bountiesAbi, fromBlock: from, toBlock: to }) as Promise<Log[]>));
   const times = await blockTimes(logs.map((l) => l.blockNumber).filter((n): n is bigint => n !== null));
   const fresh = logs.map((l) => toEvent(l, times)).filter((e): e is BountyEvent => e !== null).reverse();
   const events = [...fresh, ...(prev?.events ?? [])];

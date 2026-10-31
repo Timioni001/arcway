@@ -79,17 +79,19 @@ export function StudioCredit() {
   return (
     <aside className="card pad-lg studio-credit" aria-labelledby="studio-credit">
       <span className="studio-badge"><StudioMark /> Built with Arc Studio</span>
-      <h3 id="studio-credit" className="h4">This contract was written in Arc Studio</h3>
+      <h3 id="studio-credit" className="h4">What Arc Studio built here</h3>
       <ol className="small secondary">
-        <li><b>Written</b>: Arc Studio wrote ArcwayBounties and its deploy script against our interface, inside this repo.</li>
-        <li><b>Tested and audited</b>: it ran the full Foundry suite and a first security pass over all three contracts, then deployed the stack to Arc testnet.</li>
-        <li><b>Checked</b>: every finding was verified by hand and the test suite extended to 46 tests, including a 128,000-call escrow invariant.</li>
-        <li><b>Live</b>: deployed unchanged on Arc mainnet{BOUNTIES_CONTRACT ? <> at <a className="link mono" href={explorer.address(BOUNTIES_CONTRACT)} target="_blank" rel="noopener noreferrer">{shortAddress(BOUNTIES_CONTRACT)}</a></> : null}.</li>
+        <li><b>Wrote the contract.</b> Studio read this repo and wrote ArcwayBounties and its deploy script against our interface.</li>
+        <li><b>Tested and audited it.</b> Studio ran the Foundry suite, did a first security pass over all three contracts and deployed them to Arc testnet.</li>
+        <li><b>Built the sponsor tools.</b> Sponsors see a &quot;Your bounties&quot; panel on this page with top up and close and refund. Studio wrote it, and we merged it after review.</li>
+        <li><b>We checked it.</b> We verified each finding and grew the suite to 46 tests, including an invariant that ran 128,000 random calls.</li>
+        <li><b>It&apos;s live.</b> The same code runs on Arc mainnet{BOUNTIES_CONTRACT ? <> at <a className="link mono" href={explorer.address(BOUNTIES_CONTRACT)} target="_blank" rel="noopener noreferrer">{shortAddress(BOUNTIES_CONTRACT)}</a></> : null}.</li>
       </ol>
       <p className="xs">
         <a className="link" href={`${REPO}/blob/main/contracts/src/ArcwayBounties.sol`} target="_blank" rel="noopener noreferrer">Contract</a> ·{" "}
         <a className="link" href={`${REPO}/blob/main/contracts/AUDIT.md`} target="_blank" rel="noopener noreferrer">Audit report</a> ·{" "}
-        <a className="link" href={`${REPO}/commits/arc-studio/bounties`} target="_blank" rel="noopener noreferrer">Studio&apos;s commits</a>
+        <a className="link" href={`${REPO}/commits/arc-studio/bounties`} target="_blank" rel="noopener noreferrer">Contract commits</a> ·{" "}
+        <a className="link" href={`${REPO}/commits/arc-studio/sponsor-tools`} target="_blank" rel="noopener noreferrer">Sponsor tools commits</a>
       </p>
     </aside>
   );
