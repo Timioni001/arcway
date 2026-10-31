@@ -2971,6 +2971,32 @@ button.pcol__item:disabled { cursor: default; }
   .sponsor__grid { grid-template-columns: 1fr; }
 }
 
+/* Deploy (maintainers) */
+.deploy__facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; }
+.deploy__facts dt { color: var(--text-secondary); }
+.deploy__facts dd { margin: 0; overflow-wrap: anywhere; min-width: 0; }
+.deploy__done { display: grid; gap: 10px; }
+.deploy__addr { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.deploy__addr code { overflow-wrap: anywhere; min-width: 0; padding: 8px 10px; border-radius: 10px; background: var(--surface-soft); }
+
+/* Bounty payouts and Arc Studio credit */
+.bounty-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.bounty-stats .stat { min-width: 0; }
+.bounty-stats .stat b { font-size: 22px; overflow-wrap: anywhere; }
+@media (max-width: 640px) { .bounty-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } }
+.bounty-feed { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+.bounty-feed li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.bounty-feed li > svg { width: 16px; height: 16px; margin-top: 3px; color: var(--warning); }
+.bounty-feed li[data-kind="claimed"] > svg { color: var(--success); }
+.bounty-feed a svg { width: 12px; height: 12px; vertical-align: -1px; }
+.studio-credit { display: grid; gap: 12px; align-content: start; }
+.studio-credit ol { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.studio-credit ol b { color: var(--text); }
+.studio-badge { display: inline-flex; align-items: center; gap: 8px; width: fit-content; padding: 6px 12px 6px 8px; border-radius: 999px; font-size: 13px; font-weight: 650; color: #fff; background: linear-gradient(135deg, #0b1f3a, #1d4e89); box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 4px 14px rgba(11,31,58,.18); }
+.studio-badge svg { width: 16px; height: 16px; padding: 2px; border-radius: 6px; background: rgba(255,255,255,.14); }
+.studio-badge--sm { font-size: 12px; padding: 4px 10px 4px 6px; }
+.paid-tag { margin-top: 6px; width: fit-content; background: color-mix(in srgb, var(--warning) 14%, transparent); color: color-mix(in srgb, var(--warning) 80%, var(--text)); }
+
 /* My bounties (sponsor tools) */
 .my-bounties { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .my-bounty {
